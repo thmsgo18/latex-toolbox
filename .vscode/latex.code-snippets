@@ -1,0 +1,98 @@
+{
+  "TOC Block": {
+    "scope": "latex",
+    "prefix": "ltx-toc",
+    "body": [
+      "\\input{frontmatter/toc.tex}"
+    ],
+    "description": "Insert table of contents block"
+  },
+  "AI Notice Block": {
+    "scope": "latex",
+    "prefix": "ltx-ai",
+    "body": [
+      "\\input{backmatter/ai-statement.tex}"
+    ],
+    "description": "Insert AI notice block"
+  },
+  "Python Code Section": {
+    "scope": "latex",
+    "prefix": "ltx-code-py",
+    "body": [
+      "\\section{${1:Code Example}}",
+      "",
+      "This section presents a Python extract used in the project.",
+      "",
+      "\\begin{lstlisting}[style=pythonstyle,caption={${2:Python example}}]",
+      "${3:def main():}",
+      "${4:    print(\"Hello from LaTeX\")}",
+      "\\end{lstlisting}",
+      "",
+      "${5:Explain here what the code does and why it matters.}"
+    ],
+    "description": "Insert a Python code section"
+  },
+  "Bash Code Section": {
+    "scope": "latex",
+    "prefix": "ltx-code-sh",
+    "body": [
+      "\\section{${1:Command Line Example}}",
+      "",
+      "\\begin{lstlisting}[style=bashstyle,caption={${2:Bash example}}]",
+      "${3:python3 train.py --config config.yaml}",
+      "\\end{lstlisting}",
+      "",
+      "${4:Explain here what the command does.}"
+    ],
+    "description": "Insert a Bash code section"
+  },
+  "Single Figure": {
+    "scope": "latex",
+    "prefix": "ltx-fig",
+    "body": [
+      "\\begin{figure}[H]",
+      "  \\centering",
+      "  \\includegraphics[width=${1:0.8}\\linewidth]{${2:example-image.png}}",
+      "  \\caption{${3:Caption to adapt}}",
+      "  \\label{fig:${4:example}}",
+      "\\end{figure}"
+    ],
+    "description": "Insert a single figure"
+  },
+  "Graph Analysis Section": {
+    "scope": "latex",
+    "prefix": "ltx-graph",
+    "body": [
+      "\\section{${1:Graph and Analysis}}",
+      "",
+      "\\begin{figure}[H]",
+      "  \\centering",
+      "  \\includegraphics[width=0.8\\linewidth]{${2:example-graph.png}}",
+      "  \\caption{${3:Example graph to replace}}",
+      "\\end{figure}",
+      "",
+      "\\begin{itemize}",
+      "  \\item ${4:Describe what the graph shows}",
+      "  \\item ${5:Explain the main trend}",
+      "  \\item ${6:State the conclusion}",
+      "\\end{itemize}"
+    ],
+    "description": "Insert a graph analysis section"
+  },
+  "Screenshot Section": {
+    "scope": "latex",
+    "prefix": "ltx-screen",
+    "body": [
+      "\\section{${1:Screenshot and Comment}}",
+      "",
+      "\\begin{figure}[H]",
+      "  \\centering",
+      "  \\screen[0.9\\linewidth]{${2:example-screen.png}}",
+      "  \\caption{${3:Example screenshot to replace}}",
+      "\\end{figure}",
+      "",
+      "${4:Describe what the screenshot shows and why it matters.}"
+    ],
+    "description": "Insert a screenshot section"
+  }
+}

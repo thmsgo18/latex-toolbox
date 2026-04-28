@@ -1,0 +1,17 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{report-theorems-fr}[2026/04/28 Shared theorem environments for French reports]
+
+\RequirePackage{amsthm}
+
+\theoremstyle{plain}
+\newtheorem{thm}{Th\'eor\`eme}[chapter]
+\newtheorem{lem}[thm]{Lemme}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollaire}
+
+\theoremstyle{definition}
+\newtheorem{defn}[thm]{D\'efinition}
+\newtheorem{expl}[thm]{Exemple}
+\newtheorem{rem}[thm]{Remarque}
+
+\renewcommand{\proofname}{Preuve}

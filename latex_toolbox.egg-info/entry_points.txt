@@ -1,0 +1,2 @@
+[console_scripts]
+latex-toolbox = latex_toolbox.cli:main

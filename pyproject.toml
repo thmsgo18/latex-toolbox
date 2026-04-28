@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "latex-toolbox"
+version = "0.1.0"
+description = "CLI for creating standalone LaTeX projects from this toolbox."
+requires-python = ">=3.10"
+
+[project.scripts]
+latex-toolbox = "latex_toolbox.cli:main"
+
+[tool.setuptools]
+packages = ["latex_toolbox"]

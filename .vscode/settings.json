@@ -1,0 +1,38 @@
+{
+  "[latex]": {
+    "editor.wordWrap": "on"
+  },
+  "[tex]": {
+    "editor.wordWrap": "on"
+  },
+  "latex-workshop.view.pdf.viewer": "tab",
+  "latex-workshop.latex.autoBuild.run": "onSave",
+  "latex-workshop.latex.recipe.default": "first",
+  "latex-workshop.latex.outDir": "%DIR%/build",
+  "latex-workshop.latex.clean.subfolder.enabled": true,
+  "latex-workshop.linting.chktex.enabled": false,
+  "latex-workshop.linting.lacheck.enabled": false,
+  "latex-workshop.linting.chktex.exec.path": "/Library/TeX/texbin/chktex",
+  "latex-workshop.latex.tools": [
+    {
+      "name": "lualatexmk",
+      "command": "latexmk",
+      "args": [
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "-lualatex",
+        "-outdir=%OUTDIR%",
+        "%DOC%"
+      ]
+    }
+  ],
+  "latex-workshop.latex.recipes": [
+    {
+      "name": "lualatexmk",
+      "tools": [
+        "lualatexmk"
+      ]
+    }
+  ]
+}

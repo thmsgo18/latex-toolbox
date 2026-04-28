@@ -1,0 +1,105 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{university-project-report}[2026/04/28 Modular university project report style]
+
+\RequirePackage[T1]{fontenc}
+\RequirePackage[utf8]{inputenc}
+\RequirePackage{lmodern}
+\RequirePackage{microtype}
+\RequirePackage{setspace}
+\onehalfspacing
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.45em}
+
+\RequirePackage[
+  a4paper,
+  top=2.5cm,
+  bottom=2.5cm,
+  left=2.8cm,
+  right=2.8cm,
+  headheight=28pt
+]{geometry}
+
+\RequirePackage{styles/packages/report-colors}
+
+\RequirePackage{graphicx}
+\RequirePackage{float}
+\RequirePackage[labelfont={sc},font=small,labelsep=period]{caption}
+\setlength{\textfloatsep}{10pt plus 2pt minus 2pt}
+\setlength{\floatsep}{8pt plus 2pt minus 2pt}
+\setlength{\intextsep}{8pt plus 2pt minus 2pt}
+\graphicspath{{images/}{screens/}{figures/}{../../assets/images/common/}{../../assets/logos/}}
+
+\RequirePackage{styles/packages/report-tables}
+
+\RequirePackage{enumitem}
+\setlist[itemize]{label=\textbullet,leftmargin=1.5em,itemsep=2pt,topsep=4pt}
+\setlist[enumerate]{leftmargin=1.5em,itemsep=2pt,topsep=4pt}
+\setlist[description]{leftmargin=1.8em,itemsep=3pt,topsep=4pt,font=\normalfont\bfseries}
+
+\RequirePackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancyhead[L]{\small\textbf{\reportshorttitle}}
+\fancyhead[R]{\small\itshape \reporttype}
+\fancyfoot[C]{\thepage}
+
+\RequirePackage[
+  colorlinks=false,
+  hidelinks,
+  bookmarks=true,
+  bookmarksnumbered=true
+]{hyperref}
+
+\RequirePackage{listings}
+\RequirePackage{styles/packages/report-code-python}
+\RequirePackage{styles/packages/report-code-bash}
+\lstset{style=pythonstyle}
+
+\RequirePackage{tikz}
+\usetikzlibrary{shapes.geometric,arrows.meta,positioning,fit,backgrounds,calc}
+\newcommand{\screen}[2][\linewidth]{%
+  \begin{tikzpicture}
+    \node[inner sep=0pt, opacity=0] (sz) {\includegraphics[width=#1]{#2}};
+    \clip[rounded corners=10pt] (sz.south west) rectangle (sz.north east);
+    \node[inner sep=0pt] at (sz) {\includegraphics[width=#1]{#2}};
+  \end{tikzpicture}%
+}
+
+\RequirePackage{amsmath}
+\RequirePackage{amssymb}
+
+\RequirePackage[compact]{titlesec}
+\titleformat{\section}{\normalfont\large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalfont\normalsize\bfseries}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\normalfont\normalsize\bfseries}{\thesubsubsection}{1em}{}
+
+\RequirePackage[titles]{tocloft}
+\setlength{\cftbeforesecskip}{0pt}
+\setlength{\cftbeforesubsecskip}{-2pt}
+\renewcommand{\cftsubsecindent}{1.5em}
+\setlength{\cftbeforesubsubsecskip}{-2pt}
+\renewcommand{\cftsecfont}{\small}
+\renewcommand{\cftsubsecfont}{\small}
+\renewcommand{\cftsubsubsecfont}{\small}
+\renewcommand{\cftsecpagefont}{\small}
+\renewcommand{\cftsubsecpagefont}{\small}
+\renewcommand{\cftsubsubsecpagefont}{\small}
+\setlength{\cftbeforetoctitleskip}{0pt}
+\setlength{\cftaftertoctitleskip}{6pt}
+
+\setlength{\emergencystretch}{3em}
+\widowpenalty=10000
+\clubpenalty=10000
+\displaywidowpenalty=10000
+\brokenpenalty=10000
+\raggedbottom
+
+\RequirePackage{needspace}
+\RequirePackage{etoolbox}
+\preto{\section}{\clearpage}
+\preto{\subsection}{\needspace{10\baselineskip}}
+\preto{\subsubsection}{\needspace{14\baselineskip}}
+\preto{\paragraph}{\needspace{6\baselineskip}}
+
+\RequirePackage{styles/packages/report-metadata}

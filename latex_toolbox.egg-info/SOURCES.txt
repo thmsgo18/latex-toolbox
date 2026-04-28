@@ -1,0 +1,10 @@
+README.md
+pyproject.toml
+latex_toolbox/__init__.py
+latex_toolbox/cli.py
+latex_toolbox/project.py
+latex_toolbox.egg-info/PKG-INFO
+latex_toolbox.egg-info/SOURCES.txt
+latex_toolbox.egg-info/dependency_links.txt
+latex_toolbox.egg-info/entry_points.txt
+latex_toolbox.egg-info/top_level.txt

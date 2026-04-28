@@ -1,0 +1,113 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{research-article}[2026/04/28 Research article layout]
+
+\RequirePackage[T1]{fontenc}
+\RequirePackage[utf8]{inputenc}
+\RequirePackage{lmodern}
+\RequirePackage{microtype}
+\RequirePackage{setspace}
+\setstretch{1.05}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.35em}
+
+\RequirePackage[
+  a4paper,
+  top=1.9cm,
+  bottom=2.2cm,
+  left=1.6cm,
+  right=1.6cm,
+  columnsep=0.7cm,
+  headheight=18pt
+]{geometry}
+
+\RequirePackage{styles/packages/report-colors}
+
+\RequirePackage{siunitx}
+\DeclareSIUnit{\LUFS}{LUFS}
+
+\RequirePackage{graphicx}
+\RequirePackage{float}
+\RequirePackage[labelfont={sc},font=small,labelsep=period]{caption}
+\setlength{\textfloatsep}{6pt plus 1pt minus 1pt}
+\setlength{\floatsep}{5pt plus 1pt minus 1pt}
+\setlength{\intextsep}{5pt plus 1pt minus 1pt}
+\graphicspath{{images/}{screens/}{figures/}{results/plots/}{assets/images/common/}{assets/logos/}}
+
+\RequirePackage{styles/packages/report-tables}
+\RequirePackage{longtable}
+
+\RequirePackage{enumitem}
+\setlist[itemize]{label=\textbullet,leftmargin=1.2em,itemsep=1pt,topsep=2pt}
+\setlist[enumerate]{leftmargin=1.2em,itemsep=1pt,topsep=2pt}
+\setlist[description]{leftmargin=1.4em,itemsep=1pt,topsep=2pt,font=\normalfont\bfseries}
+
+\RequirePackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancyhead[L]{\footnotesize\textbf{\reportshorttitle}}
+\fancyhead[R]{\footnotesize\itshape \reporttype}
+\fancyfoot[C]{\footnotesize\thepage}
+
+\RequirePackage[
+  colorlinks=true,
+  linkcolor=ReportBlue,
+  citecolor=ReportBlue,
+  urlcolor=ReportBlue,
+  bookmarks=true,
+  bookmarksnumbered=true,
+  plainpages=false,
+  pdfpagelabels=true
+]{hyperref}
+
+\RequirePackage{listings}
+\RequirePackage{styles/packages/report-code-python}
+\RequirePackage{styles/packages/report-code-bash}
+\lstset{style=pythonstyle}
+
+\RequirePackage{tikz}
+\usetikzlibrary{shapes.geometric,arrows.meta,positioning,fit,backgrounds,calc}
+\newcommand{\screen}[2][\linewidth]{%
+  \begin{tikzpicture}
+    \node[inner sep=0pt, opacity=0] (sz) {\includegraphics[width=#1]{#2}};
+    \clip[rounded corners=10pt] (sz.south west) rectangle (sz.north east);
+    \node[inner sep=0pt] at (sz) {\includegraphics[width=#1]{#2}};
+  \end{tikzpicture}%
+}
+
+\RequirePackage{amsmath}
+\RequirePackage{amssymb}
+
+\RequirePackage[compact]{titlesec}
+\titleformat{\section}{\normalfont\normalsize\bfseries}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\normalfont\small\bfseries}{\thesubsection}{0.5em}{}
+\titleformat{\subsubsection}{\normalfont\small\bfseries}{\thesubsubsection}{0.5em}{}
+\titlespacing*{\section}{0pt}{8pt}{4pt}
+\titlespacing*{\subsection}{0pt}{6pt}{3pt}
+\titlespacing*{\subsubsection}{0pt}{4pt}{2pt}
+\setcounter{secnumdepth}{3}
+
+\RequirePackage[titles]{tocloft}
+\setlength{\cftbeforesecskip}{0pt}
+\setlength{\cftbeforesubsecskip}{0pt}
+\renewcommand{\cftsubsecindent}{1.2em}
+\renewcommand{\cftsecfont}{\small}
+\renewcommand{\cftsubsecfont}{\small}
+\renewcommand{\cftsecpagefont}{\small}
+\renewcommand{\cftsubsecpagefont}{\small}
+
+\setlength{\emergencystretch}{2em}
+\widowpenalty=10000
+\clubpenalty=10000
+\displaywidowpenalty=10000
+\brokenpenalty=10000
+\raggedbottom
+
+\RequirePackage{needspace}
+\RequirePackage{etoolbox}
+\preto{\section}{\needspace{10\baselineskip}}
+\preto{\subsection}{\needspace{7\baselineskip}}
+\preto{\subsubsection}{\needspace{5\baselineskip}}
+
+\RequirePackage{balance}
+\RequirePackage{styles/packages/report-metadata}

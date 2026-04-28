@@ -1,0 +1,62 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[main=french,english]{babel}
+\usepackage{styles/packages/university-project-report}
+
+\input{frontmatter/metadata.tex}
+
+\newcommand{\insertuniversitylogo}{%
+  \IfFileExists{\universitylogo}{%
+    \includegraphics[width=3.2cm]{\universitylogo}
+  }{%
+    \IfFileExists{assets/logos/\universitylogo}{%
+      \includegraphics[width=3.2cm]{assets/logos/\universitylogo}
+    }{%
+      \fbox{\parbox[c][3cm][c]{5cm}{\centering\small University logo \\ \texttt{\universitylogo}}}
+    }%
+  }%
+}
+
+\begin{document}
+
+\begin{titlepage}
+  \thispagestyle{empty}
+
+  \noindent
+  \begin{minipage}{\textwidth}
+    \hfill
+    \insertuniversitylogo
+  \end{minipage}
+
+  \vspace*{1cm}
+
+  \begin{center}
+    {\large \universityname}\\[0.25cm]
+    {\large \facultyname}\\[1.6cm]
+
+    {\LARGE\bfseries \reporttitle}\\[0.35cm]
+    \rule{0.72\linewidth}{0.5pt}\\[0.45cm]
+
+    {\large \reporttype}\\[0.25cm]
+    {\normalsize Annee universitaire : \academicyear}\\[2.3cm]
+
+    \renewcommand{\arraystretch}{1.25}
+    \begin{tabular}{rl}
+      \textbf{\contributorslabel:} & \authorlist \\
+      \textbf{Cours :} & \coursename \\
+      \insertteacherrows
+      \insertprojectlinks
+      \textbf{Date :} & \today
+    \end{tabular}
+
+    \vfill
+  \end{center}
+\end{titlepage}
+
+\input{frontmatter/toc.tex}
+
+\input{sections/introduction.tex}
+\input{sections/conclusion.tex}
+\input{backmatter/ai-statement.tex}
+
+\end{document}

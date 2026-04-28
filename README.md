@@ -2,13 +2,15 @@
 
 [Read this in French](./README.fr.md)
 
-LaTeX Toolbox is a local toolkit for creating clean, reusable, standalone LaTeX projects from ready-made templates.
+LaTeX Toolbox is a local toolkit for creating polished, reusable, standalone LaTeX projects from ready-made templates.
 
-It is designed for a simple workflow:
+It is built for a simple workflow:
 - keep your templates, styles, and shared assets in this repository;
 - generate a new project with the `latex-toolbox` command;
 - work on the generated project in VS Code;
 - version each generated project in its own Git repository if needed.
+
+If you regularly write course reports, research papers, TER reports, or collaborative LaTeX documents, this repository gives you a clean starting point every time without rebuilding your structure from scratch.
 
 ## What the toolbox does
 
@@ -44,7 +46,7 @@ The easiest installation method is `pipx`.
 From this repository root:
 
 ```bash
-cd /Users/thomas/Documents/LaTeX
+cd /path/to/latex-toolbox
 brew install pipx
 pipx install --editable .
 ```
@@ -62,6 +64,26 @@ pipx ensurepath
 ```
 
 Then open a new terminal window.
+
+## Quick start
+
+Create a project report in the current directory:
+
+```bash
+latex-toolbox create --name signal-processing-report --template rapport-projet-en
+```
+
+Create a research-style paper:
+
+```bash
+latex-toolbox create --name audio-search-paper --template research
+```
+
+Then open the generated folder in VS Code and start editing the main file:
+
+```text
+./signal-processing-report/signal-processing-report.tex
+```
 
 ## Available commands
 
@@ -104,6 +126,14 @@ This creates:
 latex-toolbox create --name my-project --template rapport-projet-en
 ```
 
+Real examples:
+
+```bash
+latex-toolbox create --name deep-learning-lab --template rapport-projet-en
+latex-toolbox create --name rapport-analyse-signaux --template rapport-projet-fr
+latex-toolbox create --name keyword-spotting-paper --template research
+```
+
 ### 2. Open the project in VS Code
 
 Open the main file, for example:
@@ -131,7 +161,7 @@ Typical values include:
 Example:
 
 ```tex
-\newcommand{\reporttitle}{Shazam}
+\newcommand{\reporttitle}{Audio Fingerprinting Study}
 \newcommand{\coursename}{Machine Learning}
 
 \resetauthors
@@ -142,7 +172,7 @@ Example:
 \addteacher{Dr Example}{}
 
 \resetprojectlinks
-\addprojectlink{Repository}{https://github.com/example/shazam}
+\addprojectlink{Repository}{https://github.com/example/audio-fingerprinting}
 ```
 
 If you leave the second argument empty in `\addauthor{...}{}` or `\addteacher{...}{}`, no role is displayed.
@@ -167,6 +197,12 @@ git commit -m "Initial report"
 ```
 
 Then create a dedicated GitHub repository for that project only.
+
+Typical collaboration workflow:
+- create the project with `latex-toolbox`;
+- initialize Git inside the generated folder;
+- create one private GitHub repository for that project;
+- invite only the people who should access that document.
 
 ## Available templates
 

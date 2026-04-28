@@ -5,7 +5,7 @@ La commande `latex-toolbox` ne cree plus automatiquement ici : elle cree un proj
 Exemples :
 
 ```bash
-cd /Users/thomas/Documents/LaTeX/projects
+cd /path/to/latex-toolbox/projects
 latex-toolbox create --name projet-big-data --template rapport-projet-en
 latex-toolbox create --name rapport-ter-vision --template rapport-ter
 latex-toolbox create --name paper-audio-search --template research

@@ -10,6 +10,8 @@ L'idee est simple :
 - tu travailles ensuite sur le projet genere dans VS Code ;
 - tu peux versionner chaque projet genere dans son propre depot Git.
 
+Si tu rediges souvent des rapports de cours, des papiers de recherche, des TER ou des documents LaTeX collaboratifs, cette toolbox t'evite de repartir de zero a chaque fois.
+
 ## Ce que fait la toolbox
 
 Quand tu crees un projet, la toolbox :
@@ -44,7 +46,7 @@ La methode la plus simple est `pipx`.
 Depuis la racine du depot :
 
 ```bash
-cd /Users/thomas/Documents/LaTeX
+cd /chemin/vers/latex-toolbox
 brew install pipx
 pipx install --editable .
 ```
@@ -62,6 +64,26 @@ pipx ensurepath
 ```
 
 Puis ouvre un nouveau terminal.
+
+## Demarrage rapide
+
+Creer un rapport de projet dans le dossier courant :
+
+```bash
+latex-toolbox create --name signal-processing-report --template rapport-projet-en
+```
+
+Creer un document de type recherche :
+
+```bash
+latex-toolbox create --name audio-search-paper --template research
+```
+
+Ensuite, ouvre dans VS Code le fichier principal du dossier genere :
+
+```text
+./signal-processing-report/signal-processing-report.tex
+```
 
 ## Commandes disponibles
 
@@ -104,6 +126,14 @@ Cela cree :
 latex-toolbox create --name mon-projet --template rapport-projet-en
 ```
 
+Exemples concrets :
+
+```bash
+latex-toolbox create --name deep-learning-lab --template rapport-projet-en
+latex-toolbox create --name rapport-analyse-signaux --template rapport-projet-fr
+latex-toolbox create --name keyword-spotting-paper --template research
+```
+
 ### 2. Ouvrir le projet dans VS Code
 
 Ouvre ensuite le fichier principal, par exemple :
@@ -131,7 +161,7 @@ Tu peux notamment y definir :
 Exemple :
 
 ```tex
-\newcommand{\reporttitle}{Shazam}
+\newcommand{\reporttitle}{Audio Fingerprinting Study}
 \newcommand{\coursename}{Machine Learning}
 
 \resetauthors
@@ -142,7 +172,7 @@ Exemple :
 \addteacher{Dr Example}{}
 
 \resetprojectlinks
-\addprojectlink{Repository}{https://github.com/example/shazam}
+\addprojectlink{Repository}{https://github.com/example/audio-fingerprinting}
 ```
 
 Si tu laisses le second argument vide dans `\addauthor{...}{}` ou `\addteacher{...}{}`, aucun role n'est affiche.
@@ -167,6 +197,12 @@ git commit -m "Initial report"
 ```
 
 Puis creer un depot GitHub uniquement pour ce projet.
+
+Workflow de collaboration typique :
+- creer le projet avec `latex-toolbox` ;
+- initialiser Git dans le dossier genere ;
+- creer un depot GitHub prive pour ce projet ;
+- inviter uniquement les personnes concernees par ce document.
 
 ## Templates disponibles
 

@@ -1,0 +1,146 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{report-ter-titlepage}[2026/04/28 TER title page helpers]
+
+\RequirePackage{etoolbox}
+\RequirePackage{geometry}
+\RequirePackage{graphicx}
+\RequirePackage[framemethod=TikZ]{mdframed}
+
+\newcommand{\universityname}{Universite}
+\newcommand{\facultyname}{}
+\newcommand{\departmentname}{}
+\newcommand{\reporttitle}{TER Report Title}
+\newcommand{\reportsubtitle}{}
+\newcommand{\reportcontext}{}
+\newcommand{\academicyear}{2025--2026}
+\newcommand{\submissiondate}{\today}
+\newcommand{\universitylogo}{logo-up-maths-info.jpg}
+\newcommand{\contributorslabel}{Authors}
+\newcommand{\teacherslabel}{Supervisors}
+
+\newcommand{\reportauthorsrows}{}
+\newcommand{\reportteachersrows}{}
+
+\newcommand{\resetauthors}{\gdef\reportauthorsrows{}}
+\newcommand{\resetteachers}{\gdef\reportteachersrows{}}
+
+\newcommand{\addauthor}[2]{%
+  \ifstrempty{#2}{%
+    \gappto\reportauthorsrows{#1\\[0.6em]}%
+  }{%
+    \gappto\reportauthorsrows{#1\\{\small #2}\\[0.9em]}%
+  }%
+}
+
+\newcommand{\addteacher}[2]{%
+  \ifstrempty{#2}{%
+    \gappto\reportteachersrows{#1\\[0.6em]}%
+  }{%
+    \gappto\reportteachersrows{#1\\{\small #2}\\[0.9em]}%
+  }%
+}
+
+\newcommand{\insertterlogo}{%
+  \IfFileExists{\universitylogo}{%
+    \includegraphics[height=0.15\textheight]{\universitylogo}%
+  }{%
+    \IfFileExists{assets/logos/\universitylogo}{%
+      \includegraphics[height=0.15\textheight]{assets/logos/\universitylogo}%
+    }{%
+      \IfFileExists{../../assets/logos/\universitylogo}{%
+        \includegraphics[height=0.15\textheight]{../../assets/logos/\universitylogo}%
+      }{%
+        \fbox{\parbox[c][3cm][c]{6cm}{\centering\small Logo \\ \texttt{\universitylogo}}}%
+      }%
+    }%
+  }%
+}
+
+\newcommand{\insertauthorsblock}{%
+  \textbf{\contributorslabel}\par
+  \vspace{0.5em}
+  \reportauthorsrows
+}
+
+\newcommand{\insertteachersblock}{%
+  \textbf{\teacherslabel}\par
+  \vspace{0.5em}
+  \reportteachersrows
+}
+
+\renewcommand*{\maketitle}{%
+  \newgeometry{margin=2.5cm}
+  \begin{titlepage}
+    \thispagestyle{empty}
+
+    \begin{minipage}[t][0.33\textheight]{\textwidth}
+      \begin{center}
+        \insertterlogo
+        \vfill
+        {\scshape\LARGE \universityname\par}
+        \ifstrempty{\facultyname}{}{%
+          \vspace{0.125em}
+          {\Large \facultyname\par}%
+        }%
+        \ifstrempty{\departmentname}{}{%
+          \vspace{0.25em}
+          {\large \departmentname\par}%
+        }%
+      \end{center}
+    \end{minipage}
+
+    \vfill
+
+    \begin{mdframed}[
+      linewidth=2pt,
+      innertopmargin=1.5em,
+      innerbottommargin=1.5em,
+      leftline=false,
+      rightline=false
+    ]
+      \begin{center}
+        {\bfseries\huge \reporttitle\par}
+      \end{center}
+    \end{mdframed}
+
+    \vfill
+
+    \begin{minipage}[b][0.33\textheight][t]{\textwidth}
+      \begin{center}
+        \ifstrempty{\reportsubtitle}{}{%
+          {\Large \reportsubtitle\par}%
+          \vspace{1.5cm}%
+        }%
+      \end{center}
+
+      \ifstrempty{\reportteachersrows}{%
+        \begin{center}
+          {\large \insertauthorsblock}
+        \end{center}
+      }{%
+        \begin{minipage}[t]{0.48\textwidth}
+          {\large \insertauthorsblock}
+        \end{minipage}
+        \hfill
+        \begin{minipage}[t]{0.48\textwidth}
+          \begin{flushright}
+            {\large \insertteachersblock}
+          \end{flushright}
+        \end{minipage}
+      }%
+
+      \vfill
+
+      \begin{center}
+        \ifstrempty{\reportcontext}{}{%
+          {\large \reportcontext\par}%
+        }%
+        {\large Academic Year \academicyear\par}
+        \ifstrempty{\submissiondate}{}{%
+          {\large \submissiondate\par}%
+        }%
+      \end{center}
+    \end{minipage}
+  \end{titlepage}
+  \restoregeometry
+}

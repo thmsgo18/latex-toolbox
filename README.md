@@ -19,6 +19,7 @@ When you create a project, the toolbox:
 - renames the main `.tex` file to match the project name;
 - copies the required LaTeX styles into the project;
 - copies the logos from `assets/logos/`;
+- creates a project-level `.gitignore` for common LaTeX build files;
 - creates a project that can compile on its own.
 
 Generated projects do not depend on this repository at compile time.
@@ -93,6 +94,21 @@ List templates:
 latex-toolbox list-templates
 ```
 
+Check or bootstrap a machine for LaTeX work:
+
+```bash
+latex-toolbox setup
+latex-toolbox setup --check-only
+latex-toolbox setup --install-tex
+```
+
+Supported automatic installation paths:
+- macOS: `brew`
+- Ubuntu / Debian: `apt-get`
+- Fedora: `dnf`
+- Arch Linux: `pacman`
+- Windows: `winget`
+
 Create a project:
 
 ```bash
@@ -116,6 +132,24 @@ This creates:
 
 ```text
 ~/Desktop/shazam-report/
+```
+
+Rename a generated project:
+
+```bash
+latex-toolbox rename shazam-report shazam-final-report
+```
+
+This renames:
+- the project folder
+- the main `.tex` file
+- the main build artifacts when they already exist
+
+You can also run the command from inside the project folder itself:
+
+```bash
+cd shazam-report
+latex-toolbox rename shazam-final-report
 ```
 
 ## Recommended workflow
@@ -221,7 +255,7 @@ Same structure as `rapport-projet-en`, but in French.
 
 ### `rapport-ter`
 
-French academic TER-style report template with a more detailed structure.
+English TER-style report template with a more detailed academic structure.
 
 ### `research`
 
@@ -368,6 +402,18 @@ List templates:
 
 ```bash
 latex-toolbox list-templates
+```
+
+Rename a project:
+
+```bash
+latex-toolbox rename old-project-name new-project-name
+```
+
+Check the local machine setup:
+
+```bash
+latex-toolbox setup --check-only
 ```
 
 Create an English project report:

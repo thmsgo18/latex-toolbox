@@ -1,15 +1,26 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "latex-toolbox"
 version = "0.1.0"
 description = "CLI for creating standalone LaTeX projects from this toolbox."
+license = "MIT"
 requires-python = ">=3.10"
 
 [project.scripts]
 latex-toolbox = "latex_toolbox.cli:main"
 
-[tool.setuptools]
-packages = ["latex_toolbox"]
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["latex_toolbox*"]
+
+[tool.setuptools.package-data]
+latex_toolbox = [
+    "templates/**/*",
+    "templates/**/.gitkeep",
+    "styles/**/*",
+    "assets/**/*",
+    ".vscode/extensions.json",
+]

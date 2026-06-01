@@ -19,6 +19,7 @@ Quand tu crees un projet, la toolbox :
 - renomme le fichier principal `.tex` avec le nom du projet ;
 - copie les styles LaTeX necessaires dans le projet ;
 - copie les logos depuis `assets/logos/` ;
+- cree un `.gitignore` local pour les fichiers de build LaTeX courants ;
 - cree un projet qui peut compiler tout seul.
 
 Les projets generes ne dependent donc pas de ce depot pour compiler.
@@ -93,6 +94,21 @@ Lister les templates :
 latex-toolbox list-templates
 ```
 
+Verifier ou preparer une machine pour travailler en LaTeX :
+
+```bash
+latex-toolbox setup
+latex-toolbox setup --check-only
+latex-toolbox setup --install-tex
+```
+
+Chemins d'installation automatique pris en charge :
+- macOS : `brew`
+- Ubuntu / Debian : `apt-get`
+- Fedora : `dnf`
+- Arch Linux : `pacman`
+- Windows : `winget`
+
 Creer un projet :
 
 ```bash
@@ -116,6 +132,24 @@ Cela cree :
 
 ```text
 ~/Desktop/shazam-report/
+```
+
+Renommer un projet genere :
+
+```bash
+latex-toolbox rename shazam-report shazam-final-report
+```
+
+Cette commande renomme :
+- le dossier du projet
+- le fichier `.tex` principal
+- les principaux fichiers de build quand ils existent deja
+
+Tu peux aussi lancer la commande depuis l'interieur du dossier du projet :
+
+```bash
+cd shazam-report
+latex-toolbox rename shazam-final-report
 ```
 
 ## Workflow recommande
@@ -221,7 +255,7 @@ Meme structure que `rapport-projet-en`, mais en francais.
 
 ### `rapport-ter`
 
-Template academique en francais pour un rapport de type TER, avec une structure plus riche.
+Template academique en anglais pour un rapport de type TER, avec une structure plus riche.
 
 ### `research`
 
@@ -370,6 +404,18 @@ Lister les templates :
 
 ```bash
 latex-toolbox list-templates
+```
+
+Renommer un projet :
+
+```bash
+latex-toolbox rename ancien-projet nouveau-projet
+```
+
+Verifier la configuration locale :
+
+```bash
+latex-toolbox setup --check-only
 ```
 
 Creer un rapport en anglais :

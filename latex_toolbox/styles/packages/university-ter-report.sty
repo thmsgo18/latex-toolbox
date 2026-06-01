@@ -1,0 +1,112 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{university-ter-report}[2026/04/28 Modular TER report style]
+
+\RequirePackage[T1]{fontenc}
+\RequirePackage[utf8]{inputenc}
+\RequirePackage{lmodern}
+\RequirePackage{microtype}
+\RequirePackage{setspace}
+\onehalfspacing
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+
+\RequirePackage[
+  a4paper,
+  top=3.2cm,
+  bottom=2.5cm,
+  left=2.5cm,
+  right=2.5cm,
+  headheight=14pt
+]{geometry}
+
+\RequirePackage{styles/packages/report-colors}
+\RequirePackage{styles/packages/report-tables}
+\RequirePackage{styles/packages/report-code-python}
+\RequirePackage{styles/packages/report-code-bash}
+\RequirePackage{styles/packages/report-theorems-en}
+\RequirePackage{styles/packages/report-ter-titlepage}
+
+\RequirePackage{graphicx}
+\RequirePackage{float}
+\RequirePackage[skip=1em]{caption}
+\RequirePackage{subcaption}
+\graphicspath{{images/}{screens/}{figures/}{assets/images/common/}{assets/logos/}{../../assets/images/common/}{../../assets/logos/}}
+
+\RequirePackage{csquotes}
+\RequirePackage{enumitem}
+\setlist[itemize]{leftmargin=1.5em,itemsep=2pt,topsep=4pt}
+\setlist[enumerate]{leftmargin=1.5em,itemsep=2pt,topsep=4pt}
+\setlist[description]{leftmargin=1.6em,itemsep=2pt,topsep=4pt,font=\normalfont\bfseries}
+
+\RequirePackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+
+\RequirePackage[
+  pdfusetitle,
+  colorlinks=true,
+  linktoc=page,
+  allcolors=ReportBlue
+]{hyperref}
+
+\RequirePackage{amsmath}
+\RequirePackage{amssymb}
+\RequirePackage{bm}
+\RequirePackage{esint}
+\RequirePackage{siunitx}
+\RequirePackage{multirow}
+\RequirePackage{multicol}
+
+\RequirePackage[
+  backend=biber,
+  style=numeric-comp,
+  sorting=none,
+  maxbibnames=99,
+  backref=true
+]{biblatex}
+
+\RequirePackage{listings}
+\lstdefinestyle{latex}{
+  language=[LaTeX]TeX,
+  backgroundcolor=\color{LightGray},
+  basicstyle=\ttfamily\footnotesize\color{TextGray},
+  keywordstyle=\bfseries\color{ReportBlue},
+  stringstyle=\color{StringRed},
+  commentstyle=\itshape\color{CommentGreen},
+  frame=single,
+  rulecolor=\color{FrameGray},
+  breaklines=true,
+  breakatwhitespace=true,
+  showstringspaces=false,
+  columns=fullflexible,
+  xleftmargin=8pt,
+  framexleftmargin=8pt,
+  aboveskip=6pt,
+  belowskip=6pt
+}
+\lstset{style=pythonstyle}
+
+\RequirePackage{tikz}
+\usetikzlibrary{arrows.meta,backgrounds,calc,fit,positioning,shapes.geometric}
+
+\RequirePackage[linesnumbered,lined]{algorithm2e}
+\SetKwInput{KwResult}{Result}
+\SetKwInput{KwInput}{Input}
+
+\AtBeginDocument{%
+  \sisetup{output-decimal-marker={.}}%
+}
+
+\renewcommand{\arraystretch}{1.1}
+
+\newcommand{\rbk}[1]{\left(#1\right)}
+\newcommand{\cbk}[1]{\left\{#1\right\}}
+\newcommand{\sbk}[1]{\left[#1\right]}
+\newcommand{\abs}[1]{\left|#1\right|}
+\newcommand{\norm}[1]{\left\|#1\right\|}
+\newcommand{\fact}[1]{#1!}
+\newcommand{\diff}{\mathrm{d}}
+\DeclareMathOperator{\tr}{tr}
+\newcommand{\noskipcaption}[1]{\caption{#1}\vspace{-1em}}

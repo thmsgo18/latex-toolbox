@@ -41,6 +41,56 @@ latex-toolbox setup
 
 This verifies that `latexmk` and `lualatex` are available, and offers to install them via your system package manager (`brew` on macOS, `apt` on Debian/Ubuntu, `winget` on Windows). VS Code extensions are also installed if the `code` CLI is available.
 
+## Profile
+
+Set up your profile once to automatically pre-fill project metadata on every `create`:
+
+```bash
+latex-toolbox profile --set
+```
+
+```
+Full name: Dupont Alice
+University / school: Université de Bordeaux
+Program / formation: Master Informatique
+GitHub username (optional): dupont-alice
+```
+
+This is offered automatically on first launch. To update it at any time:
+
+```bash
+latex-toolbox profile        # view current profile
+latex-toolbox profile --set  # update
+```
+
+Profile values are stored in `~/.latex-toolbox.toml` and applied to each new project's `frontmatter/metadata.tex`. When a GitHub username is set, it is rendered as a link under your name in the PDF title page.
+
+## Shell completion
+
+Tab completion for commands, flags, and template names. Add one line to your shell config:
+
+**bash** (`~/.bashrc`) or **zsh** (`~/.zshrc`):
+
+```bash
+eval "$(latex-toolbox completion)"
+```
+
+Reload your shell (`source ~/.zshrc`) or open a new terminal window.
+
+## Configuration
+
+Create `~/.latex-toolbox.toml` to set default values applied to every command:
+
+```toml
+default_template = "rapport-projet-en"
+default_output_dir = "~/Documents/projects"
+```
+
+| Key | Description |
+|---|---|
+| `default_template` | Template used when `--template` is omitted |
+| `default_output_dir` | Output directory used when `--output` is omitted |
+
 ## Usage
 
 ### Interactive mode
@@ -166,6 +216,9 @@ Styles and logos are copied into the project at creation time. The generated pro
 | `latex-toolbox setup --check-only` | Check without installing anything |
 | `latex-toolbox setup --install-tex` | Install LaTeX directly |
 | `latex-toolbox --version` | Show installed version |
+| `latex-toolbox profile` | View your saved profile |
+| `latex-toolbox profile --set` | Run interactive profile setup |
+| `latex-toolbox completion` | Print shell completion setup code |
 
 ## Versioning generated projects
 
@@ -183,3 +236,7 @@ Create a dedicated private repository and invite only the collaborators relevant
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+---
+
+Made by [thmsgo18](https://github.com/thmsgo18)

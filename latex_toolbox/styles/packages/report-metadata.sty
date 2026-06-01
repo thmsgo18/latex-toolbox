@@ -1,7 +1,8 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{report-metadata}[2026/04/28 Shared metadata helpers for project reports]
+\ProvidesPackage{report-metadata}[2026/06/02 Shared metadata helpers for project reports]
 
 \RequirePackage{etoolbox}
+\RequirePackage{xparse}
 
 \newcommand{\authorrows}{}
 \newcommand{\teacherrows}{}
@@ -14,11 +15,23 @@
 \newcommand{\contributorslabel}{Students}
 \newcommand{\teacherslabel}{Teachers}
 
-\newcommand{\addauthor}[2]{%
-  \ifstrempty{#2}{%
-    \gappto\authorrows{#1 & \\}%
+% \addauthor{Name}{Role}[github_username]
+% Role and github_username are optional (leave empty or omit).
+\DeclareDocumentCommand{\addauthor}{m m O{}}{%
+  \ifstrempty{#3}{%
+    \ifstrempty{#2}{%
+      \gappto\authorrows{#1 & \\}%
+    }{%
+      \gappto\authorrows{#1 & \textit{(#2)} \\}%
+    }%
   }{%
-    \gappto\authorrows{#1 & \textit{(#2)} \\}%
+    \ifstrempty{#2}{%
+      \gappto\authorrows{#1 & \\}%
+      \gappto\authorrows{{\footnotesize\href{https://github.com/#3}{\texttt{github.com/#3}}} & \\}%
+    }{%
+      \gappto\authorrows{#1 & \textit{(#2)} \\}%
+      \gappto\authorrows{{\footnotesize\href{https://github.com/#3}{\texttt{github.com/#3}}} & \\}%
+    }%
   }%
 }
 

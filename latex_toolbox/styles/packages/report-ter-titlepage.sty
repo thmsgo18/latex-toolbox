@@ -1,7 +1,8 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{report-ter-titlepage}[2026/04/28 TER title page helpers]
+\ProvidesPackage{report-ter-titlepage}[2026/06/02 TER title page helpers]
 
 \RequirePackage{etoolbox}
+\RequirePackage{xparse}
 \RequirePackage{geometry}
 \RequirePackage{graphicx}
 \RequirePackage[framemethod=TikZ]{mdframed}
@@ -24,11 +25,21 @@
 \newcommand{\resetauthors}{\gdef\reportauthorsrows{}}
 \newcommand{\resetteachers}{\gdef\reportteachersrows{}}
 
-\newcommand{\addauthor}[2]{%
-  \ifstrempty{#2}{%
-    \gappto\reportauthorsrows{#1\\[0.6em]}%
+% \addauthor{Name}{Role}[github_username]
+% Role and github_username are optional (leave empty or omit).
+\DeclareDocumentCommand{\addauthor}{m m O{}}{%
+  \ifstrempty{#3}{%
+    \ifstrempty{#2}{%
+      \gappto\reportauthorsrows{#1\\[0.6em]}%
+    }{%
+      \gappto\reportauthorsrows{#1\\{\small #2}\\[0.9em]}%
+    }%
   }{%
-    \gappto\reportauthorsrows{#1\\{\small #2}\\[0.9em]}%
+    \ifstrempty{#2}{%
+      \gappto\reportauthorsrows{#1\\{\footnotesize\href{https://github.com/#3}{\texttt{github.com/#3}}}\\[0.9em]}%
+    }{%
+      \gappto\reportauthorsrows{#1\\{\small #2}\\{\footnotesize\href{https://github.com/#3}{\texttt{github.com/#3}}}\\[0.9em]}%
+    }%
   }%
 }
 

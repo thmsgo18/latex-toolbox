@@ -6,6 +6,21 @@ import shutil
 from pathlib import Path
 
 
+_AUTHOR_PLACEHOLDERS = [
+    "LASTNAME Firstname",
+    "FirstName LASTNAME",
+    "NOM Prenom",
+]
+_UNIVERSITY_PLACEHOLDERS = [
+    "Universite Paris Cite",
+    "Example University",
+]
+_PROGRAM_PLACEHOLDERS = [
+    "Master Informatique",
+    "Master's Degree -- Computer Science",
+    "Department of Computer Science",
+]
+
 LATEX_BUILD_SUFFIXES = {
     ".aux",
     ".bbl",
@@ -29,6 +44,35 @@ LOCAL_STYLE_PATTERN = re.compile(
 )
 
 _FORBIDDEN_NAME_CHARS = re.compile(r'[ /\\:*?"<>|]')
+
+
+def apply_profile_to_metadata(metadata_path: Path, profile: dict) -> None:
+    if not metadata_path.exists() or not profile:
+        return
+
+    content = metadata_path.read_text(encoding="utf-8")
+
+    name = profile.get("name", "")
+    university = profile.get("university", "")
+    program = profile.get("program", "")
+    github = profile.get("github", "")
+
+    if name or github:
+        github_suffix = f"[{github}]" if github else ""
+        for placeholder in _AUTHOR_PLACEHOLDERS:
+            old = f"\\addauthor{{{placeholder}}}{{}}"
+            new = f"\\addauthor{{{name or placeholder}}}{{}}{github_suffix}"
+            content = content.replace(old, new)
+
+    if university:
+        for placeholder in _UNIVERSITY_PLACEHOLDERS:
+            content = content.replace(placeholder, university)
+
+    if program:
+        for placeholder in _PROGRAM_PLACEHOLDERS:
+            content = content.replace(placeholder, program)
+
+    metadata_path.write_text(content, encoding="utf-8")
 
 
 def validate_name(name: str) -> None:
@@ -587,6 +631,9 @@ def create_project(
         write_project_vscode_extensions(target_dir)
         write_project_gitignore(target_dir)
         write_project_setup_scripts(target_dir)
+
+        from .config import get_profile
+        apply_profile_to_metadata(target_dir / "frontmatter" / "metadata.tex", get_profile())
     except Exception:
         shutil.rmtree(target_dir, ignore_errors=True)
         raise

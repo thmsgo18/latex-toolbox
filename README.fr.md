@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  Skip the setup. Start writing. Everything you need, nothing more.
+  Zéro configuration. Juste écrire. Tout ce qu'il faut, rien de plus.
 </p>
 
 <p align="center">
@@ -40,6 +40,56 @@ latex-toolbox setup
 ```
 
 Cette commande vérifie que `latexmk` et `lualatex` sont disponibles, et propose de les installer via le gestionnaire de paquets du système (`brew` sur macOS, `apt` sur Debian/Ubuntu, `winget` sur Windows). Les extensions VS Code recommandées sont également installées si la commande `code` est accessible.
+
+## Profil utilisateur
+
+Configure ton profil une seule fois pour que `create` pré-remplisse automatiquement les métadonnées de chaque projet :
+
+```bash
+latex-toolbox profile --set
+```
+
+```
+Full name: Dupont Alice
+University / school: Université de Bordeaux
+Program / formation: Master Informatique
+GitHub username (optional): dupont-alice
+```
+
+Cette configuration est proposée automatiquement au premier lancement. Pour la modifier à tout moment :
+
+```bash
+latex-toolbox profile        # voir le profil actuel
+latex-toolbox profile --set  # modifier
+```
+
+Les valeurs sont stockées dans `~/.latex-toolbox.toml` et injectées dans `frontmatter/metadata.tex` à chaque création de projet. Si un nom d'utilisateur GitHub est renseigné, il est affiché sous ton nom en tant que lien cliquable sur la page de titre du PDF.
+
+## Autocomplétion shell
+
+Autocomplétion des commandes, options et noms de templates avec la touche Tab. Ajoute une ligne à la configuration de ton shell :
+
+**bash** (`~/.bashrc`) ou **zsh** (`~/.zshrc`) :
+
+```bash
+eval "$(latex-toolbox completion)"
+```
+
+Recharge ton shell (`source ~/.zshrc`) ou ouvre un nouveau terminal.
+
+## Fichier de configuration
+
+Crée `~/.latex-toolbox.toml` pour définir des valeurs par défaut appliquées à toutes les commandes :
+
+```toml
+default_template = "rapport-projet-fr"
+default_output_dir = "~/Documents/projets"
+```
+
+| Clé | Description |
+|---|---|
+| `default_template` | Template utilisé quand `--template` est absent |
+| `default_output_dir` | Dossier de destination quand `--output` est absent |
 
 ## Utilisation
 
@@ -166,6 +216,9 @@ Les styles et logos sont copiés dans le projet au moment de sa création. Le pr
 | `latex-toolbox setup --check-only` | Vérifier sans rien installer |
 | `latex-toolbox setup --install-tex` | Installer LaTeX directement |
 | `latex-toolbox --version` | Afficher la version installée |
+| `latex-toolbox profile` | Voir le profil configuré |
+| `latex-toolbox profile --set` | Configurer le profil interactivement |
+| `latex-toolbox completion` | Afficher le code d'autocomplétion shell |
 
 ## Versionner les projets générés
 
@@ -183,3 +236,7 @@ Crée ensuite un dépôt privé dédié et invite uniquement les collaborateurs 
 ## Contribuer
 
 Consulte [CONTRIBUTING.md](CONTRIBUTING.md).
+
+---
+
+Fait par [thmsgo18](https://github.com/thmsgo18)

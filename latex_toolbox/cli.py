@@ -1,10 +1,14 @@
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 
+import argcomplete
+
+from .config import get_default_output_dir, get_default_template
 from .project import (
     available_templates,
     create_project,
@@ -17,6 +21,7 @@ from .setup import (
     mark_initialized,
     offer_open_vscode,
     run_first_launch_check,
+    run_profile_setup,
     run_setup,
     warn_if_latex_missing,
 )
@@ -70,7 +75,8 @@ def _select_template_interactively() -> str:
 
 
 def _ask_output_dir() -> Path:
-    default = Path.cwd()
+    config_dir = get_default_output_dir()
+    default = config_dir if config_dir is not None else Path.cwd()
     try:
         answer = input(f"Create project in [{default}]: ").strip()
     except (EOFError, OSError, KeyboardInterrupt):
@@ -109,11 +115,12 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Name of the project (prompted interactively if omitted).",
     )
-    create_parser.add_argument(
+    template_arg = create_parser.add_argument(
         "--template",
         default=None,
         help="Template name to use (prompted interactively if omitted).",
     )
+    template_arg.completer = lambda **kwargs: available_templates()
     create_parser.add_argument(
         "--output",
         default=None,
@@ -154,16 +161,74 @@ def build_parser() -> argparse.ArgumentParser:
         "list-templates",
         help="List the available templates.",
     )
+
+    profile_parser = subparsers.add_parser(
+        "profile",
+        help="View or update your profile used to pre-fill project metadata.",
+    )
+    profile_parser.add_argument(
+        "--set",
+        action="store_true",
+        help="Run interactive profile setup.",
+    )
+
+    completion_parser = subparsers.add_parser(
+        "completion",
+        help="Print shell completion setup code.",
+    )
+    completion_parser.add_argument(
+        "--shell",
+        choices=["bash", "zsh", "fish"],
+        default=None,
+        help="Shell type (auto-detected from $SHELL if omitted).",
+    )
+
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
+    argcomplete.autocomplete(parser)
     args = parser.parse_args(argv)
 
     if args.command == "list-templates":
         for template_name in available_templates():
             print(template_name)
+        return 0
+
+    if args.command == "profile":
+        if args.set:
+            run_profile_setup()
+            return 0
+
+        from .config import get_profile
+        profile = get_profile()
+        if not profile:
+            print("No profile configured.")
+            print("Run `latex-toolbox profile --set` to set up your profile.")
+            return 0
+
+        print("Profile:")
+        for key, label in [
+            ("name", "Name"),
+            ("university", "University"),
+            ("program", "Program"),
+            ("github", "GitHub"),
+        ]:
+            value = profile.get(key)
+            if value:
+                display = f"github.com/{value}" if key == "github" else value
+                print(f"  {label:<12} {display}")
+        return 0
+
+    if args.command == "completion":
+        shell = args.shell
+        if shell is None:
+            shell_path = os.environ.get("SHELL", "")
+            shell = Path(shell_path).name if shell_path else "bash"
+            if shell not in ("bash", "zsh", "fish"):
+                shell = "bash"
+        print(argcomplete.shellcode(["latex-toolbox"], shell=shell))
         return 0
 
     if args.command == "create":
@@ -179,18 +244,30 @@ def main(argv: list[str] | None = None) -> int:
             guided = True
 
         if template is None:
-            if not _is_interactive():
-                print("--template is required in non-interactive mode.", file=sys.stderr)
-                return 1
-            template = _select_template_interactively()
-            guided = True
+            config_template = get_default_template()
+            if config_template is not None:
+                if config_template in available_templates():
+                    template = config_template
+                else:
+                    print(
+                        f"Warning: default_template '{config_template}' in "
+                        "~/.latex-toolbox.toml does not match any available template — ignoring.",
+                        file=sys.stderr,
+                    )
+            if template is None:
+                if not _is_interactive():
+                    print("--template is required in non-interactive mode.", file=sys.stderr)
+                    return 1
+                template = _select_template_interactively()
+                guided = True
 
         if args.output is not None:
             output_dir = Path(args.output).resolve()
         elif guided:
             output_dir = _ask_output_dir()
         else:
-            output_dir = Path.cwd()
+            config_dir = get_default_output_dir()
+            output_dir = config_dir if config_dir is not None else Path.cwd()
 
         first_run = is_first_run()
         if first_run:

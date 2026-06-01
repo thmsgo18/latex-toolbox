@@ -9,7 +9,13 @@ from .project import (
     rename_current_project,
     rename_project,
 )
-from .setup import run_setup
+from .setup import (
+    is_first_run,
+    mark_initialized,
+    run_first_launch_check,
+    run_setup,
+    warn_if_latex_missing,
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -81,6 +87,11 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "create":
+        first_run = is_first_run()
+        if first_run:
+            run_first_launch_check()
+            mark_initialized()
+
         try:
             target_dir, main_tex_file = create_project(
                 name=args.name,
@@ -96,6 +107,10 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Template used: {args.template}")
         print(f"Current parent folder: {target_dir.parent}")
         print("Remember to customise frontmatter/metadata.tex and the sections.")
+
+        if not first_run:
+            warn_if_latex_missing()
+
         return 0
 
     if args.command == "rename":

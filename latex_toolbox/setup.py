@@ -15,6 +15,27 @@ BASE_TOOLS = ["latexmk", "lualatex"]
 TEMPLATE_SPECIFIC_TOOLS = ["bibtex", "biber"]
 
 
+def _marker_file() -> Path:
+    return Path.home() / ".latex_toolbox_initialized"
+
+
+def is_first_run() -> bool:
+    return not _marker_file().exists()
+
+
+def mark_initialized() -> None:
+    _marker_file().touch()
+
+
+def _prompt_yes_no(question: str) -> bool:
+    try:
+        answer = input(f"{question} [y/N] ").strip().lower()
+        return answer in ("y", "yes")
+    except (EOFError, KeyboardInterrupt):
+        print("")
+        return False
+
+
 def detect_os() -> str:
     system = platform.system().lower()
     if system == "darwin":
@@ -203,6 +224,33 @@ def print_os_specific_help() -> None:
         print("- Install a LaTeX distribution that provides at least `latexmk` and `lualatex`.")
 
 
+def warn_if_latex_missing() -> None:
+    if not command_exists("lualatex"):
+        print("")
+        print("[warn] LaTeX (lualatex) is not installed — you won't be able to compile yet.")
+        print("       Run `latex-toolbox setup --install-tex` to install it automatically.")
+
+
+def run_first_launch_check() -> None:
+    print("Welcome to LaTeX Toolbox!")
+    print("Checking your environment before creating your first project...")
+    print("")
+
+    base_ready, _ = print_tool_status()
+
+    if base_ready:
+        print("")
+        print("[ok] Your environment is ready.")
+    else:
+        print("")
+        if _prompt_yes_no("LaTeX is not installed. Install it now?"):
+            install_tex_distribution()
+        else:
+            print("You can install it later with: latex-toolbox setup --install-tex")
+
+    print("")
+
+
 def run_setup(
     check_only: bool = False,
     skip_extensions: bool = False,
@@ -227,6 +275,11 @@ def run_setup(
 
     print("")
     base_ready, extra_ready = print_tool_status()
+
+    if not base_ready and not check_only and not install_tex:
+        print("")
+        if _prompt_yes_no("LaTeX is not installed. Install it now?"):
+            install_tex = True
 
     if install_tex and not base_ready:
         print("")

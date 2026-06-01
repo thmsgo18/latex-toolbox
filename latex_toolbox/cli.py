@@ -80,7 +80,11 @@ def _ask_output_dir() -> Path:
         return default
     path = Path(answer).expanduser().resolve()
     if not path.exists():
-        path.mkdir(parents=True, exist_ok=True)
+        try:
+            path.mkdir(parents=True, exist_ok=True)
+        except OSError as exc:
+            print(f"Cannot create directory: {exc}", file=sys.stderr)
+            sys.exit(1)
     return path
 
 
@@ -180,7 +184,7 @@ def main(argv: list[str] | None = None) -> int:
 
         if args.output is not None:
             output_dir = Path(args.output).resolve()
-        elif sys.stdin.isatty():
+        elif _is_interactive():
             output_dir = _ask_output_dir()
         else:
             output_dir = Path.cwd()

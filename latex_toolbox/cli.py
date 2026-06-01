@@ -29,11 +29,18 @@ def _get_version() -> str:
         return "unknown"
 
 
+def _is_interactive() -> bool:
+    try:
+        return sys.stdin.isatty()
+    except Exception:
+        return False
+
+
 def _ask_project_name() -> str:
     while True:
         try:
             name = input("Project name: ").strip()
-        except (EOFError, KeyboardInterrupt):
+        except (EOFError, OSError, KeyboardInterrupt):
             print("")
             sys.exit(1)
         try:
@@ -54,7 +61,10 @@ def _select_template_interactively() -> str:
             idx = int(answer) - 1
             if 0 <= idx < len(templates):
                 return templates[idx]
-        except (ValueError, EOFError, KeyboardInterrupt):
+        except (EOFError, OSError, KeyboardInterrupt):
+            print("")
+            sys.exit(1)
+        except ValueError:
             pass
         print(f"Please enter a number between 1 and {len(templates)}.")
 
@@ -63,7 +73,7 @@ def _ask_output_dir() -> Path:
     default = Path.cwd()
     try:
         answer = input(f"Create project in [{default}]: ").strip()
-    except (EOFError, KeyboardInterrupt):
+    except (EOFError, OSError, KeyboardInterrupt):
         print("")
         sys.exit(1)
     if not answer:
@@ -157,13 +167,13 @@ def main(argv: list[str] | None = None) -> int:
         template = args.template
 
         if name is None:
-            if not sys.stdin.isatty():
+            if not _is_interactive():
                 print("--name is required in non-interactive mode.", file=sys.stderr)
                 return 1
             name = _ask_project_name()
 
         if template is None:
-            if not sys.stdin.isatty():
+            if not _is_interactive():
                 print("--template is required in non-interactive mode.", file=sys.stderr)
                 return 1
             template = _select_template_interactively()

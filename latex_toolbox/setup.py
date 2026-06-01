@@ -33,7 +33,7 @@ def _prompt_yes_no(question: str) -> bool:
     try:
         answer = input(f"{question} [y/N] ").strip().lower()
         return answer in ("y", "yes")
-    except (EOFError, KeyboardInterrupt):
+    except (EOFError, OSError, KeyboardInterrupt):
         print("")
         return False
 
@@ -239,7 +239,7 @@ def offer_open_vscode(target_dir: Path) -> None:
         answer = input("Open project in VS Code? [y/N] ").strip().lower()
         if answer in ("y", "yes"):
             subprocess.run(["code", str(target_dir)], check=False)
-    except (EOFError, KeyboardInterrupt):
+    except (EOFError, OSError, KeyboardInterrupt):
         print("")
 
 

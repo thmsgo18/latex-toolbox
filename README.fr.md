@@ -2,10 +2,9 @@
 
 # LaTeX Toolbox
 
-CLI pour créer des projets LaTeX autonomes à partir de templates prêts à l'emploi.
+Skip the setup. Start writing. Everything you need, nothing more.
 
 [![PyPI version](https://img.shields.io/pypi/v/latex-toolbox?color=blue)](https://pypi.org/project/latex-toolbox/)
-[![CI](https://github.com/thmsgo18/latex-toolbox/actions/workflows/ci.yml/badge.svg)](https://github.com/thmsgo18/latex-toolbox/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/pypi/pyversions/latex-toolbox)](https://pypi.org/project/latex-toolbox/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 

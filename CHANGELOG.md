@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-06-02
+
 ### Added
 - Interactive mode: `create` prompts for name, template, and output directory when arguments are omitted
 - `--output` flag to specify where the project is created

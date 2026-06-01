@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import shutil
 from pathlib import Path
@@ -672,6 +673,9 @@ def _rename(old_dir: Path, new_name: str) -> tuple[Path, Path]:
             continue
         root_file.rename(old_dir / f"{new_name}{root_file.suffix}")
 
+    # Windows: cannot rename a directory that is the current working directory.
+    if Path.cwd().resolve() == old_dir.resolve():
+        os.chdir(old_dir.parent)
     old_dir.rename(new_dir)
     return new_dir, new_dir / f"{new_name}.tex"
 

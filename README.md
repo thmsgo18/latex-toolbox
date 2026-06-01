@@ -1,198 +1,109 @@
+<div align="center">
+
 # LaTeX Toolbox
 
-[Read this in French](./README.fr.md)
+CLI to create standalone LaTeX projects from ready-made templates.
 
-LaTeX Toolbox is a local toolkit for creating polished, reusable, standalone LaTeX projects from ready-made templates.
+[![PyPI version](https://img.shields.io/pypi/v/latex-toolbox?color=blue)](https://pypi.org/project/latex-toolbox/)
+[![CI](https://github.com/thmsgo18/latex-toolbox/actions/workflows/ci.yml/badge.svg)](https://github.com/thmsgo18/latex-toolbox/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/pypi/pyversions/latex-toolbox)](https://pypi.org/project/latex-toolbox/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-It is built for a simple workflow:
-- keep your templates, styles, and shared assets in this repository;
-- generate a new project with the `latex-toolbox` command;
-- work on the generated project in VS Code;
-- version each generated project in its own Git repository if needed.
+[Lire en français](./README.fr.md)
 
-If you regularly write course reports, research papers, TER reports, or collaborative LaTeX documents, this repository gives you a clean starting point every time without rebuilding your structure from scratch.
+</div>
 
-## What the toolbox does
+---
 
-When you create a project, the toolbox:
-- copies the selected template;
-- renames the main `.tex` file to match the project name;
-- copies the required LaTeX styles into the project;
-- copies the logos from `assets/logos/`;
-- creates a project-level `.gitignore` for common LaTeX build files;
-- creates a project that can compile on its own.
+LaTeX Toolbox is a command-line tool that generates ready-to-compile, standalone LaTeX projects from templates. Each generated project embeds its own styles and assets — it can be compiled, shared, and versioned independently, with no dependency on this repository.
 
-Generated projects do not depend on this repository at compile time.
-
-## Requirements
-
-Recommended setup:
-- Python 3
-- a LaTeX distribution such as `MacTeX`
-- VS Code
-- the `LaTeX Workshop` extension
-
-Useful VS Code extensions:
-- `LaTeX Workshop`
-- `LTeX+`
-- `Code Spell Checker`
-
-Important:
-- if you use `LaTeX Workshop`, disable `vscode-pdf` to avoid PDF viewer conflicts.
-
-## Install the command
-
-The easiest installation method is `pipx`.
-
-From this repository root:
+## Installation
 
 ```bash
-cd /path/to/latex-toolbox
-brew install pipx
-pipx install --editable .
+pipx install latex-toolbox
 ```
 
-After that, the command is available as:
+Requires Python 3.10+. If `pipx` is not installed: `brew install pipx` on macOS, or see [pipx.pypa.io](https://pipx.pypa.io).
+
+## First setup
+
+On a fresh machine, run the setup command to check your environment and install LaTeX automatically:
 
 ```bash
-latex-toolbox
+latex-toolbox setup
 ```
 
-If the command is not found after installation:
+This verifies that `latexmk` and `lualatex` are available, and offers to install them via your system package manager (`brew` on macOS, `apt` on Debian/Ubuntu, `winget` on Windows). VS Code extensions are also installed if the `code` CLI is available.
+
+## Usage
+
+### Interactive mode
+
+Run `create` with no arguments to be guided step by step:
+
+```
+$ latex-toolbox create
+
+Project name: my-report
+Available templates:
+  1. rapport-projet-en
+  2. rapport-projet-fr
+  3. rapport-ter
+  4. research
+Choose a template [1-4]: 1
+Create project in [/Users/thomas/Desktop]:
+
+Project created: /Users/thomas/Desktop/my-report
+Edit: my-report/my-report.tex
+Next: fill in frontmatter/metadata.tex then save to compile.
+Open project in VS Code? [y/N]
+```
+
+### With flags
+
+All arguments are optional — omitted ones are prompted interactively.
 
 ```bash
-pipx ensurepath
+# specify everything upfront
+latex-toolbox create --name my-report --template rapport-projet-en
+
+# create in a specific directory
+latex-toolbox create --name my-paper --template research --output ~/Desktop
 ```
 
-Then open a new terminal window.
-
-## Quick start
-
-Create a project report in the current directory:
+### Rename a project
 
 ```bash
-latex-toolbox create --name signal-processing-report --template rapport-projet-en
+# from the parent directory
+latex-toolbox rename old-name new-name
+
+# from inside the project directory
+latex-toolbox rename new-name
 ```
 
-Create a research-style paper:
+This renames the folder, the main `.tex` file, and any existing build artifacts.
 
-```bash
-latex-toolbox create --name audio-search-paper --template research
-```
+## Available templates
 
-Then open the generated folder in VS Code and start editing the main file:
-
-```text
-./signal-processing-report/signal-processing-report.tex
-```
-
-## Available commands
-
-List templates:
+| Template | Language | Description |
+|---|---|---|
+| `rapport-projet-en` | English | Project report with cover page, TOC, introduction, conclusion, AI statement |
+| `rapport-projet-fr` | French | Same structure as above, in French |
+| `rapport-ter` | English | Academic TER report with detailed structure, bibliography, and appendices |
+| `research` | English | Research article with two-column layout, abstract, and BibTeX bibliography |
 
 ```bash
 latex-toolbox list-templates
 ```
 
-Check or bootstrap a machine for LaTeX work:
+## After creating a project
 
-```bash
-latex-toolbox setup
-latex-toolbox setup --check-only
-latex-toolbox setup --install-tex
-```
+1. Open the generated folder in VS Code.
+2. Fill in `frontmatter/metadata.tex` — title, authors, course name, university logo.
+3. Save the main `.tex` file to trigger compilation (requires [LaTeX Workshop](https://marketplace.visualstudio.com/items?itemName=James-Yu.latex-workshop)).
+4. The PDF is built into `build/`.
 
-Supported automatic installation paths:
-- macOS: `brew`
-- Ubuntu / Debian: `apt-get`
-- Fedora: `dnf`
-- Arch Linux: `pacman`
-- Windows: `winget`
-
-Create a project:
-
-```bash
-latex-toolbox create --name my-project --template rapport-projet-en
-```
-
-Rules:
-- `--name` is required
-- `--template` is required
-- the project is created in the current directory
-- the created folder uses the project name
-
-Example:
-
-```bash
-cd ~/Desktop
-latex-toolbox create --name shazam-report --template research
-```
-
-This creates:
-
-```text
-~/Desktop/shazam-report/
-```
-
-Rename a generated project:
-
-```bash
-latex-toolbox rename shazam-report shazam-final-report
-```
-
-This renames:
-- the project folder
-- the main `.tex` file
-- the main build artifacts when they already exist
-
-You can also run the command from inside the project folder itself:
-
-```bash
-cd shazam-report
-latex-toolbox rename shazam-final-report
-```
-
-## Recommended workflow
-
-### 1. Create a project
-
-```bash
-latex-toolbox create --name my-project --template rapport-projet-en
-```
-
-Real examples:
-
-```bash
-latex-toolbox create --name deep-learning-lab --template rapport-projet-en
-latex-toolbox create --name rapport-analyse-signaux --template rapport-projet-fr
-latex-toolbox create --name keyword-spotting-paper --template research
-```
-
-### 2. Open the project in VS Code
-
-Open the main file, for example:
-
-```text
-./my-project/my-project.tex
-```
-
-### 3. Fill in the metadata
-
-Cover-page information is centralized in:
-
-```text
-frontmatter/metadata.tex
-```
-
-Typical values include:
-- report title
-- course name
-- authors
-- supervisors
-- project links
-- university logo
-
-Example:
+Example `metadata.tex`:
 
 ```tex
 \newcommand{\reporttitle}{Audio Fingerprinting Study}
@@ -206,22 +117,53 @@ Example:
 \addteacher{Dr Example}{}
 
 \resetprojectlinks
-\addprojectlink{Repository}{https://github.com/example/audio-fingerprinting}
+\addprojectlink{Repository}{https://github.com/example/project}
 ```
 
-If you leave the second argument empty in `\addauthor{...}{}` or `\addteacher{...}{}`, no role is displayed.
+Leaving the second argument empty in `\addauthor{...}{}` or `\addteacher{...}{}` hides the role label.
 
-### 4. Compile in VS Code
+## Generated project structure
 
-With `LaTeX Workshop`:
-- open the main `.tex` file;
-- run `LaTeX Workshop: View LaTeX PDF`;
-- save the file to rebuild;
-- the PDF refreshes after each successful compilation.
+```
+my-project/
+├── my-project.tex            ← main file (named after the project)
+├── frontmatter/
+│   ├── metadata.tex          ← title, authors, course
+│   └── toc.tex
+├── sections/
+├── backmatter/
+├── figures/
+├── images/
+├── screens/
+├── assets/
+│   ├── images/common/
+│   └── logos/
+├── styles/packages/          ← embedded styles, no external dependency
+├── scripts/                  ← standalone setup scripts
+├── .vscode/                  ← LaTeX Workshop settings
+└── .gitignore
+```
 
-### 5. Version the generated project
+Styles and logos are copied into the project at creation time. The generated project has no runtime dependency on this repository.
 
-Each generated project is standalone, so you can version it separately:
+## Command reference
+
+| Command | Description |
+|---|---|
+| `latex-toolbox create` | Create a project (interactive) |
+| `latex-toolbox create --name NAME --template TEMPLATE` | Create with explicit arguments |
+| `latex-toolbox create --output DIR` | Set output directory |
+| `latex-toolbox rename OLD NEW` | Rename from parent directory |
+| `latex-toolbox rename NEW` | Rename from inside project directory |
+| `latex-toolbox list-templates` | List available templates |
+| `latex-toolbox setup` | Check and set up the LaTeX environment |
+| `latex-toolbox setup --check-only` | Check without installing anything |
+| `latex-toolbox setup --install-tex` | Install LaTeX directly |
+| `latex-toolbox --version` | Show installed version |
+
+## Versioning generated projects
+
+Each generated project is self-contained, making it straightforward to version independently:
 
 ```bash
 cd my-project
@@ -230,214 +172,8 @@ git add .
 git commit -m "Initial report"
 ```
 
-Then create a dedicated GitHub repository for that project only.
+Create a dedicated private repository and invite only the collaborators relevant to that document.
 
-Typical collaboration workflow:
-- create the project with `latex-toolbox`;
-- initialize Git inside the generated folder;
-- create one private GitHub repository for that project;
-- invite only the people who should access that document.
+## Contributing
 
-## Available templates
-
-### `rapport-projet-en`
-
-English project-report template with:
-- cover page
-- table of contents
-- introduction
-- conclusion
-- AI statement
-
-### `rapport-projet-fr`
-
-Same structure as `rapport-projet-en`, but in French.
-
-### `rapport-ter`
-
-English TER-style report template with a more detailed academic structure.
-
-### `research`
-
-English research-style template with:
-- cover page
-- abstract
-- table of contents
-- two-column main body
-- introduction
-- conclusion
-- appendix
-- AI usage note
-- BibTeX bibliography
-
-## Generated project structure
-
-Typical structure:
-
-```text
-my-project/
-├── my-project.tex
-├── frontmatter/
-├── sections/
-├── backmatter/ or appendix/
-├── references/ or bibliography/
-├── figures/
-├── images/
-├── screens/
-├── assets/
-│   ├── images/common/
-│   └── logos/
-└── styles/packages/
-```
-
-Important points:
-- the main file uses the project name;
-- LaTeX styles are copied into the project;
-- logos are copied into the project;
-- the project can be shared without shipping the whole toolbox repository.
-
-## Modular styles
-
-The source styles live in:
-
-```text
-styles/packages/
-```
-
-Main files:
-- `university-project-report.sty`
-- `university-ter-report.sty`
-- `research-article.sty`
-- `report-metadata.sty`
-- `report-tables.sty`
-- `report-code-python.sty`
-- `report-code-bash.sty`
-- `report-colors.sty`
-- `report-ter-titlepage.sty`
-- `report-theorems-fr.sty`
-
-When a project is created, these styles are copied into the generated project under:
-
-```text
-styles/packages/
-```
-
-## Assets and logos
-
-The repository-level folder:
-
-```text
-assets/logos/
-```
-
-is used as the source for logos copied into new projects.
-
-In a generated project:
-- place logos in `assets/logos/`
-- place reusable images in `assets/images/common/`
-
-## Bibliography
-
-The `research` template uses a separate BibTeX file.
-
-Typical path:
-
-```text
-references/references.bib
-```
-
-Add your references there and compile the document normally.
-
-## VS Code snippets
-
-Snippets are provided in:
-
-```text
-.vscode/latex.code-snippets
-```
-
-Useful snippet prefixes:
-- `ltx-code-py`
-- `ltx-code-sh`
-- `ltx-fig`
-- `ltx-screen`
-- `ltx-ai`
-- `ltx-toc`
-
-## Evolving the toolbox
-
-If you update:
-- templates in `templates/`
-- styles in `styles/packages/`
-- logos in `assets/logos/`
-
-then future generated projects will include those changes.
-
-Already-generated projects are not updated automatically, because they embed their own local copies.
-
-## Repository structure
-
-```text
-LaTeX/
-├── assets/
-├── latex_toolbox/
-├── projects/
-├── scripts/
-├── styles/
-├── templates/
-└── .vscode/
-```
-
-Role of each folder:
-- `latex_toolbox/`: Python code for the CLI
-- `templates/`: source templates
-- `styles/`: shared toolbox styles
-- `assets/`: shared logos and reusable resources
-- `projects/`: optional place to keep real generated projects
-- `scripts/`: compatibility wrappers
-
-## Quick command reference
-
-List templates:
-
-```bash
-latex-toolbox list-templates
-```
-
-Rename a project:
-
-```bash
-latex-toolbox rename old-project-name new-project-name
-```
-
-Check the local machine setup:
-
-```bash
-latex-toolbox setup --check-only
-```
-
-Create an English project report:
-
-```bash
-latex-toolbox create --name my-project --template rapport-projet-en
-```
-
-Create a French project report:
-
-```bash
-latex-toolbox create --name mon-projet --template rapport-projet-fr
-```
-
-Create a research project:
-
-```bash
-latex-toolbox create --name paper-audio-search --template research
-```
-
-## Summary
-
-LaTeX Toolbox helps you:
-- create LaTeX projects quickly;
-- reuse your styles and logos;
-- work comfortably in VS Code;
-- share each generated project as its own Git repository.
+See [CONTRIBUTING.md](CONTRIBUTING.md).

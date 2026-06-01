@@ -3,6 +3,23 @@ from __future__ import annotations
 import argparse
 import sys
 from importlib.metadata import PackageNotFoundError, version
+from pathlib import Path
+
+from .project import (
+    available_templates,
+    create_project,
+    rename_current_project,
+    rename_project,
+    validate_name,
+)
+from .setup import (
+    is_first_run,
+    mark_initialized,
+    offer_open_vscode,
+    run_first_launch_check,
+    run_setup,
+    warn_if_latex_missing,
+)
 
 
 def _get_version() -> str:
@@ -11,19 +28,35 @@ def _get_version() -> str:
     except PackageNotFoundError:
         return "unknown"
 
-from .project import (
-    available_templates,
-    create_project,
-    rename_current_project,
-    rename_project,
-)
-from .setup import (
-    is_first_run,
-    mark_initialized,
-    run_first_launch_check,
-    run_setup,
-    warn_if_latex_missing,
-)
+
+def _ask_project_name() -> str:
+    while True:
+        try:
+            name = input("Project name: ").strip()
+        except (EOFError, KeyboardInterrupt):
+            print("")
+            sys.exit(1)
+        try:
+            validate_name(name)
+            return name
+        except ValueError as exc:
+            print(str(exc))
+
+
+def _select_template_interactively() -> str:
+    templates = available_templates()
+    print("Available templates:")
+    for i, name in enumerate(templates, 1):
+        print(f"  {i}. {name}")
+    while True:
+        try:
+            answer = input(f"Choose a template [1-{len(templates)}]: ").strip()
+            idx = int(answer) - 1
+            if 0 <= idx < len(templates):
+                return templates[idx]
+        except (ValueError, EOFError, KeyboardInterrupt):
+            pass
+        print(f"Please enter a number between 1 and {len(templates)}.")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -44,13 +77,18 @@ def build_parser() -> argparse.ArgumentParser:
     )
     create_parser.add_argument(
         "--name",
-        required=True,
-        help="Name of the report and of the generated main .tex file.",
+        default=None,
+        help="Name of the project (prompted interactively if omitted).",
     )
     create_parser.add_argument(
         "--template",
-        required=True,
-        help="Template name to use.",
+        default=None,
+        help="Template name to use (prompted interactively if omitted).",
+    )
+    create_parser.add_argument(
+        "--output",
+        default=None,
+        help="Directory where the project will be created (default: current directory).",
     )
 
     rename_parser = subparsers.add_parser(
@@ -100,29 +138,46 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "create":
+        name = args.name
+        template = args.template
+
+        if name is None:
+            if not sys.stdin.isatty():
+                print("--name is required in non-interactive mode.", file=sys.stderr)
+                return 1
+            name = _ask_project_name()
+
+        if template is None:
+            if not sys.stdin.isatty():
+                print("--template is required in non-interactive mode.", file=sys.stderr)
+                return 1
+            template = _select_template_interactively()
+
         first_run = is_first_run()
         if first_run:
             run_first_launch_check()
             mark_initialized()
 
+        output_dir = Path(args.output).resolve() if args.output else None
+
         try:
             target_dir, main_tex_file = create_project(
-                name=args.name,
-                template=args.template,
+                name=name,
+                template=template,
+                output_dir=output_dir,
             )
         except (ValueError, FileExistsError) as exc:
             print(str(exc), file=sys.stderr)
             return 1
 
-        print(f"Project created in: {target_dir}")
-        print(f"Open next: {main_tex_file}")
-        print("The project now embeds its local styles in styles/packages/.")
-        print(f"Template used: {args.template}")
-        print(f"Current parent folder: {target_dir.parent}")
-        print("Remember to customise frontmatter/metadata.tex and the sections.")
+        print(f"Project created: {target_dir}")
+        print(f"Edit: {main_tex_file.relative_to(target_dir.parent)}")
+        print("Next: fill in frontmatter/metadata.tex then save to compile.")
 
         if not first_run:
             warn_if_latex_missing()
+
+        offer_open_vscode(target_dir)
 
         return 0
 
@@ -148,10 +203,8 @@ def main(argv: list[str] | None = None) -> int:
             print(str(exc), file=sys.stderr)
             return 1
 
-        print(f"Project renamed in: {target_dir}")
-        print(f"New main file: {main_tex_file}")
-        print("The project folder and the main .tex file have been renamed.")
-        print("Build files tied to the main name were also renamed when they existed.")
+        print(f"Project renamed: {target_dir}")
+        print(f"Main file: {main_tex_file.name}")
         return 0
 
     if args.command == "setup":

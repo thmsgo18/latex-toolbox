@@ -535,7 +535,11 @@ exit /b 1
     setup_sh_path.chmod(0o755)
 
 
-def create_project(name: str, template: str) -> tuple[Path, Path]:
+def create_project(
+    name: str,
+    template: str,
+    output_dir: Path | None = None,
+) -> tuple[Path, Path]:
     validate_name(name)
 
     source_dir = templates_dir() / template
@@ -543,7 +547,7 @@ def create_project(name: str, template: str) -> tuple[Path, Path]:
         available = ", ".join(available_templates())
         raise ValueError(f"Unknown template: {template}. Available: {available}")
 
-    base_dir = Path.cwd().resolve()
+    base_dir = (output_dir or Path.cwd()).resolve()
     target_dir = base_dir / name
     main_tex_file = target_dir / f"{name}.tex"
     local_style_dir = target_dir / "styles" / "packages"

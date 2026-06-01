@@ -154,6 +154,10 @@ def install_tex_distribution() -> bool:
         return False
 
     print(description)
+    if current_os == "macos":
+        print("This may take 20-30 minutes — Homebrew will show its progress below.")
+    else:
+        print("This may take several minutes.")
     for command in commands:
         print("")
         print("Running command:")
@@ -224,6 +228,19 @@ def print_os_specific_help() -> None:
     else:
         print(f"- OS detected: {current_os}")
         print("- Install a LaTeX distribution that provides at least `latexmk` and `lualatex`.")
+
+
+def offer_open_vscode(target_dir: Path) -> None:
+    if not command_exists("code"):
+        return
+    if not sys.stdin.isatty():
+        return
+    try:
+        answer = input("Open project in VS Code? [y/N] ").strip().lower()
+        if answer in ("y", "yes"):
+            subprocess.run(["code", str(target_dir)], check=False)
+    except (EOFError, KeyboardInterrupt):
+        print("")
 
 
 def warn_if_latex_missing() -> None:

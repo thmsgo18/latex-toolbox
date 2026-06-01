@@ -28,6 +28,20 @@ LOCAL_STYLE_PATTERN = re.compile(
     r"\\(?:RequirePackage|usepackage)(?:\[[^\]]*\])?\{([^}]*)\}"
 )
 
+_FORBIDDEN_NAME_CHARS = re.compile(r'[ /\\:*?"<>|]')
+
+
+def validate_name(name: str) -> None:
+    if not name:
+        raise ValueError("Project name cannot be empty.")
+    if _FORBIDDEN_NAME_CHARS.search(name):
+        raise ValueError(
+            f"Invalid project name: {name!r}. "
+            "Avoid spaces and special characters — use hyphens (e.g. my-project)."
+        )
+    if name.startswith("."):
+        raise ValueError(f"Project name cannot start with a dot: {name!r}.")
+
 
 def package_dir() -> Path:
     return Path(__file__).resolve().parent
@@ -74,11 +88,10 @@ def copy_tree(source: Path, destination: Path) -> None:
 def patch_local_style(style_path: Path) -> None:
     if not style_path.exists():
         return
-
-    original = "{{../../assets/images/common/}}{{../../assets/logos/}}"
-    replacement = "{{assets/images/common/}}{{assets/logos/}}"
     content = style_path.read_text(encoding="utf-8")
-    style_path.write_text(content.replace(original, replacement), encoding="utf-8")
+    patched = re.sub(r"\.\./\.\./assets/", "assets/", content)
+    if patched != content:
+        style_path.write_text(patched, encoding="utf-8")
 
 
 def local_style_dependencies(file_path: Path) -> list[str]:
@@ -523,6 +536,8 @@ exit /b 1
 
 
 def create_project(name: str, template: str) -> tuple[Path, Path]:
+    validate_name(name)
+
     source_dir = templates_dir() / template
     if not source_dir.is_dir():
         available = ", ".join(available_templates())
@@ -536,49 +551,53 @@ def create_project(name: str, template: str) -> tuple[Path, Path]:
     if target_dir.exists():
         raise FileExistsError(f"Folder already exists: {target_dir}")
 
-    base_dir.mkdir(parents=True, exist_ok=True)
     target_dir.mkdir(parents=True, exist_ok=False)
-    copy_tree(source_dir, target_dir)
+    try:
+        copy_tree(source_dir, target_dir)
 
-    copied_main = target_dir / "main.tex"
-    if copied_main.exists():
-        copied_main.rename(main_tex_file)
+        copied_main = target_dir / "main.tex"
+        if copied_main.exists():
+            copied_main.rename(main_tex_file)
 
-    local_style_dir.mkdir(parents=True, exist_ok=True)
-    for style_path in required_style_files(source_dir):
-        shutil.copy2(style_path, local_style_dir / style_path.name)
+        local_style_dir.mkdir(parents=True, exist_ok=True)
+        for style_path in required_style_files(source_dir):
+            shutil.copy2(style_path, local_style_dir / style_path.name)
 
-    (target_dir / "assets" / "images" / "common").mkdir(parents=True, exist_ok=True)
-    (target_dir / "assets" / "logos").mkdir(parents=True, exist_ok=True)
-    for copied_style in local_style_dir.glob("*.sty"):
-        patch_local_style(copied_style)
+        (target_dir / "assets" / "images" / "common").mkdir(parents=True, exist_ok=True)
+        (target_dir / "assets" / "logos").mkdir(parents=True, exist_ok=True)
+        for copied_style in local_style_dir.glob("*.sty"):
+            patch_local_style(copied_style)
 
-    for logo_path in sorted(logos_dir().iterdir()):
-        if should_ignore(logo_path):
-            continue
-        destination = target_dir / "assets" / "logos" / logo_path.name
-        if logo_path.is_dir():
-            shutil.copytree(logo_path, destination)
-        else:
-            shutil.copy2(logo_path, destination)
+        for logo_path in sorted(logos_dir().iterdir()):
+            if should_ignore(logo_path):
+                continue
+            destination = target_dir / "assets" / "logos" / logo_path.name
+            if logo_path.is_dir():
+                shutil.copytree(logo_path, destination)
+            else:
+                shutil.copy2(logo_path, destination)
 
-    (target_dir / "assets" / "images" / "common" / ".gitkeep").touch(exist_ok=True)
-    (target_dir / "assets" / "logos" / ".gitkeep").touch(exist_ok=True)
-    write_project_vscode_settings(target_dir)
-    write_project_vscode_extensions(target_dir)
-    write_project_gitignore(target_dir)
-    write_project_setup_scripts(target_dir)
+        (target_dir / "assets" / "images" / "common" / ".gitkeep").touch(exist_ok=True)
+        (target_dir / "assets" / "logos" / ".gitkeep").touch(exist_ok=True)
+        write_project_vscode_settings(target_dir)
+        write_project_vscode_extensions(target_dir)
+        write_project_gitignore(target_dir)
+        write_project_setup_scripts(target_dir)
+    except Exception:
+        shutil.rmtree(target_dir, ignore_errors=True)
+        raise
+
     return target_dir, main_tex_file
 
 
-def rename_project(old_name: str, new_name: str) -> tuple[Path, Path]:
-    base_dir = Path.cwd().resolve()
-    old_dir = base_dir / old_name
-    new_dir = base_dir / new_name
+def _rename(old_dir: Path, new_name: str) -> tuple[Path, Path]:
+    validate_name(new_name)
+
+    new_dir = old_dir.parent / new_name
+    old_name = old_dir.name
 
     if not old_dir.is_dir():
         raise FileNotFoundError(f"Project not found: {old_dir}")
-
     if new_dir.exists():
         raise FileExistsError(f"Target folder already exists: {new_dir}")
 
@@ -604,35 +623,11 @@ def rename_project(old_name: str, new_name: str) -> tuple[Path, Path]:
 
     old_dir.rename(new_dir)
     return new_dir, new_dir / f"{new_name}.tex"
+
+
+def rename_project(old_name: str, new_name: str) -> tuple[Path, Path]:
+    return _rename(Path.cwd().resolve() / old_name, new_name)
 
 
 def rename_current_project(new_name: str) -> tuple[Path, Path]:
-    old_dir = Path.cwd().resolve()
-    old_name = old_dir.name
-    new_dir = old_dir.parent / new_name
-
-    if new_dir.exists():
-        raise FileExistsError(f"Target folder already exists: {new_dir}")
-
-    old_main_tex = old_dir / f"{old_name}.tex"
-    new_main_tex = old_dir / f"{new_name}.tex"
-    if not old_main_tex.exists():
-        raise FileNotFoundError(
-            f"Main file not found: {old_main_tex}. "
-            "The main file name must match the folder name."
-        )
-
-    old_main_tex.rename(new_main_tex)
-
-    build_dir = old_dir / "build"
-    if build_dir.is_dir():
-        for build_file in build_dir.glob(f"{old_name}.*"):
-            build_file.rename(build_dir / f"{new_name}{build_file.suffix}")
-
-    for root_file in old_dir.glob(f"{old_name}.*"):
-        if root_file.name == new_main_tex.name:
-            continue
-        root_file.rename(old_dir / f"{new_name}{root_file.suffix}")
-
-    old_dir.rename(new_dir)
-    return new_dir, new_dir / f"{new_name}.tex"
+    return _rename(Path.cwd().resolve(), new_name)

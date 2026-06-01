@@ -12,6 +12,12 @@ requires-python = ">=3.10"
 [project.scripts]
 latex-toolbox = "latex_toolbox.cli:main"
 
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["latex_toolbox*"]

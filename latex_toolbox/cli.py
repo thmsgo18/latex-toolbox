@@ -2,6 +2,14 @@ from __future__ import annotations
 
 import argparse
 import sys
+from importlib.metadata import PackageNotFoundError, version
+
+
+def _get_version() -> str:
+    try:
+        return version("latex-toolbox")
+    except PackageNotFoundError:
+        return "unknown"
 
 from .project import (
     available_templates,
@@ -22,6 +30,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="latex-toolbox",
         description="Utilities for generating standalone LaTeX projects from the toolbox.",
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s {_get_version()}",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 

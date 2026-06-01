@@ -59,6 +59,21 @@ def _select_template_interactively() -> str:
         print(f"Please enter a number between 1 and {len(templates)}.")
 
 
+def _ask_output_dir() -> Path:
+    default = Path.cwd()
+    try:
+        answer = input(f"Create project in [{default}]: ").strip()
+    except (EOFError, KeyboardInterrupt):
+        print("")
+        sys.exit(1)
+    if not answer:
+        return default
+    path = Path(answer).expanduser().resolve()
+    if not path.exists():
+        path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="latex-toolbox",
@@ -153,12 +168,17 @@ def main(argv: list[str] | None = None) -> int:
                 return 1
             template = _select_template_interactively()
 
+        if args.output is not None:
+            output_dir = Path(args.output).resolve()
+        elif sys.stdin.isatty():
+            output_dir = _ask_output_dir()
+        else:
+            output_dir = Path.cwd()
+
         first_run = is_first_run()
         if first_run:
             run_first_launch_check()
             mark_initialized()
-
-        output_dir = Path(args.output).resolve() if args.output else None
 
         try:
             target_dir, main_tex_file = create_project(

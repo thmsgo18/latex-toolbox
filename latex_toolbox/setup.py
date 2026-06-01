@@ -28,6 +28,8 @@ def mark_initialized() -> None:
 
 
 def _prompt_yes_no(question: str) -> bool:
+    if not sys.stdin.isatty():
+        return False
     try:
         answer = input(f"{question} [y/N] ").strip().lower()
         return answer in ("y", "yes")

@@ -1,17 +1,23 @@
-<div align="center">
-
 # LaTeX Toolbox
 
-Skip the setup. Start writing. Everything you need, nothing more.
+<p align="center">
+  <img src="docs/assets/logo.jpg" alt="LaTeX Toolbox" width="600">
+</p>
 
-[![PyPI version](https://img.shields.io/pypi/v/latex-toolbox?color=blue)](https://pypi.org/project/latex-toolbox/)
-[![CI](https://github.com/thmsgo18/latex-toolbox/actions/workflows/ci.yml/badge.svg)](https://github.com/thmsgo18/latex-toolbox/actions/workflows/ci.yml)
-[![Python](https://img.shields.io/pypi/pyversions/latex-toolbox)](https://pypi.org/project/latex-toolbox/)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+<p align="center">
+  Skip the setup. Start writing. Everything you need, nothing more.
+</p>
 
-[Read in English](./README.md)
+<p align="center">
+  <a href="https://pypi.org/project/latex-toolbox/"><img src="https://img.shields.io/pypi/v/latex-toolbox?style=for-the-badge&color=blue" alt="PyPI version"></a>
+  <a href="https://github.com/thmsgo18/latex-toolbox/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/thmsgo18/latex-toolbox/ci.yml?branch=main&style=for-the-badge" alt="CI"></a>
+  <a href="https://pypi.org/project/latex-toolbox/"><img src="https://img.shields.io/pypi/pyversions/latex-toolbox?style=for-the-badge" alt="Python versions"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?style=for-the-badge" alt="License MIT"></a>
+</p>
 
-</div>
+<p align="center">
+  <a href="./README.md">Read in English</a>
+</p>
 
 ---
 

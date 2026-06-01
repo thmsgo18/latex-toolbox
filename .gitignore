@@ -1,4 +1,14 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+dist/
+*.egg-info/
+
+# macOS
 .DS_Store
+
+# LaTeX build
 **/build/
 **/*.aux
 **/*.bbl

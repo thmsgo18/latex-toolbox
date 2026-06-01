@@ -1,7 +1,7 @@
 # LaTeX Toolbox
 
 <p align="center">
-  <img src="docs/assets/logo.jpg" alt="LaTeX Toolbox" width="600">
+  <img src="docs/assets/logo.png" alt="LaTeX Toolbox" width="600">
 </p>
 
 <p align="center">

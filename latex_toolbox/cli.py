@@ -169,22 +169,25 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "create":
         name = args.name
         template = args.template
+        guided = False
 
         if name is None:
             if not _is_interactive():
                 print("--name is required in non-interactive mode.", file=sys.stderr)
                 return 1
             name = _ask_project_name()
+            guided = True
 
         if template is None:
             if not _is_interactive():
                 print("--template is required in non-interactive mode.", file=sys.stderr)
                 return 1
             template = _select_template_interactively()
+            guided = True
 
         if args.output is not None:
             output_dir = Path(args.output).resolve()
-        elif _is_interactive():
+        elif guided:
             output_dir = _ask_output_dir()
         else:
             output_dir = Path.cwd()

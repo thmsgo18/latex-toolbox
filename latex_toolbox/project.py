@@ -160,6 +160,35 @@ This project uses **LuaLaTeX**. Verify it is available:
 ```bash
 lualatex --version
 ```
+
+---
+
+## Resources
+
+### Official documentation
+
+| Resource | Link |
+|---|---|
+| LaTeX Project | <https://www.latex-project.org/help/documentation/> |
+| CTAN — package index | <https://www.ctan.org> |
+| TeXdoc — search package docs | <https://texdoc.org> |
+| TikZ & PGF manual | <https://tikz.dev> |
+
+### Learn LaTeX
+
+| Resource | Link |
+|---|---|
+| Overleaf — Learn LaTeX in 30 minutes | <https://www.overleaf.com/learn/latex/Learn_LaTeX_in_30_minutes> |
+| Overleaf knowledge base | <https://www.overleaf.com/learn> |
+| LaTeX Wikibook | <https://en.wikibooks.org/wiki/LaTeX> |
+| LaTeX FAQ | <https://texfaq.org> |
+
+### LuaLaTeX specific
+
+| Resource | Link |
+|---|---|
+| LuaLaTeX wiki | <https://www.luatex.org/documentation.html> |
+| fontspec (font loading) | <https://texdoc.org/serve/fontspec/0> |
 """
     (target_dir / "GETTING_STARTED.md").write_text(content, encoding="utf-8")
 

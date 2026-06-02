@@ -74,6 +74,30 @@ This result has been demonstrated in prior work~\\cite{author2024}.
 
 The bibliography is printed automatically at the end of the document.
 """,
+        "rapport-projet-fr": """\
+
+### Ajouter une référence bibliographique
+
+Ajoutez votre référence dans `bibliography/references.bib`, puis citez-la dans le texte :
+
+```latex
+Ce résultat a été démontré dans des travaux antérieurs~\\cite{auteur2024}.
+```
+
+La bibliographie apparaît automatiquement avant les annexes.
+""",
+        "rapport-projet-en": """\
+
+### Add a bibliography reference
+
+Add your reference to `bibliography/references.bib`, then cite it in your text:
+
+```latex
+This result has been demonstrated in prior work~\\cite{author2024}.
+```
+
+The bibliography appears automatically before the appendices.
+""",
     }
 
     _EXTRA_FOLDERS = {
@@ -81,6 +105,8 @@ The bibliography is printed automatically at the end of the document.
                        "| `appendices/` | Appendices |\n",
         "research": "| `references/` | BibTeX reference file |\n"
                     "| `appendix/` | Appendices and supplementary material |\n",
+        "rapport-projet-fr": "| `bibliography/` | Fichier de références BibTeX |\n",
+        "rapport-projet-en": "| `bibliography/` | BibTeX reference file |\n",
     }
 
     bibliography_section = _BIBLIOGRAPHY.get(template, "")

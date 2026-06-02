@@ -1,6 +1,14 @@
 \documentclass[12pt,a4paper]{article}
 
 \usepackage[main=english,french]{babel}
+\usepackage[
+  backend=biber,
+  style=numeric-comp,
+  sorting=none,
+  maxbibnames=99,
+  backref=true
+]{biblatex}
+\addbibresource{bibliography/references.bib}
 \usepackage{styles/packages/university-project-report}
 
 \input{frontmatter/metadata.tex}
@@ -53,10 +61,21 @@
   \end{center}
 \end{titlepage}
 
+\input{frontmatter/abstract.tex}
 \input{frontmatter/toc.tex}
 
 \input{sections/introduction.tex}
+\input{sections/related-work.tex}
+\input{sections/requirements.tex}
+\input{sections/architecture.tex}
+\input{sections/implementation.tex}
+\input{sections/testing.tex}
+\input{sections/results.tex}
 \input{sections/conclusion.tex}
+
+\printbibliography[heading=bibintoc, title={References}]
+
 \input{backmatter/ai-statement.tex}
+\input{backmatter/appendices.tex}
 
 \end{document}

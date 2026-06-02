@@ -11,6 +11,16 @@
 \addbibresource{bibliography/references.bib}
 \usepackage{styles/packages/university-project-report}
 
+% Override French label from the shared style
+\renewcommand{\startannexes}{%
+  \clearpage
+  \phantomsection
+  \addcontentsline{toc}{section}{Appendices}%
+  \section*{Appendices}%
+  \setcounter{subsection}{0}%
+  \renewcommand{\thesubsection}{\Alph{subsection}}%
+}
+
 \input{frontmatter/metadata.tex}
 
 \newcommand{\insertuniversitylogo}{%

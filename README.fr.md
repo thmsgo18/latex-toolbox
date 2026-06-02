@@ -102,11 +102,12 @@ $ latex-toolbox create
 
 Project name: mon-rapport
 Available templates:
-  1. rapport-projet-en
-  2. rapport-projet-fr
-  3. rapport-ter
-  4. research
-Choose a template [1-4]: 2
+  1. cv-en
+  2. cv-fr
+  3. rapport-projet-en
+  4. rapport-projet-fr
+  5. research
+Choose a template [1-5]: 4
 Create project in [/Users/thomas/Desktop]:
 
 Project created: /Users/thomas/Desktop/mon-rapport
@@ -143,10 +144,11 @@ Cette commande renomme le dossier, le fichier `.tex` principal, et les artefacts
 
 | Template | Langue | Description |
 |---|---|---|
-| `rapport-projet-en` | Anglais | Rapport de projet avec page de garde, sommaire, introduction, conclusion, notice IA |
-| `rapport-projet-fr` | Français | Même structure que ci-dessus, en français |
-| `rapport-ter` | Anglais | Rapport académique de type TER avec structure détaillée, bibliographie et annexes |
-| `research` | Anglais | Article de recherche en deux colonnes avec abstract et bibliographie BibTeX |
+| `rapport-projet-fr` | Français | Rapport de projet aligné AFNOR/ISO — cahier des charges, architecture, tests, bibliographie, annexes |
+| `rapport-projet-en` | Anglais | Rapport de projet aligné ISO/IEEE — requirements, architecture, testing, bibliography, appendices |
+| `research` | Anglais | Article de recherche — deux colonnes, related work, methodology, experiments, bibliographie |
+| `cv-fr` | Français | CV — formation, expérience, projets, engagement, compétences |
+| `cv-en` | Anglais | CV / résumé — education, experience, projects, involvement, skills |
 
 ```bash
 latex-toolbox list-templates

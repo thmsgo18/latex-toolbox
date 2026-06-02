@@ -47,6 +47,123 @@ LOCAL_STYLE_PATTERN = re.compile(
 _FORBIDDEN_NAME_CHARS = re.compile(r'[ /\\:*?"<>|]')
 
 
+def write_getting_started_guide(target_dir: Path, name: str, template: str) -> None:
+    # Template-specific sections
+    _BIBLIOGRAPHY = {
+        "rapport-ter": """\
+
+### Add a bibliography reference
+
+Add your reference to `bibliography/references.bib`, then cite it in your text:
+
+```latex
+This result has been demonstrated in prior work~\\cite{author2024}.
+```
+
+The bibliography is printed automatically at the end of the document.
+""",
+        "research": """\
+
+### Add a bibliography reference
+
+Add your reference to `references/references.bib`, then cite it in your text:
+
+```latex
+This result has been demonstrated in prior work~\\cite{author2024}.
+```
+
+The bibliography is printed automatically at the end of the document.
+""",
+    }
+
+    _EXTRA_FOLDERS = {
+        "rapport-ter": "| `bibliography/` | BibTeX reference file |\n"
+                       "| `appendices/` | Appendices |\n",
+        "research": "| `references/` | BibTeX reference file |\n"
+                    "| `appendix/` | Appendices and supplementary material |\n",
+    }
+
+    bibliography_section = _BIBLIOGRAPHY.get(template, "")
+    extra_folders = _EXTRA_FOLDERS.get(template, "")
+
+    content = f"""\
+# Getting Started — {name}
+
+## Workflow
+
+**1. Fill in your metadata**
+
+Open `frontmatter/metadata.tex` and set the title, author(s), course, and university.
+
+**2. Write your content**
+
+Add or edit files in `sections/`. To add a new section:
+1. Create `sections/my-section.tex`
+2. Add `\\input{{sections/my-section.tex}}` to `{name}.tex`
+
+**3. Save to compile**
+
+Save `{name}.tex` in VS Code → LaTeX Workshop compiles automatically → PDF in `build/{name}.pdf`.
+
+---
+
+## Folder structure
+
+| Folder | Purpose |
+|---|---|
+| `frontmatter/` | Title page data (`metadata.tex`) and table of contents |
+| `sections/` | Main content — one `.tex` file per section |
+| `backmatter/` | AI statement and end matter |
+| `images/` | All images: photos, screenshots, PNG/JPG files |
+| `figures/` | TikZ/pgfplots diagrams (LaTeX source figures, not image files) |
+| `assets/logos/` | University and project logos |
+{extra_folders}\
+| `styles/packages/` | Embedded LaTeX styles — do not edit |
+| `build/` | Compiled PDF — auto-generated, do not commit |
+
+---
+
+## Common operations
+
+### Add an image
+
+Put your image file in `images/`, then in your `.tex` file:
+
+```latex
+\\begin{{figure}}[h]
+  \\centering
+  \\includegraphics[width=0.8\\linewidth]{{my-image.png}}
+  \\caption{{Caption here.}}
+  \\label{{fig:my-label}}
+\\end{{figure}}
+```
+{bibliography_section}
+### Rename this project
+
+```bash
+latex-toolbox rename new-name
+```
+
+This renames the folder, the main `.tex` file, and any build artifacts.
+
+---
+
+## If compilation fails
+
+1. **LaTeX not installed** → run `latex-toolbox setup --install-tex`
+2. **LaTeX Workshop not installed** → install it from the VS Code extensions panel
+3. **Missing package** → `tlmgr install package-name` (TeX Live) or let MiKTeX auto-install
+4. **Compilation stuck** → delete the `build/` folder and try again
+
+This project uses **LuaLaTeX**. Verify it is available:
+
+```bash
+lualatex --version
+```
+"""
+    (target_dir / "GETTING_STARTED.md").write_text(content, encoding="utf-8")
+
+
 def apply_profile_to_metadata(metadata_path: Path, profile: dict) -> None:
     if not metadata_path.exists() or not profile:
         return
@@ -612,7 +729,6 @@ def create_project(
         for style_path in required_style_files(source_dir):
             shutil.copy2(style_path, local_style_dir / style_path.name)
 
-        (target_dir / "assets" / "images" / "common").mkdir(parents=True, exist_ok=True)
         (target_dir / "assets" / "logos").mkdir(parents=True, exist_ok=True)
         for copied_style in local_style_dir.glob("*.sty"):
             patch_local_style(copied_style)
@@ -626,7 +742,6 @@ def create_project(
             else:
                 shutil.copy2(logo_path, destination)
 
-        (target_dir / "assets" / "images" / "common" / ".gitkeep").touch(exist_ok=True)
         (target_dir / "assets" / "logos" / ".gitkeep").touch(exist_ok=True)
         write_project_vscode_settings(target_dir)
         write_project_vscode_extensions(target_dir)
@@ -635,6 +750,7 @@ def create_project(
 
         from .config import get_profile
         apply_profile_to_metadata(target_dir / "frontmatter" / "metadata.tex", get_profile())
+        write_getting_started_guide(target_dir, name, template)
     except Exception:
         shutil.rmtree(target_dir, ignore_errors=True)
         raise

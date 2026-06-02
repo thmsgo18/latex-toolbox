@@ -26,3 +26,4 @@ dist/
 **/*.synctex.gz
 **/*.toc
 **/*.vrb
+projects/

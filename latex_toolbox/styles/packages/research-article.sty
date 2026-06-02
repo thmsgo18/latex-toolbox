@@ -111,3 +111,13 @@
 
 \RequirePackage{balance}
 \RequirePackage{styles/packages/report-metadata}
+
+% Annexes: un seul bloc "Annexes" avec sous-sections lettrées (A, B, C...)
+\newcommand{\startannexes}{%
+  \clearpage
+  \phantomsection
+  \addcontentsline{toc}{section}{Appendices}%
+  \section*{Appendices}%
+  \setcounter{subsection}{0}%
+  \renewcommand{\thesubsection}{\Alph{subsection}}%
+}

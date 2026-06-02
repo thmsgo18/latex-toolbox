@@ -103,3 +103,13 @@
 \preto{\paragraph}{\needspace{6\baselineskip}}
 
 \RequirePackage{styles/packages/report-metadata}
+
+% Annexes: un seul bloc "Annexes" avec sous-sections lettrées (A, B, C...)
+\newcommand{\startannexes}{%
+  \clearpage
+  \phantomsection
+  \addcontentsline{toc}{section}{Annexes}%
+  \section*{Annexes}%
+  \setcounter{subsection}{0}%
+  \renewcommand{\thesubsection}{\Alph{subsection}}%
+}

@@ -50,18 +50,6 @@ _FORBIDDEN_NAME_CHARS = re.compile(r'[ /\\:*?"<>|]')
 def write_getting_started_guide(target_dir: Path, name: str, template: str) -> None:
     # Template-specific sections
     _BIBLIOGRAPHY = {
-        "rapport-ter": """\
-
-### Add a bibliography reference
-
-Add your reference to `bibliography/references.bib`, then cite it in your text:
-
-```latex
-This result has been demonstrated in prior work~\\cite{author2024}.
-```
-
-The bibliography is printed automatically at the end of the document.
-""",
         "research": """\
 
 ### Add a bibliography reference
@@ -101,8 +89,6 @@ The bibliography appears automatically before the appendices.
     }
 
     _EXTRA_FOLDERS = {
-        "rapport-ter": "| `bibliography/` | BibTeX reference file |\n"
-                       "| `appendices/` | Appendices |\n",
         "research": "| `references/` | BibTeX reference file |\n"
                     "| `appendix/` | Appendices and supplementary material |\n",
         "rapport-projet-fr": "| `bibliography/` | Fichier de références BibTeX |\n",

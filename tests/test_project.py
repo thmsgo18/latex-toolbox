@@ -89,8 +89,8 @@ def test_available_templates():
     templates = available_templates()
     assert "rapport-projet-en" in templates
     assert "rapport-projet-fr" in templates
-    assert "rapport-ter" in templates
     assert "research" in templates
+    assert "rapport-ter" not in templates
 
 
 def test_required_style_files_returns_paths():

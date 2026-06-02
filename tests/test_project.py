@@ -90,6 +90,8 @@ def test_available_templates():
     assert "rapport-projet-en" in templates
     assert "rapport-projet-fr" in templates
     assert "research" in templates
+    assert "cv-fr" in templates
+    assert "cv-en" in templates
     assert "rapport-ter" not in templates
 
 

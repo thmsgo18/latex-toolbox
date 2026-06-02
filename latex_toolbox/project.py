@@ -47,7 +47,154 @@ LOCAL_STYLE_PATTERN = re.compile(
 _FORBIDDEN_NAME_CHARS = re.compile(r'[ /\\:*?"<>|]')
 
 
+def _write_cv_getting_started(target_dir: Path, name: str, template: str) -> None:
+    is_fr = template == "cv-fr"
+
+    if is_fr:
+        heading_file = "sections/en-tete.tex"
+        section_table = """\
+| `sections/en-tete.tex` | Nom, contacts, résumé |
+| `sections/formation.tex` | Diplômes et formations |
+| `sections/experience.tex` | Expériences professionnelles |
+| `sections/projets.tex` | Projets personnels et académiques |
+| `sections/engagement.tex` | Engagements et associations |
+| `sections/competences.tex` | Compétences techniques et langues |"""
+        add_exp_title = "### Ajouter une expérience"
+        add_exp_body = f"""\
+Dans `sections/experience.tex`, ajoutez un bloc `\\resumeSubheading` :
+
+```latex
+\\resumeSubheading
+  {{Intitulé du poste}}{{mois 20XX -- mois 20XX}}
+  {{Nom de l'entreprise}}{{Ville, France}}
+  \\begin{{itemize}}[leftmargin=0.12in, label={{}}, itemsep=0pt]
+    \\item \\small Description de vos missions.
+  \\end{{itemize}}
+```"""
+        add_proj_title = "### Ajouter un projet"
+        add_proj_body = f"""\
+Dans `sections/projets.tex`, ajoutez un bloc `\\resumeProjectHeading` :
+
+```latex
+\\resumeProjectHeading
+  {{\\textbf{{\\href{{https://github.com/username/projet}}{{Nom -- Technologies}}}}}}{{Contexte}}
+  \\begin{{itemize}}[leftmargin=0.12in, label={{}}, itemsep=0pt]
+    \\item \\small Description du projet.
+  \\end{{itemize}}
+```"""
+        workflow_step1 = f"Ouvrez `{heading_file}` et renseignez votre nom, téléphone, email et liens GitHub/LinkedIn."
+        workflow_step2 = "Éditez les fichiers dans `sections/` — un fichier par rubrique."
+        workflow_step3 = f"Sauvegardez `{name}.tex` dans VS Code → LaTeX Workshop compile automatiquement → PDF dans `build/{name}.pdf`."
+        fail_font = "**Police introuvable** → vérifiez que TeX Live est à jour : `tlmgr update --all`"
+        resources_title = "## Ressources"
+    else:
+        heading_file = "sections/heading.tex"
+        section_table = """\
+| `sections/heading.tex` | Name, contacts, summary |
+| `sections/education.tex` | Degrees and education |
+| `sections/experience.tex` | Work experience |
+| `sections/projects.tex` | Personal and academic projects |
+| `sections/involvement.tex` | Volunteering and associations |
+| `sections/skills.tex` | Technical skills and languages |"""
+        add_exp_title = "### Add a work experience"
+        add_exp_body = f"""\
+In `sections/experience.tex`, add a `\\resumeSubheading` block:
+
+```latex
+\\resumeSubheading
+  {{Job Title}}{{Month 20XX -- Month 20XX}}
+  {{Company Name}}{{City, Country}}
+  \\begin{{itemize}}[leftmargin=0.12in, label={{}}, itemsep=0pt]
+    \\item \\small Description of your responsibilities.
+  \\end{{itemize}}
+```"""
+        add_proj_title = "### Add a project"
+        add_proj_body = f"""\
+In `sections/projects.tex`, add a `\\resumeProjectHeading` block:
+
+```latex
+\\resumeProjectHeading
+  {{\\textbf{{\\href{{https://github.com/username/project}}{{Name -- Technologies}}}}}}{{Context}}
+  \\begin{{itemize}}[leftmargin=0.12in, label={{}}, itemsep=0pt]
+    \\item \\small Project description.
+  \\end{{itemize}}
+```"""
+        workflow_step1 = f"Open `{heading_file}` and fill in your name, phone, email and GitHub/LinkedIn links."
+        workflow_step2 = "Edit the files in `sections/` — one file per section."
+        workflow_step3 = f"Save `{name}.tex` in VS Code → LaTeX Workshop compiles automatically → PDF in `build/{name}.pdf`."
+        fail_font = "**Font not found** → make sure TeX Live is up to date: `tlmgr update --all`"
+        resources_title = "## Resources"
+
+    content = f"""\
+# Getting Started — {name}
+
+## Workflow
+
+**1. {'Modifier vos informations' if is_fr else 'Edit your personal information'}**
+
+{workflow_step1}
+
+**2. {'Remplir chaque section' if is_fr else 'Fill in each section'}**
+
+{workflow_step2}
+
+**3. {'Sauvegarder pour compiler' if is_fr else 'Save to compile'}**
+
+{workflow_step3}
+
+---
+
+## {'Structure des sections' if is_fr else 'Section structure'}
+
+| {'Fichier' if is_fr else 'File'} | {'Contenu' if is_fr else 'Content'} |
+|---|---|
+{section_table}
+
+---
+
+## {'Opérations courantes' if is_fr else 'Common operations'}
+
+{add_exp_title}
+
+{add_exp_body}
+
+{add_proj_title}
+
+{add_proj_body}
+
+---
+
+## {'Si la compilation échoue' if is_fr else 'If compilation fails'}
+
+1. **{'LaTeX non installé' if is_fr else 'LaTeX not installed'}** → `latex-toolbox setup --install-tex`
+2. **{'LaTeX Workshop non installé' if is_fr else 'LaTeX Workshop not installed'}** → {'installer depuis le panneau Extensions de VS Code' if is_fr else 'install from the VS Code Extensions panel'}
+3. {fail_font}
+4. **{'Compilation bloquée' if is_fr else 'Compilation stuck'}** → {'supprimer le dossier' if is_fr else 'delete the'} `build/` {'et réessayer' if is_fr else 'folder and try again'}
+
+{'Ce CV' if is_fr else 'This CV'} {'utilise' if is_fr else 'uses'} **LuaLaTeX** ({'pour fontspec' if is_fr else 'for fontspec'}). {'Vérifiez' if is_fr else 'Verify'}:
+
+```bash
+lualatex --version
+```
+
+---
+
+{resources_title}
+
+| {'Ressource' if is_fr else 'Resource'} | Lien |
+|---|---|
+| Overleaf — {'Modèles de CV' if is_fr else 'CV templates'} | <https://www.overleaf.com/gallery/tagged/cv> |
+| LaTeX Wikibook | <https://en.wikibooks.org/wiki/LaTeX> |
+| fontawesome5 {'icônes' if is_fr else 'icons'} | <https://mirrors.ctan.org/fonts/fontawesome5/doc/fontawesome5.pdf> |
+"""
+    (target_dir / "GETTING_STARTED.md").write_text(content, encoding="utf-8")
+
+
 def write_getting_started_guide(target_dir: Path, name: str, template: str) -> None:
+    if template in ("cv-fr", "cv-en"):
+        _write_cv_getting_started(target_dir, name, template)
+        return
+
     # Template-specific sections
     _BIBLIOGRAPHY = {
         "research": """\

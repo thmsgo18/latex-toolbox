@@ -1,6 +1,13 @@
 \documentclass[10pt,a4paper,twocolumn]{article}
 
 \usepackage[main=english,french]{babel}
+\usepackage[
+  backend=biber,
+  style=numeric-comp,
+  sorting=none,
+  maxbibnames=99
+]{biblatex}
+\addbibresource{references/references.bib}
 \usepackage{styles/packages/research-article}
 
 \input{frontmatter/metadata.tex}
@@ -66,12 +73,15 @@
 \twocolumn
 
 \input{sections/introduction.tex}
+\input{sections/related-work.tex}
+\input{sections/methodology.tex}
+\input{sections/experiments.tex}
 \input{sections/conclusion.tex}
-
-\appendix
-\input{appendix/ai-usage.tex}
 
 \balance
 \input{backmatter/bibliography.tex}
+
+\appendix
+\input{appendix/ai-usage.tex}
 
 \end{document}

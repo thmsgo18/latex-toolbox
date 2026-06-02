@@ -7,6 +7,14 @@ import shutil
 from pathlib import Path
 
 
+TEMPLATE_DESCRIPTIONS: dict[str, str] = {
+    "cv-en": "CV / résumé — education, experience, projects, involvement, skills",
+    "cv-fr": "CV — formation, expérience, projets, engagement, compétences",
+    "rapport-projet-en": "Project report — ISO/IEEE (requirements, architecture, testing, bibliography, appendices)",
+    "rapport-projet-fr": "Rapport de projet — AFNOR/ISO (cahier des charges, architecture, tests, bibliographie, annexes)",
+    "research": "Research article — two-column (related work, methodology, experiments, bibliography)",
+}
+
 _AUTHOR_PLACEHOLDERS = [
     "LASTNAME Firstname",
     "FirstName LASTNAME",
@@ -21,6 +29,16 @@ _PROGRAM_PLACEHOLDERS = [
     "Master's Degree -- Computer Science",
     "Department of Computer Science",
 ]
+
+_CV_NAME_PLACEHOLDERS = {
+    "cv-fr": "Prénom NOM",
+    "cv-en": "First LAST",
+}
+
+_CV_HEADING_FILES = {
+    "cv-fr": Path("sections") / "en-tete.tex",
+    "cv-en": Path("sections") / "heading.tex",
+}
 
 LATEX_BUILD_SUFFIXES = {
     ".aux",
@@ -379,6 +397,32 @@ def apply_profile_to_metadata(metadata_path: Path, profile: dict) -> None:
             content = content.replace(placeholder, program)
 
     metadata_path.write_text(content, encoding="utf-8")
+
+
+def apply_profile_to_cv_heading(
+    heading_path: Path, profile: dict, template: str
+) -> None:
+    if not heading_path.exists() or not profile:
+        return
+
+    content = heading_path.read_text(encoding="utf-8")
+
+    name = profile.get("name", "")
+    github = profile.get("github", "")
+
+    name_placeholder = _CV_NAME_PLACEHOLDERS.get(template, "")
+    if name and name_placeholder:
+        content = content.replace(name_placeholder, name)
+
+    if github:
+        old_github = "\\href{https://github.com/username}{\\texttt{username}}"
+        new_github = (
+            "\\href{https://github.com/" + github + "}"
+            "{\\texttt{" + github + "}}"
+        )
+        content = content.replace(old_github, new_github)
+
+    heading_path.write_text(content, encoding="utf-8")
 
 
 def validate_name(name: str) -> None:
@@ -937,7 +981,11 @@ def create_project(
         write_project_setup_scripts(target_dir)
 
         from .config import get_profile
-        apply_profile_to_metadata(target_dir / "frontmatter" / "metadata.tex", get_profile())
+        profile = get_profile()
+        apply_profile_to_metadata(target_dir / "frontmatter" / "metadata.tex", profile)
+        heading_file = _CV_HEADING_FILES.get(template)
+        if heading_file is not None:
+            apply_profile_to_cv_heading(target_dir / heading_file, profile, template)
         write_getting_started_guide(target_dir, name, template)
     except Exception:
         shutil.rmtree(target_dir, ignore_errors=True)

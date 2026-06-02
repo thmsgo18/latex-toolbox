@@ -10,6 +10,7 @@ import argcomplete
 
 from .config import get_default_output_dir, get_default_template
 from .project import (
+    TEMPLATE_DESCRIPTIONS,
     available_templates,
     create_project,
     rename_current_project,
@@ -57,9 +58,12 @@ def _ask_project_name() -> str:
 
 def _select_template_interactively() -> str:
     templates = available_templates()
+    width = max(len(t) for t in templates)
     print("Available templates:")
-    for i, name in enumerate(templates, 1):
-        print(f"  {i}. {name}")
+    for i, t in enumerate(templates, 1):
+        desc = TEMPLATE_DESCRIPTIONS.get(t, "")
+        suffix = f"  {desc}" if desc else ""
+        print(f"  {i}. {t:<{width}}{suffix}")
     while True:
         try:
             answer = input(f"Choose a template [1-{len(templates)}]: ").strip()
@@ -192,8 +196,14 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     if args.command == "list-templates":
-        for template_name in available_templates():
-            print(template_name)
+        templates = available_templates()
+        width = max(len(t) for t in templates)
+        for t in templates:
+            desc = TEMPLATE_DESCRIPTIONS.get(t, "")
+            if desc:
+                print(f"  {t:<{width}}  {desc}")
+            else:
+                print(f"  {t}")
         return 0
 
     if args.command == "profile":
@@ -286,7 +296,11 @@ def main(argv: list[str] | None = None) -> int:
 
         print(f"Project created: {target_dir}")
         print(f"Edit: {main_tex_file.relative_to(target_dir.parent)}")
-        print("Next: fill in frontmatter/metadata.tex then save to compile.")
+        if template in ("cv-fr", "cv-en"):
+            first_file = "sections/en-tete.tex" if template == "cv-fr" else "sections/heading.tex"
+            print(f"Next: fill in {first_file} then save to compile.")
+        else:
+            print("Next: fill in frontmatter/metadata.tex then save to compile.")
 
         if not first_run:
             warn_if_latex_missing()

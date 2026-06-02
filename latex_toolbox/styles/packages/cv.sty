@@ -2,7 +2,6 @@
 \ProvidesPackage{cv}[2026/06/03 CV / Resume template style]
 
 \RequirePackage{latexsym}
-\RequirePackage[empty]{fullpage}
 \RequirePackage{titlesec}
 \RequirePackage{marvosym}
 \RequirePackage[usenames,dvipsnames]{xcolor}
@@ -16,6 +15,7 @@
 \RequirePackage{fontspec}
 \setmainfont{TeX Gyre Heros}
 \setmonofont[Scale=0.90]{Fira Mono}
+\RequirePackage[a4paper, margin=0.5in]{geometry}
 \RequirePackage[hidelinks]{hyperref}
 
 % ---- Colors ----
@@ -37,13 +37,6 @@
 \fancyfoot{}
 \renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0pt}
-
-% ---- Margins ----
-\addtolength{\oddsidemargin}{-0.5in}
-\addtolength{\evensidemargin}{0in}
-\addtolength{\textwidth}{1in}
-\addtolength{\topmargin}{-.5in}
-\addtolength{\textheight}{1.0in}
 
 \urlstyle{same}
 \raggedbottom

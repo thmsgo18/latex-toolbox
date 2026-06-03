@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from latex_toolbox.project import apply_profile_to_cv_heading
+from latex_forge.project import apply_profile_to_cv_heading
 
 
 def _make_heading(tmp_path: Path, content: str) -> Path:

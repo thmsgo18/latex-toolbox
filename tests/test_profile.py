@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from latex_toolbox.project import apply_profile_to_metadata
+from latex_forge.project import apply_profile_to_metadata
 
 
 def _write(path: Path, content: str) -> None:

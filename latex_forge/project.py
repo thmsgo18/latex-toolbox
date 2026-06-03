@@ -184,7 +184,7 @@ In `sections/projects.tex`, add a `\\resumeProjectHeading` block:
 
 ## {'Si la compilation échoue' if is_fr else 'If compilation fails'}
 
-1. **{'LaTeX non installé' if is_fr else 'LaTeX not installed'}** → `latex-toolbox setup --install-tex`
+1. **{'LaTeX non installé' if is_fr else 'LaTeX not installed'}** → `latex-forge setup --install-tex`
 2. **{'LaTeX Workshop non installé' if is_fr else 'LaTeX Workshop not installed'}** → {'installer depuis le panneau Extensions de VS Code' if is_fr else 'install from the VS Code Extensions panel'}
 3. {fail_font}
 4. **{'Compilation bloquée' if is_fr else 'Compilation stuck'}** → {'supprimer le dossier' if is_fr else 'delete the'} `build/` {'et réessayer' if is_fr else 'folder and try again'}
@@ -206,6 +206,290 @@ lualatex --version
 | fontawesome5 {'icônes' if is_fr else 'icons'} | <https://mirrors.ctan.org/fonts/fontawesome5/doc/fontawesome5.pdf> |
 """
     (target_dir / "GETTING_STARTED.md").write_text(content, encoding="utf-8")
+
+
+def write_agents_md(target_dir: Path, name: str, template: str) -> None:
+    """Generate AGENTS.md — a self-contained briefing for any AI working on the project."""
+
+    is_cv = template in ("cv-fr", "cv-en")
+    is_fr_cv = template == "cv-fr"
+    has_bibliography = template in ("rapport-projet-fr", "rapport-projet-en", "research")
+    description = TEMPLATE_DESCRIPTIONS.get(template, template)
+
+    # ── Compilation section ────────────────────────────────────────────────
+    if has_bibliography:
+        compile_manual = f"""\
+```bash
+lualatex -interaction=nonstopmode -output-directory=build {name}.tex
+biber build/{name}
+lualatex -interaction=nonstopmode -output-directory=build {name}.tex
+lualatex -interaction=nonstopmode -output-directory=build {name}.tex
+```"""
+    else:
+        compile_manual = f"""\
+```bash
+lualatex -interaction=nonstopmode -output-directory=build {name}.tex
+lualatex -interaction=nonstopmode -output-directory=build {name}.tex
+```"""
+
+    # ── File structure table ───────────────────────────────────────────────
+    if is_cv:
+        if is_fr_cv:
+            structure_rows = """\
+| `{name}.tex` | Point d'entrée — ne pas modifier la structure |
+| `sections/en-tete.tex` | **Commencer ici** — nom, contacts, résumé |
+| `sections/formation.tex` | Diplômes et formations |
+| `sections/experience.tex` | Expériences professionnelles |
+| `sections/projets.tex` | Projets personnels et académiques |
+| `sections/engagement.tex` | Engagements et associations |
+| `sections/competences.tex` | Compétences techniques et langues |
+| `styles/packages/cv.sty` | Style LuaLaTeX/fontspec — **NE PAS MODIFIER** |
+| `build/` | PDF compilé — généré automatiquement |"""
+        else:
+            structure_rows = """\
+| `{name}.tex` | Entry point — do not change the structure |
+| `sections/heading.tex` | **Start here** — name, contacts, summary |
+| `sections/education.tex` | Degrees and education |
+| `sections/experience.tex` | Work experience |
+| `sections/projects.tex` | Personal and academic projects |
+| `sections/involvement.tex` | Volunteering and associations |
+| `sections/skills.tex` | Technical skills and languages |
+| `styles/packages/cv.sty` | LuaLaTeX/fontspec style — **DO NOT EDIT** |
+| `build/` | Compiled PDF — auto-generated |"""
+    elif template == "research":
+        structure_rows = """\
+| `{name}.tex` | Entry point — do not change the structure |
+| `frontmatter/metadata.tex` | Title, authors, abstract, keywords |
+| `sections/` | Content — one .tex file per section |
+| `references/references.bib` | BibTeX bibliography file |
+| `appendix/` | Appendices and supplementary material |
+| `styles/packages/` | Style files — **DO NOT EDIT** |
+| `build/` | Compiled PDF — auto-generated |"""
+    else:
+        bib_folder = "bibliography/"
+        structure_rows = """\
+| `{name}.tex` | Point d'entrée / Entry point — do not change the structure |
+| `frontmatter/metadata.tex` | Titre, auteurs, résumé, mots-clés |
+| `sections/` | Contenu — un fichier .tex par section |
+| `backmatter/` | Déclaration IA, remerciements, fin de document |
+| `images/` | Fichiers images (PNG, JPG, PDF) |
+| `figures/` | Figures TikZ/pgfplots (sources LaTeX) |
+| `assets/logos/` | Logos université et projet |
+| `{bib_folder}references.bib` | Fichier de références BibTeX |
+| `styles/packages/` | Fichiers de style — **NE PAS MODIFIER** |
+| `build/` | PDF compilé — généré automatiquement |"""
+
+    structure_rows = structure_rows.replace("{name}", name).replace("{bib_folder}", "bibliography/")
+
+    # ── Custom commands ────────────────────────────────────────────────────
+    if is_cv:
+        custom_commands = """\
+| Command | Description |
+|---|---|
+| `\\resumeSubheading{title}{date}{subtitle}{location}` | Standard CV entry (job, degree…) |
+| `\\resumeProjectHeading{\\textbf{\\href{url}{Name -- Tech}}}{Context}` | Project entry with link |
+| `\\resumeSubHeadingListStart` / `\\resumeSubHeadingListEnd` | Wrap a group of entries |
+| `\\myuline{text}` | Custom underline (used in heading links) |"""
+    elif template == "research":
+        custom_commands = """\
+| Command | Description |
+|---|---|
+| `\\startannexes` | Opens the Appendices section with lettered subsections (A, B, C…) |"""
+    else:
+        custom_commands = """\
+| Command | Description |
+|---|---|
+| `\\startannexes` | Opens the Annexes/Appendices section with lettered subsections (A, B, C…) |
+| `\\addauthor{Name}{}[github]` | Adds an author to the cover page (in `frontmatter/metadata.tex`) |"""
+
+    # ── How to add content ─────────────────────────────────────────────────
+    if is_cv:
+        if is_fr_cv:
+            add_content = """\
+### Ajouter une expérience
+
+Dans `sections/experience.tex` :
+```latex
+\\resumeSubheading
+  {Intitulé du poste}{mois 20XX -- mois 20XX}
+  {Entreprise}{Ville, France}
+  \\begin{itemize}[leftmargin=0.12in, label={}, itemsep=0pt]
+    \\item \\small Description des missions.
+  \\end{itemize}
+```
+
+### Ajouter un projet
+
+Dans `sections/projets.tex` :
+```latex
+\\resumeProjectHeading
+  {\\textbf{\\href{https://github.com/user/repo}{Nom -- Technologies}}}{Contexte}
+  \\begin{itemize}[leftmargin=0.12in, label={}, itemsep=0pt]
+    \\item \\small Description.
+  \\end{itemize}
+```"""
+        else:
+            add_content = """\
+### Add a work experience
+
+In `sections/experience.tex`:
+```latex
+\\resumeSubheading
+  {Job Title}{Month 20XX -- Month 20XX}
+  {Company}{City, Country}
+  \\begin{itemize}[leftmargin=0.12in, label={}, itemsep=0pt]
+    \\item \\small Description of responsibilities.
+  \\end{itemize}
+```
+
+### Add a project
+
+In `sections/projects.tex`:
+```latex
+\\resumeProjectHeading
+  {\\textbf{\\href{https://github.com/user/repo}{Name -- Technologies}}}{Context}
+  \\begin{itemize}[leftmargin=0.12in, label={}, itemsep=0pt]
+    \\item \\small Description.
+  \\end{itemize}
+```"""
+    else:
+        if template == "research":
+            bib_file = "references/references.bib"
+        else:
+            bib_file = "bibliography/references.bib"
+
+        add_content = f"""\
+### Add a new section
+
+1. Create `sections/my-section.tex`
+2. Add `\\input{{sections/my-section.tex}}` at the right place in `{name}.tex`
+
+### Add a bibliography reference
+
+Add an entry to `{bib_file}`, then cite inline:
+```latex
+As shown in previous work~\\cite{{author2024}}.
+```
+
+### Add appendices
+
+Place `\\startannexes` in `{name}.tex` where the appendices begin, then use `\\subsection{{...}}` for each appendix (A, B, C…).
+
+### Add an image
+
+Place the file in `images/`, then:
+```latex
+\\begin{{figure}}[h]
+  \\centering
+  \\includegraphics[width=0.8\\linewidth]{{my-image.png}}
+  \\caption{{Caption here.}}
+  \\label{{fig:my-label}}
+\\end{{figure}}
+```"""
+
+    # ── Common errors ──────────────────────────────────────────────────────
+    bib_errors = ""
+    if has_bibliography:
+        bib_errors = """\
+| `biber` not found | `tlmgr install biber` |
+| Bibliography not showing | Run `biber build/{name}` after the first lualatex pass |
+| `I found no \\bibdata command` | You ran `bibtex` instead of `biber` — use `biber` |
+""".replace("{name}", name)
+
+    common_errors = f"""\
+| Error | Fix |
+|---|---|
+| LaTeX not installed | `latex-forge setup --install-tex` |
+| `Package X not found` | `tlmgr install X` |
+| Font not found | `tlmgr update --all` or install the missing font package |
+{bib_errors}| Compilation stuck / blank pages | Delete `build/` then recompile |
+| `Undefined control sequence \\X` | Check `styles/packages/` files are present |
+| PDF viewer shows duplicate page | VS Code PDF viewer in "Two Page" mode — switch to "Single Page" |"""
+
+    # ── Assemble ───────────────────────────────────────────────────────────
+    lang_note = "French" if template in ("cv-fr", "rapport-projet-fr") else "English"
+
+    content = f"""\
+# AGENTS.md — {name}
+
+> Briefing for any AI assistant working on this project.
+> Read this file before making any changes.
+
+## Project overview
+
+| Field | Value |
+|---|---|
+| Template | `{template}` — {description} |
+| Language | {lang_note} |
+| LaTeX engine | LuaLaTeX |
+| Bibliography | {"biblatex + biber" if has_bibliography else "none"} |
+| Output | `build/{name}.pdf` |
+
+---
+
+## Compilation
+
+### Automatic (VS Code saves trigger this)
+
+LaTeX Workshop is configured to run on save via `.vscode/settings.json`.
+Recipe: `lualatexmk` → output in `build/`.
+
+### Manual
+
+```bash
+# Recommended — handles bibliography passes automatically
+latexmk -lualatex -interaction=nonstopmode -outdir=build {name}.tex
+```
+
+If `latexmk` is unavailable, run the full sequence manually:
+
+{compile_manual}
+
+---
+
+## File structure
+
+| Path | Purpose |
+|---|---|
+{structure_rows}
+
+---
+
+## Custom LaTeX commands
+
+{custom_commands}
+
+---
+
+## How to add content
+
+{add_content}
+
+---
+
+## Common errors and fixes
+
+{common_errors}
+
+---
+
+## Do not modify
+
+- `styles/packages/*.sty` — managed by latex-forge; edits will be overwritten on reinstall
+- `assets/logos/` — logo assets
+- The `\\input` / `\\include` order in `{name}.tex` (section order matters for cross-references)
+
+---
+
+## Rename this project
+
+```bash
+latex-forge rename new-name
+```
+
+Renames the folder, the main `.tex` file, and build artifacts consistently.
+"""
+    (target_dir / "AGENTS.md").write_text(content, encoding="utf-8")
 
 
 def write_getting_started_guide(target_dir: Path, name: str, template: str) -> None:
@@ -318,7 +602,7 @@ Put your image file in `images/`, then in your `.tex` file:
 ### Rename this project
 
 ```bash
-latex-toolbox rename new-name
+latex-forge rename new-name
 ```
 
 This renames the folder, the main `.tex` file, and any build artifacts.
@@ -327,7 +611,7 @@ This renames the folder, the main `.tex` file, and any build artifacts.
 
 ## If compilation fails
 
-1. **LaTeX not installed** → run `latex-toolbox setup --install-tex`
+1. **LaTeX not installed** → run `latex-forge setup --install-tex`
 2. **LaTeX Workshop not installed** → install it from the VS Code extensions panel
 3. **Missing package** → `tlmgr install package-name` (TeX Live) or let MiKTeX auto-install
 4. **Compilation stuck** → delete the `build/` folder and try again
@@ -447,7 +731,7 @@ def templates_dir() -> Path:
 
 def user_templates_dir() -> Path:
     """Directory where user-installed templates are stored."""
-    return Path.home() / ".latex-toolbox" / "templates"
+    return Path.home() / ".latex-forge" / "templates"
 
 
 def styles_dir() -> Path:
@@ -1004,6 +1288,7 @@ def create_project(
         if heading_file is not None:
             apply_profile_to_cv_heading(target_dir / heading_file, profile, template)
         write_getting_started_guide(target_dir, name, template)
+        write_agents_md(target_dir, name, template)
     except Exception:
         shutil.rmtree(target_dir, ignore_errors=True)
         raise

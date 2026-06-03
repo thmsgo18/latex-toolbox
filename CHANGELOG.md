@@ -13,7 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `--output` flag to specify where the project is created
 - `--version` flag
 - Guided LaTeX installation: first run checks the environment and offers to install LaTeX automatically
-- `latex-toolbox setup` now prompts interactively to install LaTeX when it is missing, without requiring `--install-tex`
+- `latex-forge setup` now prompts interactively to install LaTeX when it is missing, without requiring `--install-tex`
 - Offer to open the generated project in VS Code after creation
 - Installation duration warning for long-running commands (MacTeX takes ~20-30 min)
 - Name validation: rejects spaces, special characters, and dot-prefixed names

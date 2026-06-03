@@ -80,7 +80,7 @@ def list_user_templates() -> list[str]:
 
 
 def _user_templates_dir() -> Path:
-    return Path.home() / ".latex-toolbox" / "templates"
+    return Path.home() / ".latex-forge" / "templates"
 
 
 def _user_template_path(name: str) -> Path:
@@ -210,7 +210,7 @@ def _copy_to_user_library(source: Path, name: str) -> tuple[str, Path]:
     if not (source / "main.tex").exists():
         raise ValueError(
             f"No main.tex found in {source}\n"
-            "A valid latex-toolbox template must contain a main.tex file."
+            "A valid latex-forge template must contain a main.tex file."
         )
 
     dest = _user_template_path(name)

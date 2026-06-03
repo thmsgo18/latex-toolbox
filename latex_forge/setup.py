@@ -16,7 +16,7 @@ TEMPLATE_SPECIFIC_TOOLS = ["bibtex", "biber"]
 
 
 def _marker_file() -> Path:
-    return Path.home() / ".latex_toolbox_initialized"
+    return Path.home() / ".latex_forge_initialized"
 
 
 def is_first_run() -> bool:
@@ -247,7 +247,7 @@ def warn_if_latex_missing() -> None:
     if not command_exists("lualatex"):
         print("")
         print("[warn] LaTeX (lualatex) is not installed — you won't be able to compile yet.")
-        print("       Run `latex-toolbox setup --install-tex` to install it automatically.")
+        print("       Run `latex-forge setup --install-tex` to install it automatically.")
 
 
 def run_profile_setup() -> None:
@@ -275,7 +275,7 @@ def run_profile_setup() -> None:
     if profile:
         save_profile(profile)
         print("")
-        print("[ok] Profile saved to ~/.latex-toolbox.toml")
+        print("[ok] Profile saved to ~/.latex-forge.toml")
     else:
         print("")
         print("No values entered — profile not saved.")
@@ -298,7 +298,7 @@ def run_first_launch_check() -> None:
         if _prompt_yes_no("LaTeX is not installed. Install it now?"):
             install_tex_distribution()
         else:
-            print("You can install it later with: latex-toolbox setup --install-tex")
+            print("You can install it later with: latex-forge setup --install-tex")
 
     if not get_profile():
         print("")

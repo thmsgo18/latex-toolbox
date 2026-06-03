@@ -3,7 +3,7 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "latex-toolbox"
+name = "latex-forge"
 version = "0.2.0"
 description = "CLI for creating standalone LaTeX projects from this toolbox."
 license = "MIT"
@@ -32,12 +32,12 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/thmsgo18/latex-toolbox"
-Repository = "https://github.com/thmsgo18/latex-toolbox"
-"Bug Tracker" = "https://github.com/thmsgo18/latex-toolbox/issues"
+Homepage = "https://github.com/thmsgo18/latex-forge"
+Repository = "https://github.com/thmsgo18/latex-forge"
+"Bug Tracker" = "https://github.com/thmsgo18/latex-forge/issues"
 
 [project.scripts]
-latex-toolbox = "latex_toolbox.cli:main"
+latex-forge = "latex_forge.cli:main"
 
 [project.optional-dependencies]
 dev = ["pytest>=7"]
@@ -47,10 +47,10 @@ pythonpath = ["."]
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["latex_toolbox*"]
+include = ["latex_forge*"]
 
 [tool.setuptools.package-data]
-latex_toolbox = [
+latex_forge = [
     "templates/**/*",
     "templates/**/.gitkeep",
     "styles/**/*",

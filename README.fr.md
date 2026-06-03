@@ -1,7 +1,7 @@
 # LaTeX Toolbox
 
 <p align="center">
-  <img src="docs/assets/latex-toolbox-logo.png" alt="LaTeX Toolbox" width="480">
+  <img src="docs/assets/latex-forge-logo.png" alt="LaTeX Toolbox" width="480">
 </p>
 
 <p align="center">
@@ -9,9 +9,9 @@
 </p>
 
 <p align="center">
-  <a href="https://pypi.org/project/latex-toolbox/"><img src="https://img.shields.io/pypi/v/latex-toolbox?style=for-the-badge&color=blue" alt="PyPI version"></a>
-  <a href="https://github.com/thmsgo18/latex-toolbox/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/thmsgo18/latex-toolbox/ci.yml?branch=main&style=for-the-badge" alt="CI"></a>
-  <a href="https://pypi.org/project/latex-toolbox/"><img src="https://img.shields.io/pypi/pyversions/latex-toolbox?style=for-the-badge" alt="Python versions"></a>
+  <a href="https://pypi.org/project/latex-forge/"><img src="https://img.shields.io/pypi/v/latex-forge?style=for-the-badge&color=blue" alt="PyPI version"></a>
+  <a href="https://github.com/thmsgo18/latex-forge/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/thmsgo18/latex-forge/ci.yml?branch=main&style=for-the-badge" alt="CI"></a>
+  <a href="https://pypi.org/project/latex-forge/"><img src="https://img.shields.io/pypi/pyversions/latex-forge?style=for-the-badge" alt="Python versions"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?style=for-the-badge" alt="License MIT"></a>
 </p>
 
@@ -26,7 +26,7 @@ LaTeX Toolbox est un outil en ligne de commande qui génère des projets LaTeX p
 ## Installation
 
 ```bash
-pipx install latex-toolbox
+pipx install latex-forge
 ```
 
 Requiert Python 3.10+. Si `pipx` n'est pas installé : `brew install pipx` sur macOS, ou consulter [pipx.pypa.io](https://pipx.pypa.io).
@@ -36,7 +36,7 @@ Requiert Python 3.10+. Si `pipx` n'est pas installé : `brew install pipx` sur m
 Sur une nouvelle machine, lance la commande de configuration pour vérifier l'environnement et installer LaTeX automatiquement :
 
 ```bash
-latex-toolbox setup
+latex-forge setup
 ```
 
 Cette commande vérifie que `latexmk` et `lualatex` sont disponibles, et propose de les installer via le gestionnaire de paquets du système (`brew` sur macOS, `apt` sur Debian/Ubuntu, `winget` sur Windows). Les extensions VS Code recommandées sont également installées si la commande `code` est accessible.
@@ -46,7 +46,7 @@ Cette commande vérifie que `latexmk` et `lualatex` sont disponibles, et propose
 Configure ton profil une seule fois pour que `create` pré-remplisse automatiquement les métadonnées de chaque projet :
 
 ```bash
-latex-toolbox profile --set
+latex-forge profile --set
 ```
 
 ```
@@ -59,11 +59,11 @@ GitHub username (optional): dupont-alice
 Cette configuration est proposée automatiquement au premier lancement. Pour la modifier à tout moment :
 
 ```bash
-latex-toolbox profile        # voir le profil actuel
-latex-toolbox profile --set  # modifier
+latex-forge profile        # voir le profil actuel
+latex-forge profile --set  # modifier
 ```
 
-Les valeurs sont stockées dans `~/.latex-toolbox.toml` et injectées dans `frontmatter/metadata.tex` à chaque création de projet. Si un nom d'utilisateur GitHub est renseigné, il est affiché sous ton nom en tant que lien cliquable sur la page de titre du PDF.
+Les valeurs sont stockées dans `~/.latex-forge.toml` et injectées dans `frontmatter/metadata.tex` à chaque création de projet. Si un nom d'utilisateur GitHub est renseigné, il est affiché sous ton nom en tant que lien cliquable sur la page de titre du PDF.
 
 ## Autocomplétion shell
 
@@ -72,14 +72,14 @@ Autocomplétion des commandes, options et noms de templates avec la touche Tab. 
 **bash** (`~/.bashrc`) ou **zsh** (`~/.zshrc`) :
 
 ```bash
-eval "$(latex-toolbox completion)"
+eval "$(latex-forge completion)"
 ```
 
 Recharge ton shell (`source ~/.zshrc`) ou ouvre un nouveau terminal.
 
 ## Fichier de configuration
 
-Crée `~/.latex-toolbox.toml` pour définir des valeurs par défaut appliquées à toutes les commandes :
+Crée `~/.latex-forge.toml` pour définir des valeurs par défaut appliquées à toutes les commandes :
 
 ```toml
 default_template = "rapport-projet-fr"
@@ -98,7 +98,7 @@ default_output_dir = "~/Documents/projets"
 Lance `create` sans arguments pour être guidé étape par étape :
 
 ```
-$ latex-toolbox create
+$ latex-forge create
 
 Project name: mon-rapport
 Available templates:
@@ -122,20 +122,20 @@ Tous les arguments sont optionnels — ceux qui manquent sont demandés interact
 
 ```bash
 # tout spécifier d'un coup
-latex-toolbox create --name mon-rapport --template rapport-projet-fr
+latex-forge create --name mon-rapport --template rapport-projet-fr
 
 # créer dans un dossier précis
-latex-toolbox create --name mon-article --template research --output ~/Bureau
+latex-forge create --name mon-article --template research --output ~/Bureau
 ```
 
 ### Renommer un projet
 
 ```bash
 # depuis le dossier parent
-latex-toolbox rename ancien-nom nouveau-nom
+latex-forge rename ancien-nom nouveau-nom
 
 # depuis l'intérieur du projet
-latex-toolbox rename nouveau-nom
+latex-forge rename nouveau-nom
 ```
 
 Cette commande renomme le dossier, le fichier `.tex` principal, et les artefacts de build existants.
@@ -151,7 +151,7 @@ Cette commande renomme le dossier, le fichier `.tex` principal, et les artefacts
 | `cv-en` | Anglais | CV / résumé — education, experience, projects, involvement, skills |
 
 ```bash
-latex-toolbox list-templates
+latex-forge list-templates
 ```
 
 ## Après la création d'un projet
@@ -208,19 +208,19 @@ Les styles et logos sont copiés dans le projet au moment de sa création. Le pr
 
 | Commande | Description |
 |---|---|
-| `latex-toolbox create` | Créer un projet (interactif) |
-| `latex-toolbox create --name NOM --template TEMPLATE` | Créer avec des arguments explicites |
-| `latex-toolbox create --output DOSSIER` | Définir le dossier de destination |
-| `latex-toolbox rename ANCIEN NOUVEAU` | Renommer depuis le dossier parent |
-| `latex-toolbox rename NOUVEAU` | Renommer depuis l'intérieur du projet |
-| `latex-toolbox list-templates` | Lister les templates disponibles |
-| `latex-toolbox setup` | Vérifier et configurer l'environnement LaTeX |
-| `latex-toolbox setup --check-only` | Vérifier sans rien installer |
-| `latex-toolbox setup --install-tex` | Installer LaTeX directement |
-| `latex-toolbox --version` | Afficher la version installée |
-| `latex-toolbox profile` | Voir le profil configuré |
-| `latex-toolbox profile --set` | Configurer le profil interactivement |
-| `latex-toolbox completion` | Afficher le code d'autocomplétion shell |
+| `latex-forge create` | Créer un projet (interactif) |
+| `latex-forge create --name NOM --template TEMPLATE` | Créer avec des arguments explicites |
+| `latex-forge create --output DOSSIER` | Définir le dossier de destination |
+| `latex-forge rename ANCIEN NOUVEAU` | Renommer depuis le dossier parent |
+| `latex-forge rename NOUVEAU` | Renommer depuis l'intérieur du projet |
+| `latex-forge list-templates` | Lister les templates disponibles |
+| `latex-forge setup` | Vérifier et configurer l'environnement LaTeX |
+| `latex-forge setup --check-only` | Vérifier sans rien installer |
+| `latex-forge setup --install-tex` | Installer LaTeX directement |
+| `latex-forge --version` | Afficher la version installée |
+| `latex-forge profile` | Voir le profil configuré |
+| `latex-forge profile --set` | Configurer le profil interactivement |
+| `latex-forge completion` | Afficher le code d'autocomplétion shell |
 
 ## Versionner les projets générés
 

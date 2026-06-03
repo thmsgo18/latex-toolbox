@@ -11,7 +11,7 @@ else:
     except ImportError:
         tomllib = None  # type: ignore[assignment]
 
-_CONFIG_PATH = Path.home() / ".latex-toolbox.toml"
+_CONFIG_PATH = Path.home() / ".latex-forge.toml"
 
 
 def load_config() -> dict:

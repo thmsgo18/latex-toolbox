@@ -31,7 +31,7 @@ from .setup import (
 
 def _get_version() -> str:
     try:
-        return version("latex-toolbox")
+        return version("latex-forge")
     except PackageNotFoundError:
         return "unknown"
 
@@ -101,7 +101,7 @@ def _ask_output_dir() -> Path:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="latex-toolbox",
+        prog="latex-forge",
         description="Utilities for generating standalone LaTeX projects from the toolbox.",
     )
     parser.add_argument(
@@ -238,7 +238,7 @@ def main(argv: list[str] | None = None) -> int:
                 return 1
             print(f"Template installed: {name}")
             print(f"Location: {path}")
-            print(f"Use it with: latex-toolbox create --template {name}")
+            print(f"Use it with: latex-forge create --template {name}")
             return 0
 
         if args.template_command == "list":
@@ -256,7 +256,7 @@ def main(argv: list[str] | None = None) -> int:
                     print(f"  {t}")
             else:
                 print("\nNo user-installed templates.")
-                print("Install one with: latex-toolbox template install <url-or-path>")
+                print("Install one with: latex-forge template install <url-or-path>")
             return 0
 
         if args.template_command == "remove":
@@ -288,7 +288,7 @@ def main(argv: list[str] | None = None) -> int:
         profile = get_profile()
         if not profile:
             print("No profile configured.")
-            print("Run `latex-toolbox profile --set` to set up your profile.")
+            print("Run `latex-forge profile --set` to set up your profile.")
             return 0
 
         print("Profile:")
@@ -311,7 +311,7 @@ def main(argv: list[str] | None = None) -> int:
             shell = Path(shell_path).name if shell_path else "bash"
             if shell not in ("bash", "zsh", "fish"):
                 shell = "bash"
-        print(argcomplete.shellcode(["latex-toolbox"], shell=shell))
+        print(argcomplete.shellcode(["latex-forge"], shell=shell))
         return 0
 
     if args.command == "create":
@@ -334,7 +334,7 @@ def main(argv: list[str] | None = None) -> int:
                 else:
                     print(
                         f"Warning: default_template '{config_template}' in "
-                        "~/.latex-toolbox.toml does not match any available template — ignoring.",
+                        "~/.latex-forge.toml does not match any available template — ignoring.",
                         file=sys.stderr,
                     )
             if template is None:
@@ -395,8 +395,8 @@ def main(argv: list[str] | None = None) -> int:
                 )
             else:
                 print(
-                    "Usage: latex-toolbox rename <new-name> "
-                    "or latex-toolbox rename <old-name> <new-name>",
+                    "Usage: latex-forge rename <new-name> "
+                    "or latex-forge rename <old-name> <new-name>",
                     file=sys.stderr,
                 )
                 return 1

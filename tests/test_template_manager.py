@@ -7,12 +7,12 @@ from pathlib import Path
 
 import pytest
 
-from latex_toolbox.template_manager import (
+from latex_forge.template_manager import (
     install_template,
     list_user_templates,
     remove_template,
 )
-from latex_toolbox.project import available_templates, templates_dir
+from latex_forge.project import available_templates, templates_dir
 
 
 # ── Fixtures ──────────────────────────────────────────────────────────────
@@ -21,8 +21,8 @@ from latex_toolbox.project import available_templates, templates_dir
 @pytest.fixture(autouse=True)
 def isolated_user_dir(tmp_path, monkeypatch):
     """Redirect the user templates directory to a temp folder for every test."""
-    import latex_toolbox.template_manager as tm
-    import latex_toolbox.project as proj
+    import latex_forge.template_manager as tm
+    import latex_forge.project as proj
 
     fake_dir = tmp_path / "user_templates"
 

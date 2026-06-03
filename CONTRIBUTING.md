@@ -12,8 +12,8 @@ Open an issue on GitHub and include:
 ## Setting up the development environment
 
 ```bash
-git clone https://github.com/thmsgo18/latex-toolbox.git
-cd latex-toolbox
+git clone https://github.com/thmsgo18/latex-forge.git
+cd latex-forge
 pipx install --editable ".[dev]"
 ```
 
@@ -27,9 +27,9 @@ All tests must pass before submitting a pull request.
 
 ## Adding a template
 
-1. Create a new folder under `latex_toolbox/templates/your-template-name/`
+1. Create a new folder under `latex_forge/templates/your-template-name/`
 2. Add a `main.tex` and the required subfolders
-3. Make sure `latex-toolbox create --name test --template your-template-name` works
+3. Make sure `latex-forge create --name test --template your-template-name` works
 4. Add tests if needed
 
 ## Submitting a pull request

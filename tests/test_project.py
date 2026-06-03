@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import pytest
 
-from latex_toolbox.project import (
+from latex_forge.project import (
     available_templates,
     create_project,
     patch_local_style,
@@ -148,7 +148,7 @@ def test_create_project_invalid_name(tmp_path, monkeypatch):
 
 def test_create_project_atomic_cleanup(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
-    with patch("latex_toolbox.project.write_project_gitignore", side_effect=OSError("disk full")):
+    with patch("latex_forge.project.write_project_gitignore", side_effect=OSError("disk full")):
         with pytest.raises(OSError):
             create_project("my-project", "rapport-projet-en")
     assert not (tmp_path / "my-project").exists()

@@ -445,6 +445,11 @@ def templates_dir() -> Path:
     return package_dir() / "templates"
 
 
+def user_templates_dir() -> Path:
+    """Directory where user-installed templates are stored."""
+    return Path.home() / ".latex-toolbox" / "templates"
+
+
 def styles_dir() -> Path:
     return package_dir() / "styles" / "packages"
 
@@ -454,7 +459,22 @@ def logos_dir() -> Path:
 
 
 def available_templates() -> list[str]:
-    return sorted(path.name for path in templates_dir().iterdir() if path.is_dir())
+    built_in = {p.name for p in templates_dir().iterdir() if p.is_dir()}
+    user_dir = user_templates_dir()
+    user = {p.name for p in user_dir.iterdir() if p.is_dir()} if user_dir.exists() else set()
+    return sorted(built_in | user)
+
+
+def _find_template_source(template: str) -> Path:
+    """Resolve a template name to its source directory (built-in or user-installed)."""
+    built_in = templates_dir() / template
+    if built_in.is_dir():
+        return built_in
+    user = user_templates_dir() / template
+    if user.is_dir():
+        return user
+    available = ", ".join(available_templates())
+    raise ValueError(f"Unknown template: {template}. Available: {available}")
 
 
 def should_ignore(path: Path) -> bool:
@@ -936,10 +956,7 @@ def create_project(
 ) -> tuple[Path, Path]:
     validate_name(name)
 
-    source_dir = templates_dir() / template
-    if not source_dir.is_dir():
-        available = ", ".join(available_templates())
-        raise ValueError(f"Unknown template: {template}. Available: {available}")
+    source_dir = _find_template_source(template)
 
     base_dir = (output_dir or Path.cwd()).resolve()
     target_dir = base_dir / name

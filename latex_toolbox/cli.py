@@ -15,6 +15,7 @@ from .project import (
     create_project,
     rename_current_project,
     rename_project,
+    templates_dir,
     validate_name,
 )
 from .setup import (
@@ -176,6 +177,37 @@ def build_parser() -> argparse.ArgumentParser:
         help="Run interactive profile setup.",
     )
 
+    template_parser = subparsers.add_parser(
+        "template",
+        help="Install, remove or list templates.",
+    )
+    template_sub = template_parser.add_subparsers(dest="template_command", required=True)
+
+    t_install = template_sub.add_parser(
+        "install",
+        help="Install a template from a GitHub URL, ZIP URL, or local path.",
+    )
+    t_install.add_argument(
+        "source",
+        help="GitHub URL, ZIP URL, local directory, or local .zip file.",
+    )
+    t_install.add_argument(
+        "--name",
+        default=None,
+        help="Name to give the installed template (defaults to repo/folder name).",
+    )
+
+    template_sub.add_parser(
+        "list",
+        help="List built-in and user-installed templates.",
+    )
+
+    t_remove = template_sub.add_parser(
+        "remove",
+        help="Remove a user-installed template.",
+    )
+    t_remove.add_argument("name", help="Name of the template to remove.")
+
     completion_parser = subparsers.add_parser(
         "completion",
         help="Print shell completion setup code.",
@@ -194,6 +226,47 @@ def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     argcomplete.autocomplete(parser)
     args = parser.parse_args(argv)
+
+    if args.command == "template":
+        from .template_manager import install_template, list_user_templates, remove_template
+
+        if args.template_command == "install":
+            try:
+                name, path = install_template(args.source, args.name)
+            except (ValueError, FileNotFoundError, OSError) as exc:
+                print(str(exc), file=sys.stderr)
+                return 1
+            print(f"Template installed: {name}")
+            print(f"Location: {path}")
+            print(f"Use it with: latex-toolbox create --template {name}")
+            return 0
+
+        if args.template_command == "list":
+            built_in = sorted(p.name for p in templates_dir().iterdir() if p.is_dir())
+            user = list_user_templates()
+            width = max((len(t) for t in built_in + user), default=0)
+            print("Built-in templates:")
+            for t in built_in:
+                desc = TEMPLATE_DESCRIPTIONS.get(t, "")
+                suffix = f"  {desc}" if desc else ""
+                print(f"  {t:<{width}}{suffix}")
+            if user:
+                print("\nInstalled templates:")
+                for t in user:
+                    print(f"  {t}")
+            else:
+                print("\nNo user-installed templates.")
+                print("Install one with: latex-toolbox template install <url-or-path>")
+            return 0
+
+        if args.template_command == "remove":
+            try:
+                remove_template(args.name)
+            except (ValueError, FileNotFoundError) as exc:
+                print(str(exc), file=sys.stderr)
+                return 1
+            print(f"Template removed: {args.name}")
+            return 0
 
     if args.command == "list-templates":
         templates = available_templates()

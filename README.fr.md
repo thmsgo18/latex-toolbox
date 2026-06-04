@@ -1,7 +1,7 @@
-# LaTeX Toolbox
+# LaTeX Forge
 
 <p align="center">
-  <img src="docs/assets/latex-forge-logo.png" alt="LaTeX Toolbox" width="480">
+  <img src="docs/assets/latex-forge-logo.png" alt="LaTeX Forge" width="480">
 </p>
 
 <p align="center">
@@ -21,7 +21,7 @@
 
 ---
 
-LaTeX Toolbox est un outil en ligne de commande qui génère des projets LaTeX prêts à compiler à partir de templates. Chaque projet généré embarque ses propres styles et assets — il peut être compilé, partagé et versionné de façon indépendante, sans aucune dépendance envers ce dépôt.
+LaTeX Forge est un outil en ligne de commande qui génère des projets LaTeX prêts à compiler à partir de templates. Chaque projet généré embarque ses propres styles et assets — il peut être compilé, partagé et versionné de façon indépendante, sans aucune dépendance envers ce dépôt.
 
 ## Installation
 

@@ -284,7 +284,7 @@ def run_profile_setup() -> None:
 def run_first_launch_check() -> None:
     from .config import get_profile
 
-    print("Welcome to LaTeX Toolbox!")
+    print("Welcome to LaTeX Forge!")
     print("Checking your environment before creating your first project...")
     print("")
 

@@ -1,4 +1,4 @@
-# Contributing to LaTeX Toolbox
+# Contributing to LaTeX Forge
 
 Thanks for your interest in contributing!
 

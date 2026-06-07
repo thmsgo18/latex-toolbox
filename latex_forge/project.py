@@ -671,6 +671,11 @@ def apply_profile_to_metadata(metadata_path: Path, profile: dict) -> None:
             old = f"\\addauthor{{{placeholder}}}{{}}"
             new = f"\\addauthor{{{name or placeholder}}}{{}}{github_suffix}"
             content = content.replace(old, new)
+        if name:
+            for placeholder in _AUTHOR_PLACEHOLDERS:
+                old = f"\\author{{{placeholder}}}"
+                new = f"\\author{{{name}}}"
+                content = content.replace(old, new)
 
     if university:
         for placeholder in _UNIVERSITY_PLACEHOLDERS:
@@ -761,6 +766,25 @@ def _find_template_source(template: str) -> Path:
     raise ValueError(f"Unknown template: {template}. Available: {available}")
 
 
+def _read_template_engine(source_dir: Path) -> str:
+    """Read the LaTeX engine from latexforge.toml in the template directory.
+
+    Returns one of 'lualatex', 'xelatex', 'pdflatex'. Defaults to 'lualatex'.
+    """
+    toml_path = source_dir / "latexforge.toml"
+    if not toml_path.exists():
+        return "lualatex"
+    for line in toml_path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if line.startswith("engine"):
+            parts = line.split("=", 1)
+            if len(parts) == 2:
+                value = parts[1].strip().strip('"').strip("'")
+                if value in ("lualatex", "xelatex", "pdflatex"):
+                    return value
+    return "lualatex"
+
+
 def should_ignore(path: Path) -> bool:
     if path.name in IGNORED_NAMES:
         return True
@@ -832,9 +856,19 @@ def required_style_files(source_dir: Path) -> list[Path]:
     return [styles_dir() / style_name for style_name in sorted(resolved)]
 
 
-def write_project_vscode_settings(target_dir: Path) -> None:
+_ENGINE_LATEXMK_FLAG = {
+    "lualatex": "-lualatex",
+    "xelatex": "-xelatex",
+    "pdflatex": "-pdf",
+}
+
+
+def write_project_vscode_settings(target_dir: Path, engine: str = "lualatex") -> None:
     vscode_dir = target_dir / ".vscode"
     vscode_dir.mkdir(parents=True, exist_ok=True)
+
+    latexmk_flag = _ENGINE_LATEXMK_FLAG.get(engine, "-lualatex")
+    tool_name = f"{engine}mk"
 
     settings = {
         "[latex]": {"editor.wordWrap": "on"},
@@ -848,20 +882,20 @@ def write_project_vscode_settings(target_dir: Path) -> None:
         "latex-workshop.linting.lacheck.enabled": False,
         "latex-workshop.latex.tools": [
             {
-                "name": "lualatexmk",
+                "name": tool_name,
                 "command": "latexmk",
                 "args": [
                     "-synctex=1",
                     "-interaction=nonstopmode",
                     "-file-line-error",
-                    "-lualatex",
+                    latexmk_flag,
                     "-outdir=%OUTDIR%",
                     "%DOC%",
                 ],
             }
         ],
         "latex-workshop.latex.recipes": [
-            {"name": "lualatexmk", "tools": ["lualatexmk"]}
+            {"name": tool_name, "tools": [tool_name]}
         ],
     }
 
@@ -1276,7 +1310,8 @@ def create_project(
                 shutil.copy2(logo_path, destination)
 
         (target_dir / "assets" / "logos" / ".gitkeep").touch(exist_ok=True)
-        write_project_vscode_settings(target_dir)
+        engine = _read_template_engine(source_dir)
+        write_project_vscode_settings(target_dir, engine)
         write_project_vscode_extensions(target_dir)
         write_project_gitignore(target_dir)
         write_project_setup_scripts(target_dir)

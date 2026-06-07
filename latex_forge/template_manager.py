@@ -138,7 +138,7 @@ def _install_from_zip_url(url: str, name: str | None) -> tuple[str, Path]:
     template_name = name or Path(url.rstrip("/")).stem
     with tempfile.TemporaryDirectory() as tmp:
         zip_path = Path(tmp) / "template.zip"
-        _download_url(zip_url=url, dest=zip_path)
+        _download_url(url=url, dest=zip_path)
         return _extract_and_install(
             zip_path,
             extract_to=Path(tmp) / "extracted",

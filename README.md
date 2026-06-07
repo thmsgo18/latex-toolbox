@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  Skip the setup. Start writing. Everything you need, nothing more.
+  Create professional documents. Save. Your PDF appears instantly.
 </p>
 
 <p align="center">
@@ -21,7 +21,35 @@
 
 ---
 
-LaTeX Forge is a command-line tool that generates ready-to-compile, standalone LaTeX projects from templates. Each generated project embeds its own styles and assets — it can be compiled, shared, and versioned independently, with no dependency on this repository.
+One command creates a ready-to-write document project. Open it in VS Code, start writing, save — your PDF rebuilds and appears in a side panel automatically. No manual compilation, no window switching.
+
+Works for humans and AI agents alike. Every generated project includes an `AGENTS.md` that briefs any AI assistant on the document structure, so it can contribute immediately.
+
+## How it feels
+
+<p align="center">
+  <img src="docs/assets/live-preview.png" alt="LaTeX Forge live preview in VS Code" width="800">
+</p>
+
+Write on one side. See your document on the other. Every save refreshes the result.
+
+## Quick start
+
+```bash
+# 1 — install
+pipx install latex-forge
+
+# 2 — set up your environment (LaTeX + VS Code extensions)
+latex-forge setup
+
+# 3 — create a project
+latex-forge create --name my-report --template rapport-projet-en
+
+# 4 — open and start writing
+code my-report
+```
+
+Requires Python 3.10+. If `pipx` is not installed: `brew install pipx` on macOS, or see [pipx.pypa.io](https://pipx.pypa.io).
 
 ## Installation
 
@@ -29,21 +57,19 @@ LaTeX Forge is a command-line tool that generates ready-to-compile, standalone L
 pipx install latex-forge
 ```
 
-Requires Python 3.10+. If `pipx` is not installed: `brew install pipx` on macOS, or see [pipx.pypa.io](https://pipx.pypa.io).
-
 ## First setup
 
-On a fresh machine, run the setup command to check your environment and install LaTeX automatically:
+On a fresh machine, run the setup command to verify your environment and install what's missing:
 
 ```bash
 latex-forge setup
 ```
 
-This verifies that `latexmk` and `lualatex` are available, and offers to install them via your system package manager (`brew` on macOS, `apt` on Debian/Ubuntu, `winget` on Windows). VS Code extensions are also installed if the `code` CLI is available.
+This checks for `latexmk` and `lualatex`, and offers to install them automatically (`brew` on macOS, `apt` on Debian/Ubuntu, `winget` on Windows). VS Code extensions are installed too if the `code` CLI is available.
 
 ## Profile
 
-Set up your profile once to automatically pre-fill project metadata on every `create`:
+Set up your profile once. Every project you create after that will have your name, university, and program pre-filled:
 
 ```bash
 latex-forge profile --set
@@ -56,18 +82,16 @@ Program / formation: Master Informatique
 GitHub username (optional): dupont-alice
 ```
 
-This is offered automatically on first launch. To update it at any time:
-
 ```bash
 latex-forge profile        # view current profile
 latex-forge profile --set  # update
 ```
 
-Profile values are stored in `~/.latex-forge.toml` and applied to each new project's `frontmatter/metadata.tex`. When a GitHub username is set, it is rendered as a link under your name in the PDF title page.
+Profile values are stored in `~/.latex-forge.toml` and injected into each new project's `frontmatter/metadata.tex`.
 
 ## Shell completion
 
-Tab completion for commands, flags, and template names. Add one line to your shell config:
+Tab completion for commands, flags, and template names:
 
 **bash** (`~/.bashrc`) or **zsh** (`~/.zshrc`):
 
@@ -75,13 +99,10 @@ Tab completion for commands, flags, and template names. Add one line to your she
 eval "$(latex-forge completion)"
 ```
 
-Reload your shell (`source ~/.zshrc`) or open a new terminal window.
-
 ## Configuration
 
-Create `~/.latex-forge.toml` to set default values applied to every command:
-
 ```toml
+# ~/.latex-forge.toml
 default_template = "rapport-projet-en"
 default_output_dir = "~/Documents/projects"
 ```
@@ -95,8 +116,6 @@ default_output_dir = "~/Documents/projects"
 
 ### Interactive mode
 
-Run `create` with no arguments to be guided step by step:
-
 ```
 $ latex-forge create
 
@@ -108,60 +127,59 @@ Available templates:
   4. rapport-projet-fr
   5. research
 Choose a template [1-5]: 3
-Create project in [/Users/thomas/Desktop]:
+Create project in [/Users/alice/Desktop]:
 
-Project created: /Users/thomas/Desktop/my-report
-Edit: my-report/my-report.tex
-Next: fill in frontmatter/metadata.tex then save to compile.
+Project created: /Users/alice/Desktop/my-report
 Open project in VS Code? [y/N]
 ```
 
 ### With flags
 
-All arguments are optional — omitted ones are prompted interactively.
-
 ```bash
-# specify everything upfront
 latex-forge create --name my-report --template rapport-projet-en
-
-# create in a specific directory
 latex-forge create --name my-paper --template research --output ~/Desktop
 ```
 
 ### Rename a project
 
 ```bash
-# from the parent directory
-latex-forge rename old-name new-name
-
-# from inside the project directory
-latex-forge rename new-name
+latex-forge rename old-name new-name   # from parent directory
+latex-forge rename new-name            # from inside the project
 ```
 
-This renames the folder, the main `.tex` file, and any existing build artifacts.
-
-## Available templates
+## Built-in templates
 
 | Template | Language | Description |
 |---|---|---|
-| `rapport-projet-en` | English | ISO/IEEE-aligned project report — requirements, architecture, testing, bibliography, appendices |
-| `rapport-projet-fr` | French | AFNOR/ISO-aligned project report — cahier des charges, architecture, tests, bibliographie, annexes |
-| `research` | English | Research article — two-column layout, related work, methodology, experiments, bibliography |
-| `cv-en` | English | CV / résumé — education, experience, projects, involvement, skills |
-| `cv-fr` | French | CV — formation, expérience, projets, engagement, compétences |
+| `rapport-projet-en` | English | ISO/IEEE project report — requirements, architecture, testing, bibliography |
+| `rapport-projet-fr` | French | AFNOR/ISO project report — cahier des charges, architecture, tests, bibliographie |
+| `research` | English | Two-column research article — related work, methodology, experiments, bibliography |
+| `cv-en` | English | CV / résumé — education, experience, projects, skills |
+| `cv-fr` | French | CV — formation, expérience, projets, compétences |
 
 ```bash
 latex-forge list-templates
 ```
 
-## After creating a project
+## Template gallery
 
-1. Open the generated folder in VS Code.
-2. Fill in `frontmatter/metadata.tex` — title, authors, course name, university logo.
-3. Save the main `.tex` file to trigger compilation (requires [LaTeX Workshop](https://marketplace.visualstudio.com/items?itemName=James-Yu.latex-workshop)).
-4. The PDF is built into `build/`.
+More document types are available in the [latex-forge-gallery](https://github.com/thmsgo18/latex-forge-gallery): CVs, theses, articles, presentations, posters, and more.
 
-Example `metadata.tex`:
+```bash
+# install any template directly by URL
+latex-forge template install https://github.com/thmsgo18/latex-forge-gallery/tree/main/templates/thesis/clean-thesis
+
+# create a project from it
+latex-forge create --template clean-thesis --name my-thesis
+
+# manage installed templates
+latex-forge template list
+latex-forge template remove clean-thesis
+```
+
+## Filling in your project
+
+Open `frontmatter/metadata.tex` to set the title, authors, and course:
 
 ```tex
 \newcommand{\reporttitle}{Audio Fingerprinting Study}
@@ -173,36 +191,36 @@ Example `metadata.tex`:
 
 \resetteachers
 \addteacher{Dr Example}{}
-
-\resetprojectlinks
-\addprojectlink{Repository}{https://github.com/example/project}
 ```
 
-Leaving the second argument empty in `\addauthor{...}{}` or `\addteacher{...}{}` hides the role label.
+Save the main `.tex` file — the PDF rebuilds instantly in VS Code.
 
 ## Generated project structure
 
 ```
 my-project/
-├── my-project.tex            ← main file (named after the project)
+├── my-project.tex            ← main file (renamed from the project name)
 ├── frontmatter/
-│   ├── metadata.tex          ← title, authors, course
+│   ├── metadata.tex          ← title, authors, course — start here
 │   └── toc.tex
-├── sections/
-├── backmatter/
+├── sections/                 ← one .tex file per section
+├── backmatter/               ← acknowledgements, appendices
+├── bibliography/
+│   └── references.bib
 ├── figures/
 ├── images/
-├── screens/
-├── assets/
-│   ├── images/common/
-│   └── logos/
+├── assets/logos/
 ├── styles/packages/          ← embedded styles, no external dependency
-├── scripts/                  ← standalone setup scripts
-├── .vscode/                  ← LaTeX Workshop settings
+├── .vscode/                  ← pre-configured for live PDF preview
+├── AGENTS.md                 ← AI briefing for this document
 └── .gitignore
 ```
 
-Styles and logos are copied into the project at creation time. The generated project has no runtime dependency on this repository.
+The project is fully self-contained: styles and assets are copied in at creation time. It compiles, shares, and versions independently — no dependency on this repository.
+
+## AI-friendly by design
+
+Every generated project includes `AGENTS.md` — a self-contained briefing that tells any AI assistant exactly what the project contains, how to compile it, how to add content, and what not to touch. An AI can open a project cold and contribute correctly without any extra context.
 
 ## Command reference
 
@@ -212,19 +230,22 @@ Styles and logos are copied into the project at creation time. The generated pro
 | `latex-forge create --name NAME --template TEMPLATE` | Create with explicit arguments |
 | `latex-forge create --output DIR` | Set output directory |
 | `latex-forge rename OLD NEW` | Rename from parent directory |
-| `latex-forge rename NEW` | Rename from inside project directory |
+| `latex-forge rename NEW` | Rename from inside project |
 | `latex-forge list-templates` | List available templates |
-| `latex-forge setup` | Check and set up the LaTeX environment |
-| `latex-forge setup --check-only` | Check without installing anything |
-| `latex-forge setup --install-tex` | Install LaTeX directly |
-| `latex-forge --version` | Show installed version |
-| `latex-forge profile` | View your saved profile |
-| `latex-forge profile --set` | Run interactive profile setup |
-| `latex-forge completion` | Print shell completion setup code |
+| `latex-forge setup` | Check and set up the environment |
+| `latex-forge setup --check-only` | Check without installing |
+| `latex-forge setup --install-tex` | Install LaTeX |
+| `latex-forge profile` | View saved profile |
+| `latex-forge profile --set` | Set up profile |
+| `latex-forge template install URL` | Install a template |
+| `latex-forge template list` | List all templates |
+| `latex-forge template remove NAME` | Remove an installed template |
+| `latex-forge completion` | Print shell completion code |
+| `latex-forge --version` | Show version |
 
-## Versioning generated projects
+## Versioning
 
-Each generated project is self-contained, making it straightforward to version independently:
+Each project is self-contained — version it independently:
 
 ```bash
 cd my-project
@@ -232,8 +253,6 @@ git init
 git add .
 git commit -m "Initial report"
 ```
-
-Create a dedicated private repository and invite only the collaborators relevant to that document.
 
 ## Contributing
 

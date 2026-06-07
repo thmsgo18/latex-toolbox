@@ -15,31 +15,6 @@ TEMPLATE_DESCRIPTIONS: dict[str, str] = {
     "research": "Research article — two-column (related work, methodology, experiments, bibliography)",
 }
 
-_AUTHOR_PLACEHOLDERS = [
-    "LASTNAME Firstname",
-    "FirstName LASTNAME",
-    "NOM Prenom",
-]
-_UNIVERSITY_PLACEHOLDERS = [
-    "Universite Paris Cite",
-    "Example University",
-]
-_PROGRAM_PLACEHOLDERS = [
-    "Master Informatique",
-    "Master's Degree -- Computer Science",
-    "Department of Computer Science",
-]
-
-_CV_NAME_PLACEHOLDERS = {
-    "cv-fr": "Prénom NOM",
-    "cv-en": "First LAST",
-}
-
-_CV_HEADING_FILES = {
-    "cv-fr": Path("sections") / "en-tete.tex",
-    "cv-en": Path("sections") / "heading.tex",
-}
-
 LATEX_BUILD_SUFFIXES = {
     ".aux",
     ".bbl",
@@ -654,66 +629,6 @@ lualatex --version
     (target_dir / "GETTING_STARTED.md").write_text(content, encoding="utf-8")
 
 
-def apply_profile_to_metadata(metadata_path: Path, profile: dict) -> None:
-    if not metadata_path.exists() or not profile:
-        return
-
-    content = metadata_path.read_text(encoding="utf-8")
-
-    name = profile.get("name", "")
-    university = profile.get("university", "")
-    program = profile.get("program", "")
-    github = profile.get("github", "")
-
-    if name or github:
-        github_suffix = f"[{github}]" if github else ""
-        for placeholder in _AUTHOR_PLACEHOLDERS:
-            old = f"\\addauthor{{{placeholder}}}{{}}"
-            new = f"\\addauthor{{{name or placeholder}}}{{}}{github_suffix}"
-            content = content.replace(old, new)
-        if name:
-            for placeholder in _AUTHOR_PLACEHOLDERS:
-                old = f"\\author{{{placeholder}}}"
-                new = f"\\author{{{name}}}"
-                content = content.replace(old, new)
-
-    if university:
-        for placeholder in _UNIVERSITY_PLACEHOLDERS:
-            content = content.replace(placeholder, university)
-
-    if program:
-        for placeholder in _PROGRAM_PLACEHOLDERS:
-            content = content.replace(placeholder, program)
-
-    metadata_path.write_text(content, encoding="utf-8")
-
-
-def apply_profile_to_cv_heading(
-    heading_path: Path, profile: dict, template: str
-) -> None:
-    if not heading_path.exists() or not profile:
-        return
-
-    content = heading_path.read_text(encoding="utf-8")
-
-    name = profile.get("name", "")
-    github = profile.get("github", "")
-
-    name_placeholder = _CV_NAME_PLACEHOLDERS.get(template, "")
-    if name and name_placeholder:
-        content = content.replace(name_placeholder, name)
-
-    if github:
-        old_github = "\\href{https://github.com/username}{\\texttt{username}}"
-        new_github = (
-            "\\href{https://github.com/" + github + "}"
-            "{\\texttt{" + github + "}}"
-        )
-        content = content.replace(old_github, new_github)
-
-    heading_path.write_text(content, encoding="utf-8")
-
-
 def validate_name(name: str) -> None:
     if not name:
         raise ValueError("Project name cannot be empty.")
@@ -1316,12 +1231,6 @@ def create_project(
         write_project_gitignore(target_dir)
         write_project_setup_scripts(target_dir)
 
-        from .config import get_profile
-        profile = get_profile()
-        apply_profile_to_metadata(target_dir / "frontmatter" / "metadata.tex", profile)
-        heading_file = _CV_HEADING_FILES.get(template)
-        if heading_file is not None:
-            apply_profile_to_cv_heading(target_dir / heading_file, profile, template)
         write_getting_started_guide(target_dir, name, template)
         write_agents_md(target_dir, name, template)
     except Exception:

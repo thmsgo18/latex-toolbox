@@ -250,40 +250,7 @@ def warn_if_latex_missing() -> None:
         print("       Run `latex-forge setup --install-tex` to install it automatically.")
 
 
-def run_profile_setup() -> None:
-    from .config import save_profile
-
-    print("Set up your profile (press Enter to skip any field):")
-    print("")
-
-    profile: dict[str, str] = {}
-    fields = [
-        ("name", "Full name"),
-        ("university", "University / school"),
-        ("program", "Program / formation"),
-        ("github", "GitHub username (optional)"),
-    ]
-    for key, label in fields:
-        try:
-            value = input(f"  {label}: ").strip()
-        except (EOFError, OSError, KeyboardInterrupt):
-            print("")
-            return
-        if value:
-            profile[key] = value
-
-    if profile:
-        save_profile(profile)
-        print("")
-        print("[ok] Profile saved to ~/.latex-forge.toml")
-    else:
-        print("")
-        print("No values entered — profile not saved.")
-
-
 def run_first_launch_check() -> None:
-    from .config import get_profile
-
     print("Welcome to LaTeX Forge!")
     print("Checking your environment before creating your first project...")
     print("")
@@ -299,11 +266,6 @@ def run_first_launch_check() -> None:
             install_tex_distribution()
         else:
             print("You can install it later with: latex-forge setup --install-tex")
-
-    if not get_profile():
-        print("")
-        if _prompt_yes_no("Set up your profile to pre-fill project metadata?"):
-            run_profile_setup()
 
     print("")
 

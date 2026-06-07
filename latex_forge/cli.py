@@ -23,7 +23,6 @@ from .setup import (
     mark_initialized,
     offer_open_vscode,
     run_first_launch_check,
-    run_profile_setup,
     run_setup,
     warn_if_latex_missing,
 )
@@ -167,16 +166,6 @@ def build_parser() -> argparse.ArgumentParser:
         help="List the available templates.",
     )
 
-    profile_parser = subparsers.add_parser(
-        "profile",
-        help="View or update your profile used to pre-fill project metadata.",
-    )
-    profile_parser.add_argument(
-        "--set",
-        action="store_true",
-        help="Run interactive profile setup.",
-    )
-
     template_parser = subparsers.add_parser(
         "template",
         help="Install, remove or list templates.",
@@ -277,31 +266,6 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"  {t:<{width}}  {desc}")
             else:
                 print(f"  {t}")
-        return 0
-
-    if args.command == "profile":
-        if args.set:
-            run_profile_setup()
-            return 0
-
-        from .config import get_profile
-        profile = get_profile()
-        if not profile:
-            print("No profile configured.")
-            print("Run `latex-forge profile --set` to set up your profile.")
-            return 0
-
-        print("Profile:")
-        for key, label in [
-            ("name", "Name"),
-            ("university", "University"),
-            ("program", "Program"),
-            ("github", "GitHub"),
-        ]:
-            value = profile.get(key)
-            if value:
-                display = f"github.com/{value}" if key == "github" else value
-                print(f"  {label:<12} {display}")
         return 0
 
     if args.command == "completion":

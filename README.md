@@ -67,28 +67,6 @@ latex-forge setup
 
 This checks for `latexmk` and `lualatex`, and offers to install them automatically (`brew` on macOS, `apt` on Debian/Ubuntu, `winget` on Windows). VS Code extensions are installed too if the `code` CLI is available.
 
-## Profile
-
-Set up your profile once. Every project you create after that will have your name, university, and program pre-filled:
-
-```bash
-latex-forge profile --set
-```
-
-```
-Full name: Dupont Alice
-University / school: Université de Bordeaux
-Program / formation: Master Informatique
-GitHub username (optional): dupont-alice
-```
-
-```bash
-latex-forge profile        # view current profile
-latex-forge profile --set  # update
-```
-
-Profile values are stored in `~/.latex-forge.toml` and injected into each new project's `frontmatter/metadata.tex`.
-
 ## Shell completion
 
 Tab completion for commands, flags, and template names:
@@ -235,8 +213,6 @@ Every generated project includes `AGENTS.md` — a self-contained briefing that 
 | `latex-forge setup` | Check and set up the environment |
 | `latex-forge setup --check-only` | Check without installing |
 | `latex-forge setup --install-tex` | Install LaTeX |
-| `latex-forge profile` | View saved profile |
-| `latex-forge profile --set` | Set up profile |
 | `latex-forge template install URL` | Install a template |
 | `latex-forge template list` | List all templates |
 | `latex-forge template remove NAME` | Remove an installed template |

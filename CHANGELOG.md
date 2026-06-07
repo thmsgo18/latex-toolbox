@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-06-07
+
+### Added
+- Project creation now reads the LaTeX engine (`lualatex`/`xelatex`/`pdflatex`) from each template's `latexforge.toml` and generates the matching `latexmk` recipe in `.vscode/settings.json`
+- `apply_profile_to_metadata` (now removed, see below) gained `\author{PLACEHOLDER}` recognition before the feature was dropped entirely
+
+### Changed
+- Both READMEs rewritten to lead with the live PDF preview experience rather than LaTeX itself, with a real screenshot and an "AI-friendly by design" section
+
+### Removed
+- The `latex-forge profile` command and the whole user-profile feature (`get_profile`/`save_profile`, `apply_profile_to_metadata`, `apply_profile_to_cv_heading`, the first-launch profile prompt, and related tests/docs). Generated projects now keep their template placeholders for the user to fill in directly.
+
 ## [0.2.0] - 2026-06-02
 
 ### Added

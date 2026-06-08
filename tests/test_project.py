@@ -87,8 +87,8 @@ def test_patch_local_style_missing_file(tmp_path):
 
 def test_available_templates():
     templates = available_templates()
-    assert "rapport-projet-en" in templates
-    assert "rapport-projet-fr" in templates
+    assert "project-report-en" in templates
+    assert "project-report-fr" in templates
     assert "research" in templates
     assert "cv-fr" in templates
     assert "cv-en" in templates
@@ -96,7 +96,7 @@ def test_available_templates():
 
 
 def test_required_style_files_returns_paths():
-    source = templates_dir() / "rapport-projet-en"
+    source = templates_dir() / "project-report-en"
     styles = required_style_files(source)
     assert len(styles) > 0
     assert all(p.suffix == ".sty" for p in styles)
@@ -109,7 +109,7 @@ def test_required_style_files_returns_paths():
 
 def test_create_project_success(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
-    target_dir, main_tex = create_project("my-project", "rapport-projet-en")
+    target_dir, main_tex = create_project("my-project", "project-report-en")
 
     assert target_dir == tmp_path / "my-project"
     assert main_tex == target_dir / "my-project.tex"
@@ -137,26 +137,26 @@ def test_create_project_existing_folder(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     (tmp_path / "my-project").mkdir()
     with pytest.raises(FileExistsError):
-        create_project("my-project", "rapport-projet-en")
+        create_project("my-project", "project-report-en")
 
 
 def test_create_project_invalid_name(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     with pytest.raises(ValueError, match="Invalid project name"):
-        create_project("my project", "rapport-projet-en")
+        create_project("my project", "project-report-en")
 
 
 def test_create_project_atomic_cleanup(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     with patch("latex_forge.project.write_project_gitignore", side_effect=OSError("disk full")):
         with pytest.raises(OSError):
-            create_project("my-project", "rapport-projet-en")
+            create_project("my-project", "project-report-en")
     assert not (tmp_path / "my-project").exists()
 
 
 def test_create_project_no_relative_paths_in_styles(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
-    create_project("my-project", "rapport-projet-en")
+    create_project("my-project", "project-report-en")
     for sty in (tmp_path / "my-project" / "styles" / "packages").glob("*.sty"):
         content = sty.read_text(encoding="utf-8")
         assert "../../assets/" not in content, f"Unpatched path in {sty.name}"
@@ -168,7 +168,7 @@ def test_create_project_no_relative_paths_in_styles(tmp_path, monkeypatch):
 
 def test_rename_project_success(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
-    create_project("old-name", "rapport-projet-en")
+    create_project("old-name", "project-report-en")
     new_dir, new_tex = rename_project("old-name", "new-name")
 
     assert new_dir == tmp_path / "new-name"
@@ -184,7 +184,7 @@ def test_rename_project_not_found(tmp_path, monkeypatch):
 
 def test_rename_project_target_exists(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
-    create_project("old-name", "rapport-projet-en")
+    create_project("old-name", "project-report-en")
     (tmp_path / "new-name").mkdir()
     with pytest.raises(FileExistsError):
         rename_project("old-name", "new-name")
@@ -192,14 +192,14 @@ def test_rename_project_target_exists(tmp_path, monkeypatch):
 
 def test_rename_project_invalid_new_name(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
-    create_project("old-name", "rapport-projet-en")
+    create_project("old-name", "project-report-en")
     with pytest.raises(ValueError, match="Invalid project name"):
         rename_project("old-name", "new name")
 
 
 def test_rename_current_project_success(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
-    create_project("old-name", "rapport-projet-en")
+    create_project("old-name", "project-report-en")
     monkeypatch.chdir(tmp_path / "old-name")
     new_dir, new_tex = rename_current_project("new-name")
 
@@ -209,7 +209,7 @@ def test_rename_current_project_success(tmp_path, monkeypatch):
 
 def test_rename_renames_build_artifacts(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
-    create_project("old-name", "rapport-projet-en")
+    create_project("old-name", "project-report-en")
     build_dir = tmp_path / "old-name" / "build"
     build_dir.mkdir()
     (build_dir / "old-name.pdf").touch()

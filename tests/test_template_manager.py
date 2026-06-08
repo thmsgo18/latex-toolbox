@@ -145,5 +145,5 @@ def test_available_templates_includes_user(sample_template):
 
 def test_available_templates_without_user_dir():
     templates = available_templates()
-    assert "rapport-projet-fr" in templates
+    assert "project-report-fr" in templates
     assert "cv-en" in templates

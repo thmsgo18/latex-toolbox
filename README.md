@@ -43,7 +43,7 @@ pipx install latex-forge
 latex-forge setup
 
 # 3 — create a project
-latex-forge create --name my-report --template rapport-projet-en
+latex-forge create --name my-report --template project-report-en
 
 # 4 — open and start writing
 code my-report
@@ -81,7 +81,7 @@ eval "$(latex-forge completion)"
 
 ```toml
 # ~/.latex-forge.toml
-default_template = "rapport-projet-en"
+default_template = "project-report-en"
 default_output_dir = "~/Documents/projects"
 ```
 
@@ -101,8 +101,8 @@ Project name: my-report
 Available templates:
   1. cv-en
   2. cv-fr
-  3. rapport-projet-en
-  4. rapport-projet-fr
+  3. project-report-en
+  4. project-report-fr
   5. research
 Choose a template [1-5]: 3
 Create project in [/Users/alice/Desktop]:
@@ -114,7 +114,7 @@ Open project in VS Code? [y/N]
 ### With flags
 
 ```bash
-latex-forge create --name my-report --template rapport-projet-en
+latex-forge create --name my-report --template project-report-en
 latex-forge create --name my-paper --template research --output ~/Desktop
 ```
 
@@ -129,8 +129,8 @@ latex-forge rename new-name            # from inside the project
 
 | Template | Language | Description |
 |---|---|---|
-| `rapport-projet-en` | English | ISO/IEEE project report — requirements, architecture, testing, bibliography |
-| `rapport-projet-fr` | French | AFNOR/ISO project report — cahier des charges, architecture, tests, bibliographie |
+| `project-report-en` | English | ISO/IEEE project report — requirements, architecture, testing, bibliography |
+| `project-report-fr` | French | AFNOR/ISO project report — cahier des charges, architecture, tests, bibliographie |
 | `research` | English | Two-column research article — related work, methodology, experiments, bibliography |
 | `cv-en` | English | CV / résumé — education, experience, projects, skills |
 | `cv-fr` | French | CV — formation, expérience, projets, compétences |

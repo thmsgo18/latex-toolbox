@@ -43,7 +43,7 @@ pipx install latex-forge
 latex-forge setup
 
 # 3 — créer un projet
-latex-forge create --name mon-rapport --template rapport-projet-fr
+latex-forge create --name mon-rapport --template project-report-fr
 
 # 4 — ouvrir et écrire
 code mon-rapport
@@ -81,7 +81,7 @@ eval "$(latex-forge completion)"
 
 ```toml
 # ~/.latex-forge.toml
-default_template = "rapport-projet-fr"
+default_template = "project-report-fr"
 default_output_dir = "~/Documents/projets"
 ```
 
@@ -101,8 +101,8 @@ Project name: mon-rapport
 Available templates:
   1. cv-en
   2. cv-fr
-  3. rapport-projet-en
-  4. rapport-projet-fr
+  3. project-report-en
+  4. project-report-fr
   5. research
 Choose a template [1-5]: 4
 Create project in [/Users/alice/Desktop]:
@@ -114,7 +114,7 @@ Open project in VS Code? [y/N]
 ### Avec des arguments
 
 ```bash
-latex-forge create --name mon-rapport --template rapport-projet-fr
+latex-forge create --name mon-rapport --template project-report-fr
 latex-forge create --name mon-article --template research --output ~/Bureau
 ```
 
@@ -129,8 +129,8 @@ latex-forge rename nouveau-nom             # depuis l'intérieur du projet
 
 | Template | Langue | Description |
 |---|---|---|
-| `rapport-projet-fr` | Français | Rapport de projet AFNOR/ISO — cahier des charges, architecture, tests, bibliographie |
-| `rapport-projet-en` | Anglais | Rapport de projet ISO/IEEE — requirements, architecture, testing, bibliography |
+| `project-report-fr` | Français | Rapport de projet AFNOR/ISO — cahier des charges, architecture, tests, bibliographie |
+| `project-report-en` | Anglais | Rapport de projet ISO/IEEE — requirements, architecture, testing, bibliography |
 | `research` | Anglais | Article de recherche deux colonnes — related work, methodology, experiments, bibliography |
 | `cv-fr` | Français | CV — formation, expérience, projets, compétences |
 | `cv-en` | Anglais | CV / résumé — education, experience, projects, skills |

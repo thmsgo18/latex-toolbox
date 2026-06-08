@@ -14,9 +14,9 @@ def test_no_config_file_returns_none_template(tmp_path, monkeypatch):
 
 def test_default_template_read_from_config(tmp_path, monkeypatch):
     config_file = tmp_path / ".latex-forge.toml"
-    config_file.write_text('default_template = "rapport-projet-fr"\n', encoding="utf-8")
+    config_file.write_text('default_template = "project-report-fr"\n', encoding="utf-8")
     monkeypatch.setattr(config_module, "_CONFIG_PATH", config_file)
-    assert config_module.get_default_template() == "rapport-projet-fr"
+    assert config_module.get_default_template() == "project-report-fr"
 
 
 def test_no_config_file_returns_none_output_dir(tmp_path, monkeypatch):

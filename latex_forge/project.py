@@ -10,8 +10,8 @@ from pathlib import Path
 TEMPLATE_DESCRIPTIONS: dict[str, str] = {
     "cv-en": "CV / résumé — education, experience, projects, involvement, skills",
     "cv-fr": "CV — formation, expérience, projets, engagement, compétences",
-    "rapport-projet-en": "Project report — ISO/IEEE (requirements, architecture, testing, bibliography, appendices)",
-    "rapport-projet-fr": "Rapport de projet — AFNOR/ISO (cahier des charges, architecture, tests, bibliographie, annexes)",
+    "project-report-en": "Project report — ISO/IEEE (requirements, architecture, testing, bibliography, appendices)",
+    "project-report-fr": "Rapport de projet — AFNOR/ISO (cahier des charges, architecture, tests, bibliographie, annexes)",
     "research": "Research article — two-column (related work, methodology, experiments, bibliography)",
 }
 
@@ -188,7 +188,7 @@ def write_agents_md(target_dir: Path, name: str, template: str) -> None:
 
     is_cv = template in ("cv-fr", "cv-en")
     is_fr_cv = template == "cv-fr"
-    has_bibliography = template in ("rapport-projet-fr", "rapport-projet-en", "research")
+    has_bibliography = template in ("project-report-fr", "project-report-en", "research")
     description = TEMPLATE_DESCRIPTIONS.get(template, template)
 
     # ── Compilation section ────────────────────────────────────────────────
@@ -382,7 +382,7 @@ Place the file in `images/`, then:
 | PDF viewer shows duplicate page | VS Code PDF viewer in "Two Page" mode — switch to "Single Page" |"""
 
     # ── Assemble ───────────────────────────────────────────────────────────
-    lang_note = "French" if template in ("cv-fr", "rapport-projet-fr") else "English"
+    lang_note = "French" if template in ("cv-fr", "project-report-fr") else "English"
 
     content = f"""\
 # AGENTS.md — {name}
@@ -486,7 +486,7 @@ This result has been demonstrated in prior work~\\cite{author2024}.
 
 The bibliography is printed automatically at the end of the document.
 """,
-        "rapport-projet-fr": """\
+        "project-report-fr": """\
 
 ### Ajouter une référence bibliographique
 
@@ -498,7 +498,7 @@ Ce résultat a été démontré dans des travaux antérieurs~\\cite{auteur2024}.
 
 La bibliographie apparaît automatiquement avant les annexes.
 """,
-        "rapport-projet-en": """\
+        "project-report-en": """\
 
 ### Add a bibliography reference
 
@@ -515,8 +515,8 @@ The bibliography appears automatically before the appendices.
     _EXTRA_FOLDERS = {
         "research": "| `references/` | BibTeX reference file |\n"
                     "| `appendix/` | Appendices and supplementary material |\n",
-        "rapport-projet-fr": "| `bibliography/` | Fichier de références BibTeX |\n",
-        "rapport-projet-en": "| `bibliography/` | BibTeX reference file |\n",
+        "project-report-fr": "| `bibliography/` | Fichier de références BibTeX |\n",
+        "project-report-en": "| `bibliography/` | BibTeX reference file |\n",
     }
 
     bibliography_section = _BIBLIOGRAPHY.get(template, "")

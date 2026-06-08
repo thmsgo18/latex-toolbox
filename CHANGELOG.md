@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [0.2.3] - 2026-06-08
+
+### Changed
+- Renamed the built-in templates `rapport-projet-en`/`rapport-projet-fr` to `project-report-en`/`project-report-fr`, so the template name is in English regardless of the document's language — consistent with `cv-en`/`cv-fr`. Update `--template`, `default_template`, and any scripts that reference the old names.
+
 ## [0.2.2] - 2026-06-07
 
 ### Added

@@ -18,14 +18,14 @@ def test_list_templates(capsys):
     result = main(["list-templates"])
     assert result == 0
     out = capsys.readouterr().out
-    assert "rapport-projet-en" in out
+    assert "project-report-en" in out
     assert "research" in out
 
 
 def test_create_invalid_name(tmp_path, monkeypatch, capsys):
     monkeypatch.chdir(tmp_path)
     with patch("latex_forge.cli.is_first_run", return_value=False):
-        result = main(["create", "--name", "bad name", "--template", "rapport-projet-en"])
+        result = main(["create", "--name", "bad name", "--template", "project-report-en"])
     assert result == 1
     assert "Invalid project name" in capsys.readouterr().err
 
@@ -41,6 +41,6 @@ def test_create_unknown_template(tmp_path, monkeypatch, capsys):
 def test_create_success(tmp_path, monkeypatch, capsys):
     monkeypatch.chdir(tmp_path)
     with patch("latex_forge.cli.is_first_run", return_value=False):
-        result = main(["create", "--name", "my-project", "--template", "rapport-projet-en"])
+        result = main(["create", "--name", "my-project", "--template", "project-report-en"])
     assert result == 0
     assert (tmp_path / "my-project" / "my-project.tex").exists()

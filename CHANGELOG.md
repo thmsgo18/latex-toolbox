@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [0.2.4] - 2026-06-08
+
+### Added
+- New built-in template `blank`: minimal pdfLaTeX `article` starter with title, author, and one section — the simplest possible starting point.
+- `latex-forge template install` now raises an error if the template name is already installed, preventing silent overwrites. Add `--force` to overwrite explicitly.
+- Attempting to install a template with the same name as a built-in template now raises a clear error.
+
+### Fixed
+- `AGENTS.md` and `GETTING_STARTED.md` now reflect the actual LaTeX engine of the template instead of always showing LuaLaTeX.
+- Added `.claude/` to `.gitignore` so Claude Code session files are never accidentally committed.
+
 ## [0.2.3] - 2026-06-08
 
 ### Changed

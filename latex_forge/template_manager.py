@@ -12,7 +12,11 @@ from pathlib import Path
 # ── Public API ────────────────────────────────────────────────────────────
 
 
-def install_template(source: str, name: str | None = None) -> tuple[str, Path]:
+def install_template(
+    source: str,
+    name: str | None = None,
+    force: bool = False,
+) -> tuple[str, Path]:
     """Install a template from a GitHub URL, ZIP URL, or local path.
 
     Returns ``(template_name, installed_path)``.
@@ -23,21 +27,25 @@ def install_template(source: str, name: str | None = None) -> tuple[str, Path]:
     - Any ``https://`` URL ending in ``.zip``
     - A local directory
     - A local ``.zip`` file
+
+    Raises ``FileExistsError`` if a user-installed template with the same name
+    already exists and *force* is False.
+    Raises ``ValueError`` if the name matches a built-in template.
     """
     source = source.strip()
 
     if "github.com" in source:
-        return _install_from_github(source, name)
+        return _install_from_github(source, name, force=force)
 
     if source.startswith(("https://", "http://")) and source.endswith(".zip"):
-        return _install_from_zip_url(source, name)
+        return _install_from_zip_url(source, name, force=force)
 
     local = Path(source).expanduser().resolve()
     if local.exists():
         if local.is_dir():
-            return _install_from_dir(local, name)
+            return _install_from_dir(local, name, force=force)
         if local.suffix == ".zip":
-            return _install_from_zip_file(local, name)
+            return _install_from_zip_file(local, name, force=force)
 
     raise ValueError(
         f"Cannot install template from: {source!r}\n"
@@ -103,7 +111,7 @@ def _download_url(url: str, dest: Path) -> None:
 # ── Install from various sources ──────────────────────────────────────────
 
 
-def _install_from_github(url: str, name: str | None) -> tuple[str, Path]:
+def _install_from_github(url: str, name: str | None, force: bool = False) -> tuple[str, Path]:
     """Install from a GitHub URL, optionally pointing to a subdirectory."""
     parts = url.rstrip("/").split("/")
 
@@ -131,10 +139,11 @@ def _install_from_github(url: str, name: str | None) -> tuple[str, Path]:
             extract_to=Path(tmp) / "extracted",
             subdir=subdir,
             name=template_name,
+            force=force,
         )
 
 
-def _install_from_zip_url(url: str, name: str | None) -> tuple[str, Path]:
+def _install_from_zip_url(url: str, name: str | None, force: bool = False) -> tuple[str, Path]:
     template_name = name or Path(url.rstrip("/")).stem
     with tempfile.TemporaryDirectory() as tmp:
         zip_path = Path(tmp) / "template.zip"
@@ -144,10 +153,11 @@ def _install_from_zip_url(url: str, name: str | None) -> tuple[str, Path]:
             extract_to=Path(tmp) / "extracted",
             subdir=None,
             name=template_name,
+            force=force,
         )
 
 
-def _install_from_zip_file(zip_path: Path, name: str | None) -> tuple[str, Path]:
+def _install_from_zip_file(zip_path: Path, name: str | None, force: bool = False) -> tuple[str, Path]:
     template_name = name or zip_path.stem
     with tempfile.TemporaryDirectory() as tmp:
         return _extract_and_install(
@@ -155,12 +165,13 @@ def _install_from_zip_file(zip_path: Path, name: str | None) -> tuple[str, Path]
             extract_to=Path(tmp) / "extracted",
             subdir=None,
             name=template_name,
+            force=force,
         )
 
 
-def _install_from_dir(source: Path, name: str | None) -> tuple[str, Path]:
+def _install_from_dir(source: Path, name: str | None, force: bool = False) -> tuple[str, Path]:
     template_name = name or source.name
-    return _copy_to_user_library(source, template_name)
+    return _copy_to_user_library(source, template_name, force=force)
 
 
 # ── Core install logic ────────────────────────────────────────────────────
@@ -171,6 +182,7 @@ def _extract_and_install(
     extract_to: Path,
     subdir: str | None,
     name: str,
+    force: bool = False,
 ) -> tuple[str, Path]:
     extract_to.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(zip_path) as zf:
@@ -179,7 +191,7 @@ def _extract_and_install(
     # Case 1: flat ZIP — main.tex sits directly at the extraction root
     if (extract_to / "main.tex").exists():
         source = extract_to
-        return _copy_to_user_library(source, name)
+        return _copy_to_user_library(source, name, force=force)
 
     # Case 2: GitHub-style ZIP — files are wrapped inside a top-level directory
     # (e.g. repo-HEAD/ or repo-abc123/)
@@ -202,21 +214,44 @@ def _extract_and_install(
         if len(children) == 1:
             source = children[0]
 
-    return _copy_to_user_library(source, name)
+    return _copy_to_user_library(source, name, force=force)
 
 
-def _copy_to_user_library(source: Path, name: str) -> tuple[str, Path]:
-    """Validate and copy a template directory into the user library."""
+def _copy_to_user_library(source: Path, name: str, force: bool = False) -> tuple[str, Path]:
+    """Validate and copy a template directory into the user library.
+
+    Raises ``ValueError`` if *name* matches a built-in template.
+    Raises ``FileExistsError`` if the template is already installed and *force* is False.
+    """
+    from .project import templates_dir as _builtin_templates_dir
+
     if not (source / "main.tex").exists():
         raise ValueError(
             f"No main.tex found in {source}\n"
             "A valid latex-forge template must contain a main.tex file."
         )
 
+    # Prevent overwriting a built-in template
+    if (_builtin_templates_dir() / name).is_dir():
+        raise ValueError(
+            f"'{name}' is the name of a built-in template and cannot be overwritten.\n"
+            "Choose a different name with:\n"
+            f"  latex-forge template install <source> --name <new-name>"
+        )
+
     dest = _user_template_path(name)
     _user_templates_dir().mkdir(parents=True, exist_ok=True)
 
     if dest.exists():
+        if not force:
+            raise FileExistsError(
+                f"Template '{name}' is already installed.\n"
+                "To overwrite it, add --force:\n"
+                f"  latex-forge template install <source> --name {name} --force\n"
+                "Or remove it first:\n"
+                f"  latex-forge template remove {name}"
+            )
         shutil.rmtree(dest)
+
     shutil.copytree(source, dest)
     return name, dest

@@ -8,6 +8,9 @@ dist/
 # macOS
 .DS_Store
 
+# Claude Code
+.claude/
+
 # LaTeX build
 **/build/
 **/*.aux

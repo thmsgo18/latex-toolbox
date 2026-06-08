@@ -185,6 +185,11 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Name to give the installed template (defaults to repo/folder name).",
     )
+    t_install.add_argument(
+        "--force",
+        action="store_true",
+        help="Overwrite an existing user-installed template with the same name.",
+    )
 
     template_sub.add_parser(
         "list",
@@ -221,8 +226,8 @@ def main(argv: list[str] | None = None) -> int:
 
         if args.template_command == "install":
             try:
-                name, path = install_template(args.source, args.name)
-            except (ValueError, FileNotFoundError, OSError) as exc:
+                name, path = install_template(args.source, args.name, force=args.force)
+            except (ValueError, FileNotFoundError, FileExistsError, OSError) as exc:
                 print(str(exc), file=sys.stderr)
                 return 1
             print(f"Template installed: {name}")

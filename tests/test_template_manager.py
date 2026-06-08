@@ -80,11 +80,24 @@ def test_install_local_dir_custom_name(sample_template):
     assert path.name == "custom-name"
 
 
-def test_install_replaces_existing(sample_template, isolated_user_dir):
+def test_install_raises_when_already_installed(sample_template):
+    install_template(str(sample_template))
+    with pytest.raises(FileExistsError, match="already installed"):
+        install_template(str(sample_template))
+
+
+def test_install_force_overwrites(sample_template, isolated_user_dir):
     install_template(str(sample_template))
     (sample_template / "extra.tex").write_text("extra")
-    install_template(str(sample_template))
+    install_template(str(sample_template), force=True)
     assert (isolated_user_dir / "my-template" / "extra.tex").exists()
+
+
+def test_install_raises_for_builtin_name(sample_template):
+    built_ins = [p.name for p in templates_dir().iterdir() if p.is_dir()]
+    if built_ins:
+        with pytest.raises(ValueError, match="built-in"):
+            install_template(str(sample_template), name=built_ins[0])
 
 
 def test_install_missing_main_tex_raises(tmp_path):
@@ -145,5 +158,6 @@ def test_available_templates_includes_user(sample_template):
 
 def test_available_templates_without_user_dir():
     templates = available_templates()
+    assert "blank" in templates
     assert "project-report-fr" in templates
     assert "cv-en" in templates

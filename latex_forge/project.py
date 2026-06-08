@@ -8,6 +8,7 @@ from pathlib import Path
 
 
 TEMPLATE_DESCRIPTIONS: dict[str, str] = {
+    "blank": "Blank document — minimal pdfLaTeX starter (article class, title, one section)",
     "cv-en": "CV / résumé — education, experience, projects, involvement, skills",
     "cv-fr": "CV — formation, expérience, projets, engagement, compétences",
     "project-report-en": "Project report — ISO/IEEE (requirements, architecture, testing, bibliography, appendices)",
@@ -183,32 +184,48 @@ lualatex --version
     (target_dir / "GETTING_STARTED.md").write_text(content, encoding="utf-8")
 
 
-def write_agents_md(target_dir: Path, name: str, template: str) -> None:
+_ENGINE_DISPLAY = {
+    "lualatex": "LuaLaTeX",
+    "xelatex": "XeLaTeX",
+    "pdflatex": "pdfLaTeX",
+}
+
+
+def write_agents_md(target_dir: Path, name: str, template: str, engine: str = "lualatex") -> None:
     """Generate AGENTS.md — a self-contained briefing for any AI working on the project."""
 
     is_cv = template in ("cv-fr", "cv-en")
     is_fr_cv = template == "cv-fr"
+    is_blank = template == "blank"
     has_bibliography = template in ("project-report-fr", "project-report-en", "research")
     description = TEMPLATE_DESCRIPTIONS.get(template, template)
+    engine_display = _ENGINE_DISPLAY.get(engine, engine)
+    latexmk_flag = _ENGINE_LATEXMK_FLAG.get(engine, "-lualatex")
 
     # ── Compilation section ────────────────────────────────────────────────
     if has_bibliography:
         compile_manual = f"""\
 ```bash
-lualatex -interaction=nonstopmode -output-directory=build {name}.tex
+{engine} -interaction=nonstopmode -output-directory=build {name}.tex
 biber build/{name}
-lualatex -interaction=nonstopmode -output-directory=build {name}.tex
-lualatex -interaction=nonstopmode -output-directory=build {name}.tex
+{engine} -interaction=nonstopmode -output-directory=build {name}.tex
+{engine} -interaction=nonstopmode -output-directory=build {name}.tex
 ```"""
     else:
         compile_manual = f"""\
 ```bash
-lualatex -interaction=nonstopmode -output-directory=build {name}.tex
-lualatex -interaction=nonstopmode -output-directory=build {name}.tex
+{engine} -interaction=nonstopmode -output-directory=build {name}.tex
+{engine} -interaction=nonstopmode -output-directory=build {name}.tex
 ```"""
 
     # ── File structure table ───────────────────────────────────────────────
-    if is_cv:
+    if is_blank:
+        structure_rows = f"""\
+| `{name}.tex` | Entry point — main document |
+| `frontmatter/metadata.tex` | **Start here** — title, author, date |
+| `sections/content.tex` | Main content |
+| `build/` | Compiled PDF — auto-generated |"""
+    elif is_cv:
         if is_fr_cv:
             structure_rows = """\
 | `{name}.tex` | Point d'entrée — ne pas modifier la structure |
@@ -257,7 +274,12 @@ lualatex -interaction=nonstopmode -output-directory=build {name}.tex
     structure_rows = structure_rows.replace("{name}", name).replace("{bib_folder}", "bibliography/")
 
     # ── Custom commands ────────────────────────────────────────────────────
-    if is_cv:
+    if is_blank:
+        custom_commands = (
+            "No custom commands — this is a standard `article` document.\n"
+            "Use any standard LaTeX commands and packages freely."
+        )
+    elif is_cv:
         custom_commands = """\
 | Command | Description |
 |---|---|
@@ -278,7 +300,35 @@ lualatex -interaction=nonstopmode -output-directory=build {name}.tex
 | `\\addauthor{Name}{}[github]` | Adds an author to the cover page (in `frontmatter/metadata.tex`) |"""
 
     # ── How to add content ─────────────────────────────────────────────────
-    if is_cv:
+    if is_blank:
+        add_content = f"""\
+### Add a new section
+
+Either add directly to `sections/content.tex`, or:
+1. Create `sections/my-section.tex`
+2. Add `\\input{{sections/my-section.tex}}` in `{name}.tex`
+
+### Add an image
+
+Place the image in the project folder, then:
+```latex
+\\begin{{figure}}[h]
+  \\centering
+  \\includegraphics[width=0.8\\linewidth]{{my-image.png}}
+  \\caption{{Caption here.}}
+  \\label{{fig:my-label}}
+\\end{{figure}}
+```
+
+### Add a bibliography
+
+Add a `references.bib` file, then in `{name}.tex` before `\\end{{document}}`:
+```latex
+\\bibliographystyle{{plain}}
+\\bibliography{{references}}
+```
+Then cite with `\\cite{{key}}` in your text."""
+    elif is_cv:
         if is_fr_cv:
             add_content = """\
 ### Ajouter une expérience
@@ -396,7 +446,7 @@ Place the file in `images/`, then:
 |---|---|
 | Template | `{template}` — {description} |
 | Language | {lang_note} |
-| LaTeX engine | LuaLaTeX |
+| LaTeX engine | {engine_display} |
 | Bibliography | {"biblatex + biber" if has_bibliography else "none"} |
 | Output | `build/{name}.pdf` |
 
@@ -407,13 +457,13 @@ Place the file in `images/`, then:
 ### Automatic (VS Code saves trigger this)
 
 LaTeX Workshop is configured to run on save via `.vscode/settings.json`.
-Recipe: `lualatexmk` → output in `build/`.
+Recipe: `{engine}mk` → output in `build/`.
 
 ### Manual
 
 ```bash
 # Recommended — handles bibliography passes automatically
-latexmk -lualatex -interaction=nonstopmode -outdir=build {name}.tex
+latexmk {latexmk_flag} -interaction=nonstopmode -outdir=build {name}.tex
 ```
 
 If `latexmk` is unavailable, run the full sequence manually:
@@ -467,9 +517,111 @@ Renames the folder, the main `.tex` file, and build artifacts consistently.
     (target_dir / "AGENTS.md").write_text(content, encoding="utf-8")
 
 
-def write_getting_started_guide(target_dir: Path, name: str, template: str) -> None:
+def _write_blank_getting_started(target_dir: Path, name: str, engine: str) -> None:
+    engine_display = _ENGINE_DISPLAY.get(engine, engine)
+    content = f"""\
+# Getting Started — {name}
+
+## Workflow
+
+**1. Set document metadata**
+
+Open `frontmatter/metadata.tex` and update the title, author, and date.
+
+**2. Write your content**
+
+Edit `sections/content.tex`. To add more sections:
+1. Create a new file, e.g. `sections/my-section.tex`
+2. Add `\\input{{sections/my-section.tex}}` to `{name}.tex`
+
+**3. Save to compile**
+
+Save `{name}.tex` in VS Code → LaTeX Workshop compiles automatically → PDF in `build/{name}.pdf`.
+
+---
+
+## Folder structure
+
+| Path | Purpose |
+|---|---|
+| `frontmatter/metadata.tex` | Document title, author, date |
+| `sections/content.tex` | Main content |
+| `build/` | Compiled PDF — auto-generated, do not commit |
+
+---
+
+## Common operations
+
+### Add an image
+
+Put your image file in the project folder, then in your `.tex` file:
+
+```latex
+\\begin{{figure}}[h]
+  \\centering
+  \\includegraphics[width=0.8\\linewidth]{{my-image.png}}
+  \\caption{{Caption here.}}
+  \\label{{fig:my-label}}
+\\end{{figure}}
+```
+
+### Add a bibliography
+
+1. Add a `references.bib` file
+2. In `{name}.tex`, before `\\end{{document}}`:
+
+```latex
+\\bibliographystyle{{plain}}
+\\bibliography{{references}}
+```
+
+3. Cite with `\\cite{{key}}` in your text.
+
+### Rename this project
+
+```bash
+latex-forge rename new-name
+```
+
+---
+
+## If compilation fails
+
+1. **LaTeX not installed** → run `latex-forge setup --install-tex`
+2. **LaTeX Workshop not installed** → install it from the VS Code extensions panel
+3. **Missing package** → `tlmgr install package-name`
+4. **Compilation stuck** → delete the `build/` folder and try again
+
+This project uses **{engine_display}**. Verify it is available:
+
+```bash
+{engine} --version
+```
+
+---
+
+## Resources
+
+| Resource | Link |
+|---|---|
+| LaTeX Project | <https://www.latex-project.org/help/documentation/> |
+| CTAN — package index | <https://www.ctan.org> |
+| Overleaf — Learn LaTeX in 30 minutes | <https://www.overleaf.com/learn/latex/Learn_LaTeX_in_30_minutes> |
+| LaTeX Wikibook | <https://en.wikibooks.org/wiki/LaTeX> |
+| LaTeX FAQ | <https://texfaq.org> |
+"""
+    (target_dir / "GETTING_STARTED.md").write_text(content, encoding="utf-8")
+
+
+def write_getting_started_guide(
+    target_dir: Path, name: str, template: str, engine: str = "lualatex"
+) -> None:
     if template in ("cv-fr", "cv-en"):
         _write_cv_getting_started(target_dir, name, template)
+        return
+
+    if template == "blank":
+        _write_blank_getting_started(target_dir, name, engine)
         return
 
     # Template-specific sections
@@ -591,10 +743,10 @@ This renames the folder, the main `.tex` file, and any build artifacts.
 3. **Missing package** → `tlmgr install package-name` (TeX Live) or let MiKTeX auto-install
 4. **Compilation stuck** → delete the `build/` folder and try again
 
-This project uses **LuaLaTeX**. Verify it is available:
+This project uses **{_ENGINE_DISPLAY.get(engine, engine)}**. Verify it is available:
 
 ```bash
-lualatex --version
+{engine} --version
 ```
 
 ---
@@ -1231,8 +1383,8 @@ def create_project(
         write_project_gitignore(target_dir)
         write_project_setup_scripts(target_dir)
 
-        write_getting_started_guide(target_dir, name, template)
-        write_agents_md(target_dir, name, template)
+        write_getting_started_guide(target_dir, name, template, engine=engine)
+        write_agents_md(target_dir, name, template, engine=engine)
     except Exception:
         shutil.rmtree(target_dir, ignore_errors=True)
         raise

@@ -1,0 +1,32 @@
+\documentclass[12pt, a4paper]{article}
+
+% ── Encoding & language ───────────────────────────────────────────────────
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+
+% ── Page layout ───────────────────────────────────────────────────────────
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% ── Typography ────────────────────────────────────────────────────────────
+\usepackage{parskip}
+
+% ── Hyperlinks ────────────────────────────────────────────────────────────
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=black, urlcolor=blue, citecolor=black}
+
+% ── Metadata ──────────────────────────────────────────────────────────────
+\input{frontmatter/metadata}
+
+% ══════════════════════════════════════════════════════════════════════════
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+\newpage
+
+\input{sections/content}
+
+\end{document}

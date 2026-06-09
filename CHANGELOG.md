@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [0.2.5] - 2026-06-09
+
+### Added
+- User profile stored at `~/.latex-forge/profile.toml`: name, email, phone, website, GitHub, LinkedIn, university, faculty, program, supervisor, company, department, job title.
+- `latex-forge profile set` — interactive prompts to create or update the profile.
+- `latex-forge profile show` — display the current profile.
+- `latex-forge profile clear` — delete the profile.
+- Profile is applied automatically at `latex-forge create`: substitutes values into `frontmatter/metadata.tex` (reports, blank) and `sections/heading.tex` / `sections/en-tete.tex` (CVs). Silent no-op for external/gallery templates and unset fields.
+- Profile file is plain TOML — readable and writable directly by the future VS Code extension without spawning the CLI.
+
 ## [0.2.4] - 2026-06-08
 
 ### Added

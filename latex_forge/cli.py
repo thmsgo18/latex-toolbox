@@ -196,6 +196,25 @@ def build_parser() -> argparse.ArgumentParser:
         help="List built-in and user-installed templates.",
     )
 
+    # ── profile ──────────────────────────────────────────────────────────
+    profile_parser = subparsers.add_parser(
+        "profile",
+        help="Manage your user profile (auto-fills new projects).",
+    )
+    profile_sub = profile_parser.add_subparsers(dest="profile_command", required=True)
+    profile_sub.add_parser(
+        "set",
+        help="Set or update profile values interactively.",
+    )
+    profile_sub.add_parser(
+        "show",
+        help="Display the current profile.",
+    )
+    profile_sub.add_parser(
+        "clear",
+        help="Delete the profile.",
+    )
+
     t_remove = template_sub.add_parser(
         "remove",
         help="Remove a user-installed template.",
@@ -220,6 +239,76 @@ def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     argcomplete.autocomplete(parser)
     args = parser.parse_args(argv)
+
+    if args.command == "profile":
+        from .profile import (
+            PROFILE_SCHEMA,
+            SECTION_HEADERS,
+            clear_profile,
+            load_profile,
+            profile_path,
+            save_profile,
+        )
+
+        if args.profile_command == "set":
+            if not _is_interactive():
+                print("'profile set' requires an interactive terminal.", file=sys.stderr)
+                return 1
+
+            current = load_profile()
+            new_values: dict[str, str] = dict(current)
+
+            print("Setting up your latex-forge profile.")
+            print("Press Enter to keep the current value. Leave blank to clear a field.")
+            print(f"Saved to: {profile_path()}")
+            print()
+
+            prev_section: str | None = None
+            for key, label, section in PROFILE_SCHEMA:
+                if section != prev_section:
+                    header = SECTION_HEADERS[section]
+                    print(f"── {header} " + "─" * (52 - len(header)))
+                    prev_section = section
+                cur = current.get(key, "")
+                prompt = f"  {label} [{cur}]: " if cur else f"  {label}: "
+                try:
+                    answer = input(prompt).strip()
+                except (EOFError, OSError, KeyboardInterrupt):
+                    print("")
+                    return 1
+                if answer:
+                    new_values[key] = answer
+                elif key not in new_values:
+                    new_values[key] = ""
+
+            save_profile(new_values)
+            print()
+            print(f"Profile saved to {profile_path()}")
+            return 0
+
+        if args.profile_command == "show":
+            profile = load_profile()
+            if not profile:
+                print("No profile set.")
+                print(f"Run 'latex-forge profile set' to create one.")
+                return 0
+
+            print(f"Profile — {profile_path()}")
+            prev_section = None
+            key_width = max(len(label) for _, label, _ in PROFILE_SCHEMA)
+            for key, label, section in PROFILE_SCHEMA:
+                if section != prev_section:
+                    print(f"\n{SECTION_HEADERS[section]}")
+                    prev_section = section
+                value = profile.get(key, "")
+                display = value if value else "(not set)"
+                print(f"  {label:<{key_width}}  {display}")
+            return 0
+
+        if args.profile_command == "clear":
+            clear_profile()
+            print("Profile cleared.")
+            return 0
 
     if args.command == "template":
         from .template_manager import install_template, list_user_templates, remove_template

@@ -1385,6 +1385,9 @@ def create_project(
 
         write_getting_started_guide(target_dir, name, template, engine=engine)
         write_agents_md(target_dir, name, template, engine=engine)
+
+        from .profile import apply_profile_to_project, load_profile
+        apply_profile_to_project(target_dir, template, load_profile())
     except Exception:
         shutil.rmtree(target_dir, ignore_errors=True)
         raise

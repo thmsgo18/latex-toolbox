@@ -20,14 +20,19 @@ from latex_forge.project import available_templates, templates_dir
 
 @pytest.fixture(autouse=True)
 def isolated_user_dir(tmp_path, monkeypatch):
-    """Redirect the user templates directory to a temp folder for every test."""
+    """Redirect the user templates directory and metadata path to temp folders."""
     import latex_forge.template_manager as tm
     import latex_forge.project as proj
+    import latex_forge.installed_templates as meta
 
     fake_dir = tmp_path / "user_templates"
+    fake_meta = tmp_path / "installed_templates.json"
 
     monkeypatch.setattr(tm, "_user_templates_dir", lambda: fake_dir)
     monkeypatch.setattr(proj, "user_templates_dir", lambda: fake_dir)
+    monkeypatch.setattr(meta, "metadata_path", lambda: fake_meta)
+    # Prevent network calls in _record_installation by making _GALLERY_HOST never match
+    monkeypatch.setattr(tm, "_GALLERY_HOST", "__no_match__")
     yield fake_dir
 
 

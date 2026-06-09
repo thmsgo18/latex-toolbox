@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-06-09
+
+### Added
+- **Install tracking**: after every `template install`, metadata (version, install URL, timestamp) is persisted to `~/.latex-forge/installed_templates.json`.  The VS Code extension can read this file directly without spawning the CLI.
+- **`latex-forge template list --json`**: outputs all templates (built-in + user-installed) as a JSON array with `name`, `type`, `description`, `installed_version`, and `install_url` fields.
+- **`latex-forge template update [name]`**: checks the gallery for newer versions of user-installed templates and reinstalls them.  Accepts an optional template name to update only one; otherwise updates all.  Supports `--json`. Exit codes: `0` = at least one update applied, `1` = error, `2` = nothing to update / already up to date.
+- **`latex-forge diagnose`**: environment health check — reports the installed latex-forge version, pipx, TeX Live (year + available engines), latexmk, profile status, and default template. Supports `--json`. Exit code `1` if TeX Live or latexmk is missing.
+- **Template versioning in gallery**: `gallery.json` schema bumped to `v2.0`; every template entry now carries a `"version": "1.0.0"` semver field used by `template update` to detect outdated installs.
+
 ## [0.2.5] - 2026-06-09
 
 ### Added

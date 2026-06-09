@@ -191,9 +191,32 @@ def build_parser() -> argparse.ArgumentParser:
         help="Overwrite an existing user-installed template with the same name.",
     )
 
-    template_sub.add_parser(
+    t_list = template_sub.add_parser(
         "list",
         help="List built-in and user-installed templates.",
+    )
+    t_list.add_argument(
+        "--json",
+        action="store_true",
+        dest="json_output",
+        help="Output the template list as JSON.",
+    )
+
+    t_update = template_sub.add_parser(
+        "update",
+        help="Update user-installed templates from the gallery.",
+    )
+    t_update.add_argument(
+        "name",
+        nargs="?",
+        default=None,
+        help="Name of the template to update (updates all if omitted).",
+    )
+    t_update.add_argument(
+        "--json",
+        action="store_true",
+        dest="json_output",
+        help="Output update results as JSON.",
     )
 
     # ── profile ──────────────────────────────────────────────────────────
@@ -220,6 +243,17 @@ def build_parser() -> argparse.ArgumentParser:
         help="Remove a user-installed template.",
     )
     t_remove.add_argument("name", help="Name of the template to remove.")
+
+    diagnose_parser = subparsers.add_parser(
+        "diagnose",
+        help="Check the latex-forge environment (LaTeX, latexmk, profile, etc.).",
+    )
+    diagnose_parser.add_argument(
+        "--json",
+        action="store_true",
+        dest="json_output",
+        help="Output diagnostics as JSON.",
+    )
 
     completion_parser = subparsers.add_parser(
         "completion",
@@ -311,7 +345,13 @@ def main(argv: list[str] | None = None) -> int:
             return 0
 
     if args.command == "template":
-        from .template_manager import install_template, list_user_templates, remove_template
+        from .template_manager import (
+            install_template,
+            list_all_templates_detailed,
+            list_user_templates,
+            remove_template,
+            update_templates,
+        )
 
         if args.template_command == "install":
             try:
@@ -325,6 +365,12 @@ def main(argv: list[str] | None = None) -> int:
             return 0
 
         if args.template_command == "list":
+            if args.json_output:
+                import json
+                entries = list_all_templates_detailed()
+                print(json.dumps(entries, indent=2))
+                return 0
+            # Human-readable output (backward compatible)
             built_in = sorted(p.name for p in templates_dir().iterdir() if p.is_dir())
             user = list_user_templates()
             width = max((len(t) for t in built_in + user), default=0)
@@ -342,6 +388,44 @@ def main(argv: list[str] | None = None) -> int:
                 print("Install one with: latex-forge template install <url-or-path>")
             return 0
 
+        if args.template_command == "update":
+            results = update_templates(name=args.name)
+            if args.json_output:
+                import json
+                print(json.dumps(results, indent=2))
+                # Exit 2 if everything is up-to-date (nothing actually updated)
+                any_updated = any(r.get("status") == "updated" for r in results)
+                any_error = any(r.get("status") == "error" for r in results)
+                if any_error:
+                    return 1
+                if not any_updated:
+                    return 2
+                return 0
+            # Human-readable output
+            if not results:
+                print("No user-installed templates to update.")
+                return 2
+            any_updated = False
+            any_error = False
+            for r in results:
+                status = r.get("status")
+                name_r = r.get("name", "?")
+                if status == "updated":
+                    any_updated = True
+                    print(f"  ✓ {name_r}: {r.get('from')} → {r.get('to')}")
+                elif status == "up_to_date":
+                    print(f"  — {name_r}: already up to date ({r.get('from')})")
+                elif status == "skipped":
+                    print(f"  · {name_r}: skipped ({r.get('reason', '')})")
+                elif status == "error":
+                    any_error = True
+                    print(f"  ✗ {name_r}: {r.get('reason', 'error')}", file=sys.stderr)
+            if any_error:
+                return 1
+            if not any_updated:
+                return 2
+            return 0
+
         if args.template_command == "remove":
             try:
                 remove_template(args.name)
@@ -350,6 +434,21 @@ def main(argv: list[str] | None = None) -> int:
                 return 1
             print(f"Template removed: {args.name}")
             return 0
+
+    if args.command == "diagnose":
+        from .diagnose import format_diagnose_text, run_diagnose
+
+        data = run_diagnose()
+        if args.json_output:
+            import json
+            print(json.dumps(data, indent=2))
+        else:
+            print(format_diagnose_text(data))
+        # Exit 1 if any critical check failed
+        critical = ("texlive", "latexmk")
+        if any(not data[k]["ok"] for k in critical):
+            return 1
+        return 0
 
     if args.command == "list-templates":
         templates = available_templates()

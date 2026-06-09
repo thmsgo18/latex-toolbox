@@ -82,27 +82,28 @@ def test_clear_is_noop_when_no_file():
 def blank_project(tmp_path) -> Path:
     (tmp_path / "frontmatter").mkdir()
     (tmp_path / "frontmatter" / "metadata.tex").write_text(
-        "\\title{Document Title}\n\\author{Author Name}\n\\date{\\today}\n"
+        "\\title{Document Title}\n\\author{Author Name}\n\\date{\\today}\n",
+        encoding="utf-8",
     )
     return tmp_path
 
 
 def test_apply_blank_substitutes_author(blank_project, full_profile):
     apply_profile_to_project(blank_project, "blank", full_profile)
-    content = (blank_project / "frontmatter" / "metadata.tex").read_text()
+    content = (blank_project / "frontmatter" / "metadata.tex").read_text(encoding="utf-8")
     assert "Thomas Gourmelen" in content
     assert "Author Name" not in content
 
 
 def test_apply_blank_preserves_title(blank_project, full_profile):
     apply_profile_to_project(blank_project, "blank", full_profile)
-    content = (blank_project / "frontmatter" / "metadata.tex").read_text()
+    content = (blank_project / "frontmatter" / "metadata.tex").read_text(encoding="utf-8")
     assert "Document Title" in content
 
 
 def test_apply_blank_empty_profile_is_noop(blank_project):
     apply_profile_to_project(blank_project, "blank", {})
-    content = (blank_project / "frontmatter" / "metadata.tex").read_text()
+    content = (blank_project / "frontmatter" / "metadata.tex").read_text(encoding="utf-8")
     assert "Author Name" in content
 
 
@@ -117,35 +118,36 @@ def cv_en_project(tmp_path) -> Path:
         "\\faPhone* \\texttt{+1 000.000.0000}\n"
         "\\faEnvelope \\texttt{email@example.com}\n"
         "\\href{https://github.com/username}{\\texttt{username}}\n"
-        "\\href{https://www.linkedin.com/in/first-last/}{\\texttt{first-last}}\n"
+        "\\href{https://www.linkedin.com/in/first-last/}{\\texttt{first-last}}\n",
+        encoding="utf-8",
     )
     return tmp_path
 
 
 def test_apply_cv_en_name(cv_en_project, full_profile):
     apply_profile_to_project(cv_en_project, "cv-en", full_profile)
-    content = (cv_en_project / "sections" / "heading.tex").read_text()
+    content = (cv_en_project / "sections" / "heading.tex").read_text(encoding="utf-8")
     assert "Thomas Gourmelen" in content
     assert "First LAST" not in content
 
 
 def test_apply_cv_en_email(cv_en_project, full_profile):
     apply_profile_to_project(cv_en_project, "cv-en", full_profile)
-    content = (cv_en_project / "sections" / "heading.tex").read_text()
+    content = (cv_en_project / "sections" / "heading.tex").read_text(encoding="utf-8")
     assert "thomas@example.com" in content
     assert "email@example.com" not in content
 
 
 def test_apply_cv_en_github(cv_en_project, full_profile):
     apply_profile_to_project(cv_en_project, "cv-en", full_profile)
-    content = (cv_en_project / "sections" / "heading.tex").read_text()
+    content = (cv_en_project / "sections" / "heading.tex").read_text(encoding="utf-8")
     assert "thmsgo18" in content
     assert "username" not in content
 
 
 def test_apply_cv_en_linkedin(cv_en_project, full_profile):
     apply_profile_to_project(cv_en_project, "cv-en", full_profile)
-    content = (cv_en_project / "sections" / "heading.tex").read_text()
+    content = (cv_en_project / "sections" / "heading.tex").read_text(encoding="utf-8")
     assert "thomas-gourmelen" in content
     assert "first-last" not in content
 
@@ -161,21 +163,22 @@ def cv_fr_project(tmp_path) -> Path:
         "\\faPhone* \\texttt{+33 6.00.00.00.00}\n"
         "\\faEnvelope \\texttt{email@example.com}\n"
         "\\href{https://github.com/username}{\\texttt{username}}\n"
-        "\\href{https://www.linkedin.com/in/prenom-nom/}{\\texttt{prenom-nom}}\n"
+        "\\href{https://www.linkedin.com/in/prenom-nom/}{\\texttt{prenom-nom}}\n",
+        encoding="utf-8",
     )
     return tmp_path
 
 
 def test_apply_cv_fr_name(cv_fr_project, full_profile):
     apply_profile_to_project(cv_fr_project, "cv-fr", full_profile)
-    content = (cv_fr_project / "sections" / "en-tete.tex").read_text()
+    content = (cv_fr_project / "sections" / "en-tete.tex").read_text(encoding="utf-8")
     assert "Thomas Gourmelen" in content
     assert "Prénom NOM" not in content
 
 
 def test_apply_cv_fr_linkedin(cv_fr_project, full_profile):
     apply_profile_to_project(cv_fr_project, "cv-fr", full_profile)
-    content = (cv_fr_project / "sections" / "en-tete.tex").read_text()
+    content = (cv_fr_project / "sections" / "en-tete.tex").read_text(encoding="utf-8")
     assert "thomas-gourmelen" in content
     assert "prenom-nom" not in content
 
@@ -189,7 +192,8 @@ def report_en_project(tmp_path) -> Path:
     (tmp_path / "frontmatter" / "metadata.tex").write_text(
         "\\newcommand{\\universityname}{Universite Paris Cite}\n"
         "\\newcommand{\\facultyname}{Master's Degree -- Computer Science}\n"
-        "\\addauthor{LASTNAME Firstname}{}\n"
+        "\\addauthor{LASTNAME Firstname}{}\n",
+        encoding="utf-8",
     )
     return tmp_path
 
@@ -200,34 +204,35 @@ def report_fr_project(tmp_path) -> Path:
     (tmp_path / "frontmatter" / "metadata.tex").write_text(
         "\\newcommand{\\universityname}{Universite Paris Cite}\n"
         "\\newcommand{\\facultyname}{Master Informatique}\n"
-        "\\addauthor{NOM Prenom}{}\n"
+        "\\addauthor{NOM Prenom}{}\n",
+        encoding="utf-8",
     )
     return tmp_path
 
 
 def test_apply_report_en_university(report_en_project, full_profile):
     apply_profile_to_project(report_en_project, "project-report-en", full_profile)
-    content = (report_en_project / "frontmatter" / "metadata.tex").read_text()
+    content = (report_en_project / "frontmatter" / "metadata.tex").read_text(encoding="utf-8")
     assert "Université Paris Cité" in content
     assert "Universite Paris Cite" not in content
 
 
 def test_apply_report_en_program(report_en_project, full_profile):
     apply_profile_to_project(report_en_project, "project-report-en", full_profile)
-    content = (report_en_project / "frontmatter" / "metadata.tex").read_text()
+    content = (report_en_project / "frontmatter" / "metadata.tex").read_text(encoding="utf-8")
     assert "Master Informatique" in content
 
 
 def test_apply_report_en_author(report_en_project, full_profile):
     apply_profile_to_project(report_en_project, "project-report-en", full_profile)
-    content = (report_en_project / "frontmatter" / "metadata.tex").read_text()
+    content = (report_en_project / "frontmatter" / "metadata.tex").read_text(encoding="utf-8")
     assert "Gourmelen Thomas" in content
     assert "LASTNAME Firstname" not in content
 
 
 def test_apply_report_fr_author(report_fr_project, full_profile):
     apply_profile_to_project(report_fr_project, "project-report-fr", full_profile)
-    content = (report_fr_project / "frontmatter" / "metadata.tex").read_text()
+    content = (report_fr_project / "frontmatter" / "metadata.tex").read_text(encoding="utf-8")
     assert "Gourmelen Thomas" in content
     assert "NOM Prenom" not in content
 
@@ -238,13 +243,13 @@ def test_apply_report_fr_author(report_fr_project, full_profile):
 def test_partial_profile_only_substitutes_set_fields(blank_project):
     partial = {"first_name": "Alice", "last_name": "Smith"}
     apply_profile_to_project(blank_project, "blank", partial)
-    content = (blank_project / "frontmatter" / "metadata.tex").read_text()
+    content = (blank_project / "frontmatter" / "metadata.tex").read_text(encoding="utf-8")
     assert "Alice Smith" in content
 
 
 def test_missing_name_skips_author(blank_project):
     apply_profile_to_project(blank_project, "blank", {"email": "a@b.com"})
-    content = (blank_project / "frontmatter" / "metadata.tex").read_text()
+    content = (blank_project / "frontmatter" / "metadata.tex").read_text(encoding="utf-8")
     assert "Author Name" in content  # unchanged
 
 
@@ -267,14 +272,15 @@ def cv_en_gallery_project(tmp_path) -> Path:
         "\\newcommand{\\cvphone}{+1 000.000.0000}\n"
         "\\newcommand{\\cvemail}{email@example.com}\n"
         "\\newcommand{\\cvgithub}{username}\n"
-        "\\newcommand{\\cvlinkedin}{first-last}\n"
+        "\\newcommand{\\cvlinkedin}{first-last}\n",
+        encoding="utf-8",
     )
     return tmp_path
 
 
 def test_apply_cv_gallery_format(cv_en_gallery_project, full_profile):
     apply_profile_to_project(cv_en_gallery_project, "cv-en", full_profile)
-    content = (cv_en_gallery_project / "frontmatter" / "metadata.tex").read_text()
+    content = (cv_en_gallery_project / "frontmatter" / "metadata.tex").read_text(encoding="utf-8")
     assert "Thomas Gourmelen" in content
     assert "thomas@example.com" in content
     assert "thmsgo18" in content

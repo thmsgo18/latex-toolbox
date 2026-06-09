@@ -17,6 +17,23 @@ GALLERY_JSON_URL = (
 _GALLERY_HOST = "thmsgo18/latex-forge-gallery"
 
 
+def _validate_template_name(name: str) -> None:
+    """Ensure *name* is a plain directory name inside the user library.
+
+    Rejects anything that could escape ``~/.latex-forge/templates/``
+    (path separators, ``..``, absolute paths) or hide the directory.
+    """
+    if not name or name in (".", ".."):
+        raise ValueError(f"Invalid template name: {name!r}")
+    if "/" in name or "\\" in name or ":" in name:
+        raise ValueError(
+            f"Invalid template name: {name!r}. "
+            "Template names cannot contain path separators."
+        )
+    if name.startswith("."):
+        raise ValueError(f"Template name cannot start with a dot: {name!r}")
+
+
 # ── Public API ────────────────────────────────────────────────────────────
 
 
@@ -85,6 +102,7 @@ def remove_template(name: str) -> None:
     """
     from .project import templates_dir
 
+    _validate_template_name(name)
     if (templates_dir() / name).is_dir():
         raise ValueError(
             f"'{name}' is a built-in template and cannot be removed.\n"
@@ -424,6 +442,7 @@ def _copy_to_user_library(source: Path, name: str, force: bool = False) -> tuple
     """Validate and copy a template directory into the user library."""
     from .project import templates_dir as _builtin_templates_dir
 
+    _validate_template_name(name)
     if not (source / "main.tex").exists():
         raise ValueError(
             f"No main.tex found in {source}\n"

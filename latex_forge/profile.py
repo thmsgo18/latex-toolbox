@@ -49,12 +49,19 @@ def profile_path() -> Path:
 
 
 def load_profile() -> dict[str, str]:
-    """Return the stored profile as a flat dict. Returns {} if no file exists."""
+    """Return the stored profile as a flat dict.
+
+    Returns {} if no file exists or if the file is corrupted, so a broken
+    profile never blocks project creation.
+    """
     p = profile_path()
     if not p.exists():
         return {}
-    with open(p, "rb") as fh:
-        data = tomllib.load(fh)
+    try:
+        with open(p, "rb") as fh:
+            data = tomllib.load(fh)
+    except (tomllib.TOMLDecodeError, OSError):
+        return {}
     return {k: str(v) for k, v in data.items() if isinstance(v, str)}
 
 
@@ -73,7 +80,7 @@ def save_profile(values: dict[str, str]) -> None:
             header = SECTION_HEADERS[section]
             lines.append(f"# ── {header} " + "─" * (55 - len(header)))
             current_section = section
-        value = values.get(key, "")
+        value = values.get(key, "").replace("\\", "\\\\").replace('"', '\\"')
         lines.append(f'{key} = "{value}"')
 
     p.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -239,7 +246,8 @@ def _apply_gallery_metadata(
 
     # ── CV author fields ──────────────────────────────────────────────────
     if full_name:
-        content = _replace_newcmd(content, "cvname", full_name)
+        content = _replace_newcmd(content,   "cvname", full_name)
+        content = _replace_renewcmd(content, "cvname", full_name)  # twenty-seconds-cv uses \renewcommand
     if profile.get("first_name"):
         content = _replace_newcmd(content, "cvfirstname", profile["first_name"])
     if profile.get("last_name"):

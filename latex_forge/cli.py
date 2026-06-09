@@ -557,7 +557,7 @@ def main(argv: list[str] | None = None) -> int:
                     file=sys.stderr,
                 )
                 return 1
-        except (FileNotFoundError, FileExistsError) as exc:
+        except (ValueError, FileNotFoundError, FileExistsError) as exc:
             print(str(exc), file=sys.stderr)
             return 1
 

@@ -1416,15 +1416,18 @@ def _rename(old_dir: Path, new_name: str) -> tuple[Path, Path]:
 
     old_main_tex.rename(new_main_tex)
 
+    # Keep the full multi-part extension (e.g. .synctex.gz), not just .suffix
     build_dir = old_dir / "build"
     if build_dir.is_dir():
         for build_file in build_dir.glob(f"{old_name}.*"):
-            build_file.rename(build_dir / f"{new_name}{build_file.suffix}")
+            extension = build_file.name[len(old_name):]
+            build_file.rename(build_dir / f"{new_name}{extension}")
 
     for root_file in old_dir.glob(f"{old_name}.*"):
         if root_file.name == new_main_tex.name:
             continue
-        root_file.rename(old_dir / f"{new_name}{root_file.suffix}")
+        extension = root_file.name[len(old_name):]
+        root_file.rename(old_dir / f"{new_name}{extension}")
 
     # Windows: cannot rename a directory that is the current working directory.
     if Path.cwd().resolve() == old_dir.resolve():

@@ -94,8 +94,9 @@ def apply_profile_to_project(
 ) -> None:
     """Substitute profile values into a newly created project.
 
-    Targets only built-in templates whose file structure is known.
-    Silent no-op for unknown templates or unset profile fields.
+    Works for all gallery templates whose metadata.tex uses the standard
+    newcommand / renewcommand / def patterns defined in this module.
+    Silent no-op for unset profile fields or missing commands.
     """
     if not profile:
         return
@@ -108,7 +109,10 @@ def apply_profile_to_project(
         _apply_cv(target_dir, template, profile, full_name)
     elif template in ("project-report-en", "project-report-fr", "research", "blank"):
         _apply_metadata(target_dir, template, profile, full_name)
-    # External / gallery templates: no-op — don't risk corrupting unknown files
+    else:
+        # All other gallery templates: inject into frontmatter/metadata.tex
+        # using whichever standard commands the template declares.
+        _apply_gallery_metadata(target_dir, profile, full_name)
 
 
 # ── CV templates ──────────────────────────────────────────────────────────
@@ -208,12 +212,89 @@ def _apply_metadata(
     metadata.write_text(content, encoding="utf-8")
 
 
+# ── Gallery templates ─────────────────────────────────────────────────────
+
+
+def _apply_gallery_metadata(
+    target_dir: Path, profile: dict[str, str], full_name: str
+) -> None:
+    """Apply profile to any gallery template using standard command patterns.
+
+    Tries every known standard command; _replace_* helpers are no-ops when
+    the command is not present in the file, so this is always safe.
+    """
+    metadata = target_dir / "frontmatter" / "metadata.tex"
+    if not metadata.exists():
+        return
+
+    content = metadata.read_text(encoding="utf-8")
+
+    # ── Non-CV author fields ──────────────────────────────────────────────
+    if full_name:
+        content = _replace_newcmd(content, "authorname", full_name)
+    if profile.get("email"):
+        content = _replace_newcmd(content, "authoremail", profile["email"])
+    if profile.get("phone"):
+        content = _replace_newcmd(content, "authorphone", profile["phone"])
+
+    # ── CV author fields ──────────────────────────────────────────────────
+    if full_name:
+        content = _replace_newcmd(content, "cvname", full_name)
+    if profile.get("first_name"):
+        content = _replace_newcmd(content, "cvfirstname", profile["first_name"])
+    if profile.get("last_name"):
+        content = _replace_newcmd(content, "cvlastname", profile["last_name"])
+    if profile.get("email"):
+        content = _replace_newcmd(content, "cvemail",  profile["email"])
+        content = _replace_newcmd(content, "cvmail",   profile["email"])  # twenty-seconds-cv variant
+    if profile.get("phone"):
+        content = _replace_newcmd(content, "cvphone",  profile["phone"])
+    if profile.get("github"):
+        content = _replace_newcmd(content, "cvgithub",   profile["github"])
+    if profile.get("linkedin"):
+        content = _replace_newcmd(content, "cvlinkedin", profile["linkedin"])
+
+    # ── Academic / institutional fields ──────────────────────────────────
+    if profile.get("university"):
+        content = _replace_newcmd(content, "universityname", profile["university"])
+        content = _replace_newcmd(content, "cvuniversity",   profile["university"])
+    if profile.get("program"):
+        content = _replace_newcmd(content, "facultyname", profile["program"])
+        content = _replace_newcmd(content, "cvposition",  profile["program"])
+    if profile.get("supervisor"):
+        content = _replace_newcmd(content, "supervisorname", profile["supervisor"])
+
+    # ── Project-UPC: uses \renewcommand ──────────────────────────────────
+    if profile.get("supervisor"):
+        content = _replace_renewcmd(content, "projetEncadrant", profile["supervisor"])
+    if full_name:
+        # UPC convention: "NOM Prenom" — swap last/first for the first author
+        first = profile.get("first_name", "").strip()
+        last  = profile.get("last_name",  "").strip()
+        upc_author = f"{last} {first}".strip() if (first or last) else full_name
+        content = _replace_renewcmd(content, "projetAuteurs", upc_author)
+
+    metadata.write_text(content, encoding="utf-8")
+
+
 # ── Regex helpers ─────────────────────────────────────────────────────────
 
 
 def _replace_newcmd(content: str, cmd: str, value: str) -> str:
     r"""\\newcommand{\cmd}{OLD} → \\newcommand{\cmd}{value}."""
     pat = re.compile(r"(\\newcommand\{\\" + re.escape(cmd) + r"\}\{)[^}]*(\})")
+    return pat.sub(lambda m: m.group(1) + value + m.group(2), content)
+
+
+def _replace_renewcmd(content: str, cmd: str, value: str) -> str:
+    r"""\\renewcommand{\cmd}{OLD} → \\renewcommand{\cmd}{value}."""
+    pat = re.compile(r"(\\renewcommand\{\\" + re.escape(cmd) + r"\}\{)[^}]*(\})")
+    return pat.sub(lambda m: m.group(1) + value + m.group(2), content)
+
+
+def _replace_def(content: str, cmd: str, value: str) -> str:
+    r"""\\def\cmd{OLD} → \\def\cmd{value}. Applied only to non-commented lines."""
+    pat = re.compile(r"(^\s*\\def\\" + re.escape(cmd) + r"\{)[^}]*(\})", re.MULTILINE)
     return pat.sub(lambda m: m.group(1) + value + m.group(2), content)
 
 

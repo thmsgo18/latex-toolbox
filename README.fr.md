@@ -319,11 +319,9 @@ Voir [CONTRIBUTING.md](CONTRIBUTING.md). Les GIFs de démo sont générés avec 
 
 ## Projets liés
 
-| Projet | Ce qu'il apporte |
-|---|---|
-| [**latex-forge-vscode**](https://github.com/thmsgo18/latex-forge-vscode) | Tout faire depuis VS Code : créer des projets, parcourir la galerie avec aperçus, installer en un clic (sans terminal) |
-| [**latex-forge-gallery**](https://github.com/thmsgo18/latex-forge-gallery) | La galerie de templates curée (80+) et son [site web](https://thmsgo18.github.io/latex-forge-gallery/) |
-| [**latex-forge-skill**](https://github.com/thmsgo18/latex-forge-skill) | Un skill Claude qui pilote tout le workflow depuis une conversation : génération, rédaction, compilation et export des documents |
+- [**latex-forge-vscode**](https://github.com/thmsgo18/latex-forge-vscode) : tout faire depuis VS Code : créer des projets, parcourir la galerie avec aperçus, installer en un clic (sans terminal)
+- [**latex-forge-gallery**](https://github.com/thmsgo18/latex-forge-gallery) : la galerie de templates curée (80+) et son [site web](https://thmsgo18.github.io/latex-forge-gallery/)
+- [**latex-forge-skill**](https://github.com/thmsgo18/latex-forge-skill) : un skill Claude qui pilote tout le workflow depuis une conversation : génération, rédaction, compilation et export des documents
 
 ## Auteur
 

@@ -319,11 +319,9 @@ See [CONTRIBUTING.md](CONTRIBUTING.md). The demo GIFs are generated with [vhs](h
 
 ## Related projects
 
-| Project | What it adds |
-|---|---|
-| [**latex-forge-vscode**](https://github.com/thmsgo18/latex-forge-vscode) | Do everything from VS Code: create projects, browse the gallery with previews, one-click template install (no terminal needed) |
-| [**latex-forge-gallery**](https://github.com/thmsgo18/latex-forge-gallery) | The curated template gallery (80+ templates) and its [browsable website](https://thmsgo18.github.io/latex-forge-gallery/) |
-| [**latex-forge-skill**](https://github.com/thmsgo18/latex-forge-skill) | A Claude skill that drives the whole workflow from a conversation: scaffold, write, build and export documents |
+- [**latex-forge-vscode**](https://github.com/thmsgo18/latex-forge-vscode): do everything from VS Code: create projects, browse the gallery with previews, one-click template install (no terminal needed)
+- [**latex-forge-gallery**](https://github.com/thmsgo18/latex-forge-gallery): the curated template gallery (80+ templates) and its [browsable website](https://thmsgo18.github.io/latex-forge-gallery/)
+- [**latex-forge-skill**](https://github.com/thmsgo18/latex-forge-skill): a Claude skill that drives the whole workflow from a conversation: scaffold, write, build and export documents
 
 ## Author
 

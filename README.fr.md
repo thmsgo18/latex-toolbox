@@ -304,13 +304,6 @@ latex-forge diagnose
 | `latex-forge completion [--shell SHELL]` | Afficher le code de complétion shell |
 | `latex-forge --version` | Afficher la version |
 
-## Projets liés
-
-| Projet | Ce qu'il apporte |
-|---|---|
-| [**latex-forge-vscode**](https://github.com/thmsgo18/latex-forge-vscode) | Tout faire depuis VS Code : créer des projets, parcourir la galerie avec aperçus, installer en un clic (sans terminal) |
-| [**latex-forge-gallery**](https://github.com/thmsgo18/latex-forge-gallery) | La galerie de templates curée (80+) et son [site web](https://thmsgo18.github.io/latex-forge-gallery/) |
-
 ## Versionner vos documents
 
 Chaque projet est autonome, vous pouvez donc le versionner indépendamment :
@@ -324,6 +317,13 @@ git init && git add . && git commit -m "Rapport initial"
 
 Voir [CONTRIBUTING.md](CONTRIBUTING.md). Les GIFs de démo sont générés avec [vhs](https://github.com/charmbracelet/vhs) : `./docs/demo/record.sh`.
 
----
+## Projets liés
+
+| Projet | Ce qu'il apporte |
+|---|---|
+| [**latex-forge-vscode**](https://github.com/thmsgo18/latex-forge-vscode) | Tout faire depuis VS Code : créer des projets, parcourir la galerie avec aperçus, installer en un clic (sans terminal) |
+| [**latex-forge-gallery**](https://github.com/thmsgo18/latex-forge-gallery) | La galerie de templates curée (80+) et son [site web](https://thmsgo18.github.io/latex-forge-gallery/) |
+
+## Auteur
 
 Créé par [thmsgo18](https://github.com/thmsgo18)

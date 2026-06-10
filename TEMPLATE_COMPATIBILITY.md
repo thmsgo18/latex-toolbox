@@ -3,7 +3,7 @@
 `latex-forge template install <source>` accepts **any** Git repository, ZIP
 file, or local folder that contains a `main.tex`. This guide explains how to
 get the most out of `latex-forge create` with a template that wasn't built
-for latex-forge from the start — your own templates, a colleague's, or one
+for latex-forge from the start: your own templates, a colleague's, or one
 found online.
 
 None of this is required to install a template. It only affects two things:
@@ -16,15 +16,15 @@ your name, email, university, etc. from your [profile](README.md#your-profile).
 
 ```
 my-template/
-├── main.tex              # required — renamed to <project-name>.tex on create
+├── main.tex              # required, renamed to <project-name>.tex on create
 ├── frontmatter/
-│   └── metadata.tex       # optional — see "Profile placeholders" below
-├── latexforge.toml         # optional — declares the LaTeX engine
+│   └── metadata.tex       # optional, see "Profile placeholders" below
+├── latexforge.toml         # optional, declares the LaTeX engine
 └── ...                     # any other files (sections, assets, styles, .bib...)
 ```
 
 Everything except `main.tex` is copied as-is. If your template doesn't use
-this exact layout, it still installs and works — `latex-forge create` will
+this exact layout, it still installs and works: `latex-forge create` will
 just rename your root `.tex` file and skip the steps below.
 
 ## 2. Declaring the LaTeX engine
@@ -52,7 +52,7 @@ This writes `latexforge.toml` for you in the installed copy.
 
 If `frontmatter/metadata.tex` exists, `latex-forge create` rewrites any of
 the following standard commands using your profile
-(`latex-forge profile set ...`). Commands you don't define are left alone —
+(`latex-forge profile set ...`). Commands you don't define are left alone;
 add only the ones relevant to your template.
 
 | Profile field | Recognized commands |
@@ -76,7 +76,7 @@ Example `frontmatter/metadata.tex`:
 ```
 
 After `latex-forge create --template my-template`, these are automatically
-replaced with the values from your profile — no manual editing needed.
+replaced with the values from your profile, no manual editing needed.
 
 ## 4. Checklist
 
@@ -85,6 +85,6 @@ replaced with the values from your profile — no manual editing needed.
 - [ ] `frontmatter/metadata.tex` uses the standard commands above, if you want profile auto-fill
 - [ ] Compiles with `latexmk -<engine> main.tex` from a clean checkout
 
-That's it — `latex-forge create --template <name>` will then produce a
+That's it: `latex-forge create --template <name>` will then produce a
 project with the same structure (`.vscode/`, `.gitignore`, `AGENTS.md`,
 `GETTING_STARTED.md`, `build`/`watch` support) as the built-in templates.

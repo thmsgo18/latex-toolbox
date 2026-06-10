@@ -33,25 +33,25 @@
 
 ## C'est quoi, LaTeX Forge ?
 
-Vous devez rendre un rapport, un CV ou un article en LaTeX — et vous préféreriez passer votre temps à **écrire** plutôt qu'à vous battre avec les packages, les compilateurs et la configuration.
+Vous devez rendre un rapport, un CV ou un article en LaTeX, et vous préféreriez passer votre temps à **écrire** plutôt qu'à vous battre avec les packages, les compilateurs et la configuration.
 
-LaTeX Forge est un petit outil que vous installez une fois. Une commande crée ensuite un projet de document complet et prêt à l'emploi : l'arborescence, les styles, la bibliographie, et un espace VS Code pré-configuré. Ouvrez-le, écrivez, sauvegardez — le PDF se reconstruit automatiquement dans un panneau latéral.
+LaTeX Forge est un petit outil que vous installez une fois. Une commande crée ensuite un projet de document complet et prêt à l'emploi : l'arborescence, les styles, la bibliographie, et un espace VS Code pré-configuré. Ouvrez-le, écrivez, sauvegardez : le PDF se reconstruit automatiquement dans un panneau latéral.
 
 **Aucune connaissance de LaTeX n'est requise pour démarrer.** Et si vous vivez déjà dans un terminal, tout est scriptable.
 
 ## Démarrage rapide
 
 ```bash
-# 1 — installer (une seule fois)
+# 1. installer (une seule fois)
 pipx install latex-forge
 
-# 2 — vérifier votre machine et installer ce qui manque (LaTeX, extensions VS Code)
+# 2. vérifier votre machine et installer ce qui manque (LaTeX, extensions VS Code)
 latex-forge setup
 
-# 3 — créer votre premier projet
+# 3. créer votre premier projet
 latex-forge create --name mon-rapport --template project-report-fr
 
-# 4 — l'ouvrir et commencer à écrire
+# 4. l'ouvrir et commencer à écrire
 code mon-rapport
 ```
 
@@ -60,25 +60,25 @@ code mon-rapport
 
 `pipx` installe proprement les outils Python en ligne de commande. S'il manque :
 
-- **macOS** — `brew install pipx && pipx ensurepath`
-- **Windows** — `py -m pip install --user pipx && py -m pipx ensurepath`
-- **Linux** — `sudo apt install pipx && pipx ensurepath` (ou voir [pipx.pypa.io](https://pipx.pypa.io))
+- **macOS** : `brew install pipx && pipx ensurepath`
+- **Windows** : `py -m pip install --user pipx && py -m pipx ensurepath`
+- **Linux** : `sudo apt install pipx && pipx ensurepath` (ou voir [pipx.pypa.io](https://pipx.pypa.io))
 
 Ouvrez ensuite un nouveau terminal et relancez l'étape 1. Python 3.10+ est requis.
 </details>
 
 ## Fonctionnalités
 
-- **Des projets en une commande** — arborescence complète, styles embarqués, aucune dépendance externe
-- **Aperçu PDF en direct** — les projets sont pré-câblés pour [LaTeX Workshop](https://marketplace.visualstudio.com/items?itemName=James-Yu.latex-workshop) : sauvegardez dans VS Code, voyez le PDF
-- **Compilation en terminal** — `latex-forge build` et `latex-forge watch` fonctionnent sans aucun éditeur, et installent automatiquement les paquets manquants
-- **Plus de 80 templates** — CV, thèses, articles, posters, présentations… installables depuis la [galerie](https://github.com/thmsgo18/latex-forge-gallery) en une commande, ainsi que les vôtres avec `--engine`
-- **Votre profil, pré-rempli** — renseignez votre nom, email et université une fois ; chaque nouveau projet démarre personnalisé
-- **Prêt pour git** — `latex-forge create --git` initialise un dépôt avec le premier commit
-- **Export prêt à rendre** — `latex-forge export` regroupe vos sources et le PDF dans un ZIP propre
-- **Docteur d'environnement** — `latex-forge setup` installe la chaîne LaTeX selon votre OS ; `latex-forge diagnose` vous dit ce qui ne va pas
-- **Pensé pour les IA** — chaque projet embarque un `AGENTS.md` qui briefe n'importe quel assistant IA
-- **Multi-plateforme** — macOS, Linux, Windows
+- **Des projets en une commande** : arborescence complète, styles embarqués, aucune dépendance externe
+- **Aperçu PDF en direct** : les projets sont pré-câblés pour [LaTeX Workshop](https://marketplace.visualstudio.com/items?itemName=James-Yu.latex-workshop) : sauvegardez dans VS Code, voyez le PDF
+- **Compilation en terminal** : `latex-forge build` et `latex-forge watch` fonctionnent sans aucun éditeur, et installent automatiquement les paquets manquants
+- **Plus de 80 templates** : CV, thèses, articles, posters, présentations… installables depuis la [galerie](https://github.com/thmsgo18/latex-forge-gallery) en une commande, ainsi que les vôtres avec `--engine`
+- **Votre profil, pré-rempli** : renseignez votre nom, email et université une fois ; chaque nouveau projet démarre personnalisé
+- **Prêt pour git** : `latex-forge create --git` initialise un dépôt avec le premier commit
+- **Export prêt à rendre** : `latex-forge export` regroupe vos sources et le PDF dans un ZIP propre
+- **Docteur d'environnement** : `latex-forge setup` installe la chaîne LaTeX selon votre OS ; `latex-forge diagnose` vous dit ce qui ne va pas
+- **Pensé pour les IA** : chaque projet embarque un `AGENTS.md` qui briefe n'importe quel assistant IA
+- **Multi-plateforme** : macOS, Linux, Windows
 
 ## À quoi ça ressemble
 
@@ -94,18 +94,18 @@ Six templates sont intégrés :
 
 | Template | Langue | Description |
 |---|---|---|
-| `blank` | Anglais | Document minimal — titre, une section, prêt à grandir |
-| `project-report-en` | Anglais | Rapport de projet ISO/IEEE — exigences, architecture, tests, bibliographie |
-| `project-report-fr` | Français | Rapport de projet AFNOR/ISO — cahier des charges, architecture, tests, bibliographie |
-| `research` | Anglais | Article de recherche deux colonnes — état de l'art, méthodologie, expériences |
-| `cv-en` | Anglais | CV — éducation, expérience, projets, compétences |
-| `cv-fr` | Français | CV — formation, expérience, projets, compétences |
+| `blank` | Anglais | Document minimal : titre, une section, prêt à grandir |
+| `project-report-en` | Anglais | Rapport de projet ISO/IEEE : exigences, architecture, tests, bibliographie |
+| `project-report-fr` | Français | Rapport de projet AFNOR/ISO : cahier des charges, architecture, tests, bibliographie |
+| `research` | Anglais | Article de recherche deux colonnes : état de l'art, méthodologie, expériences |
+| `cv-en` | Anglais | CV : éducation, expérience, projets, compétences |
+| `cv-fr` | Français | CV : formation, expérience, projets, compétences |
 
 ```bash
 latex-forge list-templates
 ```
 
-### La galerie — plus de 80 autres
+### La galerie (plus de 80 autres)
 
 Parcourez la [**galerie de templates**](https://thmsgo18.github.io/latex-forge-gallery/) avec aperçus, puis installez n'importe quel template en une commande :
 
@@ -131,7 +131,7 @@ latex-forge template update          # récupère les nouvelles versions de la g
 latex-forge template remove clean-thesis
 ```
 
-Vous pouvez aussi installer **vos propres templates** — depuis n'importe quel dépôt GitHub, fichier ZIP ou dossier local. Seule exigence : un `main.tex` à la racine :
+Vous pouvez aussi installer **vos propres templates** depuis n'importe quel dépôt GitHub, fichier ZIP ou dossier local. Seule exigence : un `main.tex` à la racine :
 
 ```bash
 latex-forge template install https://github.com/quelquun/son-template
@@ -147,10 +147,10 @@ Voir [TEMPLATE_COMPATIBILITY.md](TEMPLATE_COMPATIBILITY.md) pour activer le pré
 
 ## Votre profil
 
-Dites à LaTeX Forge qui vous êtes **une seule fois** — chaque nouveau projet est pré-rempli avec votre nom, email, université, etc. :
+Dites à LaTeX Forge qui vous êtes **une seule fois**, et chaque nouveau projet est pré-rempli avec votre nom, email, université, etc. :
 
 ```bash
-latex-forge profile set      # interactif — nom, email, téléphone, université…
+latex-forge profile set      # interactif : nom, email, téléphone, université…
 latex-forge profile show
 latex-forge profile clear
 ```
@@ -171,7 +171,7 @@ latex-forge build --clean    # nettoie les artefacts de compilation d'abord
 latex-forge watch            # recompile à chaque sauvegarde (Ctrl+C pour arrêter)
 ```
 
-Le bon moteur LaTeX est détecté depuis le projet lui-même — rien à configurer.
+Le bon moteur LaTeX est détecté depuis le projet lui-même : rien à configurer.
 
 ## Utilisation
 
@@ -224,7 +224,7 @@ default_output_dir = "~/Documents/projets"
 
 ### Complétion shell
 
-Complétion Tab pour les commandes, options et noms de templates — **bash** (`~/.bashrc`) ou **zsh** (`~/.zshrc`) :
+Complétion Tab pour les commandes, options et noms de templates pour **bash** (`~/.bashrc`) ou **zsh** (`~/.zshrc`) :
 
 ```bash
 eval "$(latex-forge completion)"
@@ -243,7 +243,7 @@ Ouvrez `frontmatter/metadata.tex` pour définir le titre, les auteurs et le cour
 \addauthor{Bob Durand}{}
 ```
 
-Sauvegardez le fichier `.tex` principal — le PDF se reconstruit instantanément dans VS Code (ou lancez `latex-forge build`).
+Sauvegardez le fichier `.tex` principal : le PDF se reconstruit instantanément dans VS Code (ou lancez `latex-forge build`).
 
 ## Structure d'un projet généré
 
@@ -251,7 +251,7 @@ Sauvegardez le fichier `.tex` principal — le PDF se reconstruit instantanémen
 mon-projet/
 ├── mon-projet.tex            ← fichier principal (nommé d'après le projet)
 ├── frontmatter/
-│   ├── metadata.tex          ← titre, auteurs, cours — commencez ici
+│   ├── metadata.tex          ← titre, auteurs, cours (commencez ici)
 │   └── toc.tex
 ├── sections/                 ← un fichier .tex par section
 ├── backmatter/               ← remerciements, annexes
@@ -265,11 +265,11 @@ mon-projet/
 └── .gitignore
 ```
 
-Le projet est entièrement autonome : il se compile, se partage et se versionne indépendamment — aucune dépendance envers ce dépôt. Chaque projet embarque aussi `AGENTS.md`, un briefing qui permet à n'importe quel assistant IA d'ouvrir le projet à froid et de contribuer correctement.
+Le projet est entièrement autonome : il se compile, se partage et se versionne indépendamment, sans dépendance envers ce dépôt. Chaque projet embarque aussi `AGENTS.md`, un briefing qui permet à n'importe quel assistant IA d'ouvrir le projet à froid et de contribuer correctement.
 
 ## Besoin d'aide ?
 
-Commencez par le docteur — il vérifie tout et vous dit quoi corriger :
+Commencez par le docteur, qui vérifie tout et vous dit quoi corriger :
 
 ```bash
 latex-forge diagnose
@@ -279,7 +279,7 @@ latex-forge diagnose
 |---|---|
 | `latex-forge: command not found` | Ouvrez un nouveau terminal, ou lancez `pipx ensurepath` |
 | Rien ne compile / pas de PDF | `latex-forge setup --install-tex` installe LaTeX pour votre OS |
-| `Package X not found` | `tlmgr install X` (TeX Live) — MiKTeX l'installe automatiquement |
+| `Package X not found` | `tlmgr install X` (TeX Live) ; MiKTeX l'installe automatiquement |
 | Compilation bloquée | `latex-forge build --clean`, puis réessayez |
 | Autre chose | [Ouvrez une issue](https://github.com/thmsgo18/latex-forge/issues) avec la sortie de `latex-forge diagnose` |
 
@@ -308,12 +308,12 @@ latex-forge diagnose
 
 | Projet | Ce qu'il apporte |
 |---|---|
-| [**latex-forge-vscode**](https://github.com/thmsgo18/latex-forge-vscode) | Tout faire depuis VS Code : créer des projets, parcourir la galerie avec aperçus, installer en un clic — sans terminal |
+| [**latex-forge-vscode**](https://github.com/thmsgo18/latex-forge-vscode) | Tout faire depuis VS Code : créer des projets, parcourir la galerie avec aperçus, installer en un clic (sans terminal) |
 | [**latex-forge-gallery**](https://github.com/thmsgo18/latex-forge-gallery) | La galerie de templates curée (80+) et son [site web](https://thmsgo18.github.io/latex-forge-gallery/) |
 
 ## Versionner vos documents
 
-Chaque projet est autonome — versionnez-le indépendamment :
+Chaque projet est autonome, vous pouvez donc le versionner indépendamment :
 
 ```bash
 cd mon-projet

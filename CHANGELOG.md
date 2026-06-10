@@ -18,7 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [0.4.0] - 2026-06-10
 
 ### Added
-- **`latex-forge build [project]`**: compiles the project to PDF with latexmk — no editor required. Reads the engine from the project's `.vscode/settings.json` (same invocation LaTeX Workshop would use, LuaLaTeX fallback), outputs to `build/`, and prints actionable hints on failure. `--clean` deletes `build/` first.
+- **`latex-forge build [project]`**: compiles the project to PDF with latexmk, no editor required. Reads the engine from the project's `.vscode/settings.json` (same invocation LaTeX Workshop would use, LuaLaTeX fallback), outputs to `build/`, and prints actionable hints on failure. `--clean` deletes `build/` first.
 - **`latex-forge watch [project]`**: continuous compilation on every save (`latexmk -pvc`), stop with Ctrl+C.
 
 ### Fixed
@@ -32,23 +32,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Install tracking**: after every `template install`, metadata (version, install URL, timestamp) is persisted to `~/.latex-forge/installed_templates.json`.  The VS Code extension can read this file directly without spawning the CLI.
 - **`latex-forge template list --json`**: outputs all templates (built-in + user-installed) as a JSON array with `name`, `type`, `description`, `installed_version`, and `install_url` fields.
 - **`latex-forge template update [name]`**: checks the gallery for newer versions of user-installed templates and reinstalls them.  Accepts an optional template name to update only one; otherwise updates all.  Supports `--json`. Exit codes: `0` = at least one update applied, `1` = error, `2` = nothing to update / already up to date.
-- **`latex-forge diagnose`**: environment health check — reports the installed latex-forge version, pipx, TeX Live (year + available engines), latexmk, profile status, and default template. Supports `--json`. Exit code `1` if TeX Live or latexmk is missing.
+- **`latex-forge diagnose`**: environment health check that reports the installed latex-forge version, pipx, TeX Live (year + available engines), latexmk, profile status, and default template. Supports `--json`. Exit code `1` if TeX Live or latexmk is missing.
 - **Template versioning in gallery**: `gallery.json` schema bumped to `v2.0`; every template entry now carries a `"version": "1.0.0"` semver field used by `template update` to detect outdated installs.
 
 ## [0.2.5] - 2026-06-09
 
 ### Added
 - User profile stored at `~/.latex-forge/profile.toml`: name, email, phone, website, GitHub, LinkedIn, university, faculty, program, supervisor, company, department, job title.
-- `latex-forge profile set` — interactive prompts to create or update the profile.
-- `latex-forge profile show` — display the current profile.
-- `latex-forge profile clear` — delete the profile.
+- `latex-forge profile set`: interactive prompts to create or update the profile.
+- `latex-forge profile show`: display the current profile.
+- `latex-forge profile clear`: delete the profile.
 - Profile is applied automatically at `latex-forge create`: substitutes values into `frontmatter/metadata.tex` (reports, blank) and `sections/heading.tex` / `sections/en-tete.tex` (CVs). Silent no-op for external/gallery templates and unset fields.
-- Profile file is plain TOML — readable and writable directly by the future VS Code extension without spawning the CLI.
+- Profile file is plain TOML, readable and writable directly by the future VS Code extension without spawning the CLI.
 
 ## [0.2.4] - 2026-06-08
 
 ### Added
-- New built-in template `blank`: minimal pdfLaTeX `article` starter with title, author, and one section — the simplest possible starting point.
+- New built-in template `blank`: minimal pdfLaTeX `article` starter with title, author, and one section, the simplest possible starting point.
 - `latex-forge template install` now raises an error if the template name is already installed, preventing silent overwrites. Add `--force` to overwrite explicitly.
 - Attempting to install a template with the same name as a built-in template now raises a clear error.
 
@@ -59,7 +59,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [0.2.3] - 2026-06-08
 
 ### Changed
-- Renamed the built-in templates `rapport-projet-en`/`rapport-projet-fr` to `project-report-en`/`project-report-fr`, so the template name is in English regardless of the document's language — consistent with `cv-en`/`cv-fr`. Update `--template`, `default_template`, and any scripts that reference the old names.
+- Renamed the built-in templates `rapport-projet-en`/`rapport-projet-fr` to `project-report-en`/`project-report-fr`, so the template name is in English regardless of the document's language, consistent with `cv-en`/`cv-fr`. Update `--template`, `default_template`, and any scripts that reference the old names.
 
 ## [0.2.2] - 2026-06-07
 

@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-06-10
+
+### Added
+- **`latex-forge build [project]`**: compiles the project to PDF with latexmk — no editor required. Reads the engine from the project's `.vscode/settings.json` (same invocation LaTeX Workshop would use, LuaLaTeX fallback), outputs to `build/`, and prints actionable hints on failure. `--clean` deletes `build/` first.
+- **`latex-forge watch [project]`**: continuous compilation on every save (`latexmk -pvc`), stop with Ctrl+C.
+
+### Fixed
+- Template names are validated on install/remove: names containing path separators or `..` can no longer escape the user template library.
+- `profile.toml` values containing quotes or backslashes are escaped correctly, and a corrupted profile file no longer blocks project creation.
+- `latex-forge rename` with an invalid name prints a clean error instead of a traceback, and files with multi-part extensions (e.g. `.synctex.gz`) are renamed correctly.
+
 ## [0.3.0] - 2026-06-09
 
 ### Added

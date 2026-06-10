@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "latex-forge"
-version = "0.3.0"
+version = "0.4.0"
 description = "CLI for creating standalone LaTeX projects from this toolbox."
 license = "MIT"
 readme = "README.md"

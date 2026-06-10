@@ -131,6 +131,43 @@ def build_parser() -> argparse.ArgumentParser:
         help="Directory where the project will be created (default: current directory).",
     )
 
+    build_parser = subparsers.add_parser(
+        "build",
+        help="Compile the project to PDF with latexmk.",
+    )
+    build_parser.add_argument(
+        "project",
+        nargs="?",
+        default=None,
+        help="Project directory (default: current directory).",
+    )
+    build_parser.add_argument(
+        "--clean",
+        action="store_true",
+        help="Delete the build/ directory before compiling.",
+    )
+    build_parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Show the full latexmk output instead of errors only.",
+    )
+
+    watch_parser = subparsers.add_parser(
+        "watch",
+        help="Recompile automatically on every save (latexmk -pvc).",
+    )
+    watch_parser.add_argument(
+        "project",
+        nargs="?",
+        default=None,
+        help="Project directory (default: current directory).",
+    )
+    watch_parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Show the full latexmk output instead of errors only.",
+    )
+
     rename_parser = subparsers.add_parser(
         "rename",
         help="Rename a generated LaTeX project folder and its main .tex file.",
@@ -434,6 +471,21 @@ def main(argv: list[str] | None = None) -> int:
                 return 1
             print(f"Template removed: {args.name}")
             return 0
+
+    if args.command in ("build", "watch"):
+        from .build import run_build
+
+        project_dir = Path(args.project).expanduser().resolve() if args.project else None
+        try:
+            return run_build(
+                project_dir=project_dir,
+                watch=(args.command == "watch"),
+                clean=getattr(args, "clean", False),
+                verbose=args.verbose,
+            )
+        except (ValueError, FileNotFoundError) as exc:
+            print(str(exc), file=sys.stderr)
+            return 1
 
     if args.command == "diagnose":
         from .diagnose import format_diagnose_text, run_diagnose

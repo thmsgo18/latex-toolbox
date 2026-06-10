@@ -1,11 +1,11 @@
-# LaTeX Forge
+<p align="right"><b>English</b> | <a href="./README.fr.md">Français</a></p>
 
 <p align="center">
-  <img src="docs/assets/latex-forge-logo.png" alt="LaTeX Forge" width="480">
+  <img src="docs/assets/latex-forge-logo.png" alt="LaTeX Forge" width="420">
 </p>
 
 <p align="center">
-  Create professional documents. Save. Your PDF appears instantly.
+  <b>Write your document. Save. Your PDF appears. That's it.</b>
 </p>
 
 <p align="center">
@@ -16,14 +16,67 @@
 </p>
 
 <p align="center">
-  <a href="./README.fr.md">Lire en français</a>
+  <a href="#quick-start">Quick start</a> •
+  <a href="#templates">Templates</a> •
+  <a href="#your-profile">Profile</a> •
+  <a href="#compile-from-the-terminal">Build</a> •
+  <a href="#need-help">Help</a> •
+  <a href="#command-reference">Commands</a> •
+  <a href="#related-projects">VS Code extension</a>
 </p>
 
 ---
 
-One command creates a ready-to-write document project. Open it in VS Code, start writing, save — your PDF rebuilds and appears in a side panel automatically. No manual compilation, no window switching.
+<p align="center">
+  <img src="docs/assets/demo-create.gif" alt="latex-forge create demo" width="900">
+</p>
 
-Works for humans and AI agents alike. Every generated project includes an `AGENTS.md` that briefs any AI assistant on the document structure, so it can contribute immediately.
+## What is LaTeX Forge?
+
+You need to hand in a report, a CV, or a paper in LaTeX — and you'd rather spend your time **writing** than fighting with packages, compilers, and configuration.
+
+LaTeX Forge is a small tool you install once. One command then creates a complete, ready-to-write document project: the folder structure, the styles, the bibliography setup, and a pre-configured VS Code workspace. Open it, type, save — the PDF rebuilds automatically in a side panel.
+
+**No LaTeX knowledge required to get started.** And if you already live in a terminal, everything is scriptable.
+
+## Quick start
+
+```bash
+# 1 — install (one time)
+pipx install latex-forge
+
+# 2 — check your machine and install what's missing (LaTeX, VS Code extensions)
+latex-forge setup
+
+# 3 — create your first project
+latex-forge create --name my-report --template project-report-en
+
+# 4 — open it and start writing
+code my-report
+```
+
+<details>
+<summary><i>What is pipx? (click if step 1 fails)</i></summary>
+
+`pipx` installs Python command-line tools cleanly. If it's missing:
+
+- **macOS** — `brew install pipx && pipx ensurepath`
+- **Windows** — `py -m pip install --user pipx && py -m pipx ensurepath`
+- **Linux** — `sudo apt install pipx && pipx ensurepath` (or see [pipx.pypa.io](https://pipx.pypa.io))
+
+Then open a new terminal and run step 1 again. Python 3.10+ is required.
+</details>
+
+## Features
+
+- **One-command projects** — complete folder structure, embedded styles, zero external dependencies
+- **Live PDF preview** — generated projects are pre-wired for [LaTeX Workshop](https://marketplace.visualstudio.com/items?itemName=James-Yu.latex-workshop): save in VS Code, see the PDF
+- **Terminal compilation** — `latex-forge build` and `latex-forge watch` work without any editor
+- **80+ templates** — CVs, theses, papers, posters, slides… installable from the [gallery](https://github.com/thmsgo18/latex-forge-gallery) in one command
+- **Your profile, auto-filled** — set your name, email, and university once; every new project starts personalized
+- **Environment doctor** — `latex-forge setup` installs the toolchain per OS; `latex-forge diagnose` tells you what's wrong
+- **AI-friendly** — every project ships an `AGENTS.md` briefing so any AI assistant can contribute immediately
+- **Cross-platform** — macOS, Linux, Windows
 
 ## How it feels
 
@@ -33,62 +86,85 @@ Works for humans and AI agents alike. Every generated project includes an `AGENT
 
 Write on one side. See your document on the other. Every save refreshes the result.
 
-## Quick start
+## Templates
+
+Six templates are built in:
+
+| Template | Language | Description |
+|---|---|---|
+| `blank` | English | Minimal document — title, one section, ready to grow |
+| `project-report-en` | English | ISO/IEEE project report — requirements, architecture, testing, bibliography |
+| `project-report-fr` | French | AFNOR/ISO project report — cahier des charges, architecture, tests, bibliographie |
+| `research` | English | Two-column research article — related work, methodology, experiments, bibliography |
+| `cv-en` | English | CV / résumé — education, experience, projects, skills |
+| `cv-fr` | French | CV — formation, expérience, projets, compétences |
 
 ```bash
-# 1 — install
-pipx install latex-forge
-
-# 2 — set up your environment (LaTeX + VS Code extensions)
-latex-forge setup
-
-# 3 — create a project
-latex-forge create --name my-report --template project-report-en
-
-# 4 — open and start writing
-code my-report
+latex-forge list-templates
 ```
 
-Requires Python 3.10+. If `pipx` is not installed: `brew install pipx` on macOS, or see [pipx.pypa.io](https://pipx.pypa.io).
+### The gallery — 80+ more
 
-## Installation
+Browse the [**template gallery**](https://thmsgo18.github.io/latex-forge-gallery/) with previews, then install any template in one command:
+
+<p align="center">
+  <a href="https://thmsgo18.github.io/latex-forge-gallery/">
+    <img src="https://raw.githubusercontent.com/thmsgo18/latex-forge-gallery/main/previews/cv/awesome-cv.png" alt="awesome-cv" width="160">
+    <img src="https://raw.githubusercontent.com/thmsgo18/latex-forge-gallery/main/previews/thesis/clean-thesis.png" alt="clean-thesis" width="160">
+    <img src="https://raw.githubusercontent.com/thmsgo18/latex-forge-gallery/main/previews/presentation/beamer-metropolis.png" alt="beamer-metropolis" width="160">
+    <img src="https://raw.githubusercontent.com/thmsgo18/latex-forge-gallery/main/previews/article/arxiv-template.png" alt="arxiv-template" width="160">
+  </a>
+</p>
 
 ```bash
-pipx install latex-forge
+# install a template from the gallery
+latex-forge template install https://github.com/thmsgo18/latex-forge-gallery/tree/main/templates/thesis/clean-thesis
+
+# create a project from it
+latex-forge create --template clean-thesis --name my-thesis
+
+# manage installed templates
+latex-forge template list
+latex-forge template update          # pull new versions from the gallery
+latex-forge template remove clean-thesis
 ```
 
-## First setup
-
-On a fresh machine, run the setup command to verify your environment and install what's missing:
+You can also install **your own templates** — from any GitHub repo, ZIP file, or local folder. The only requirement is a `main.tex` at the root:
 
 ```bash
-latex-forge setup
+latex-forge template install https://github.com/someone/their-template
+latex-forge template install ~/my-templates/lab-notes --name lab-notes
 ```
 
-This checks for `latexmk` and `lualatex`, and offers to install them automatically (`brew` on macOS, `apt` on Debian/Ubuntu, `winget` on Windows). VS Code extensions are installed too if the `code` CLI is available.
+> Prefer clicking to typing? The [VS Code extension](https://github.com/thmsgo18/latex-forge-vscode) has a built-in gallery browser with previews and one-click install.
 
-## Shell completion
+## Your profile
 
-Tab completion for commands, flags, and template names:
-
-**bash** (`~/.bashrc`) or **zsh** (`~/.zshrc`):
+Tell LaTeX Forge who you are **once** — every new project is pre-filled with your name, email, university, and more:
 
 ```bash
-eval "$(latex-forge completion)"
+latex-forge profile set      # interactive — name, email, phone, university…
+latex-forge profile show
+latex-forge profile clear
 ```
 
-## Configuration
+Works with the built-in templates and the gallery ones (CVs get your contact details, reports get your university and supervisor).
 
-```toml
-# ~/.latex-forge.toml
-default_template = "project-report-en"
-default_output_dir = "~/Documents/projects"
+## Compile from the terminal
+
+No VS Code? No problem.
+
+<p align="center">
+  <img src="docs/assets/demo-build.gif" alt="latex-forge build demo" width="900">
+</p>
+
+```bash
+latex-forge build            # compile once → build/<name>.pdf
+latex-forge build --clean    # wipe build artifacts first
+latex-forge watch            # recompile on every save (Ctrl+C to stop)
 ```
 
-| Key | Description |
-|---|---|
-| `default_template` | Template used when `--template` is omitted |
-| `default_output_dir` | Output directory used when `--output` is omitted |
+The right LaTeX engine is detected from the project itself — nothing to configure.
 
 ## Usage
 
@@ -99,12 +175,13 @@ $ latex-forge create
 
 Project name: my-report
 Available templates:
-  1. cv-en
-  2. cv-fr
-  3. project-report-en
-  4. project-report-fr
-  5. research
-Choose a template [1-5]: 3
+  1. blank
+  2. cv-en
+  3. cv-fr
+  4. project-report-en
+  5. project-report-fr
+  6. research
+Choose a template [1-6]: 4
 Create project in [/Users/alice/Desktop]:
 
 Project created: /Users/alice/Desktop/my-report
@@ -121,38 +198,29 @@ latex-forge create --name my-paper --template research --output ~/Desktop
 ### Rename a project
 
 ```bash
-latex-forge rename old-name new-name   # from parent directory
+latex-forge rename old-name new-name   # from the parent directory
 latex-forge rename new-name            # from inside the project
 ```
 
-## Built-in templates
+### Configuration
 
-| Template | Language | Description |
-|---|---|---|
-| `project-report-en` | English | ISO/IEEE project report — requirements, architecture, testing, bibliography |
-| `project-report-fr` | French | AFNOR/ISO project report — cahier des charges, architecture, tests, bibliographie |
-| `research` | English | Two-column research article — related work, methodology, experiments, bibliography |
-| `cv-en` | English | CV / résumé — education, experience, projects, skills |
-| `cv-fr` | French | CV — formation, expérience, projets, compétences |
-
-```bash
-latex-forge list-templates
+```toml
+# ~/.latex-forge.toml
+default_template = "project-report-en"
+default_output_dir = "~/Documents/projects"
 ```
 
-## Template gallery
+| Key | Description |
+|---|---|
+| `default_template` | Template used when `--template` is omitted |
+| `default_output_dir` | Output directory used when `--output` is omitted |
 
-More document types are available in the [latex-forge-gallery](https://github.com/thmsgo18/latex-forge-gallery): CVs, theses, articles, presentations, posters, and more.
+### Shell completion
+
+Tab completion for commands, flags, and template names — **bash** (`~/.bashrc`) or **zsh** (`~/.zshrc`):
 
 ```bash
-# install any template directly by URL
-latex-forge template install https://github.com/thmsgo18/latex-forge-gallery/tree/main/templates/thesis/clean-thesis
-
-# create a project from it
-latex-forge create --template clean-thesis --name my-thesis
-
-# manage installed templates
-latex-forge template list
-latex-forge template remove clean-thesis
+eval "$(latex-forge completion)"
 ```
 
 ## Filling in your project
@@ -166,18 +234,15 @@ Open `frontmatter/metadata.tex` to set the title, authors, and course:
 \resetauthors
 \addauthor{Alice Martin}{}
 \addauthor{Bob Durand}{}
-
-\resetteachers
-\addteacher{Dr Example}{}
 ```
 
-Save the main `.tex` file — the PDF rebuilds instantly in VS Code.
+Save the main `.tex` file — the PDF rebuilds instantly in VS Code (or run `latex-forge build`).
 
 ## Generated project structure
 
 ```
 my-project/
-├── my-project.tex            ← main file (renamed from the project name)
+├── my-project.tex            ← main file (named after the project)
 ├── frontmatter/
 │   ├── metadata.tex          ← title, authors, course — start here
 │   └── toc.tex
@@ -185,54 +250,71 @@ my-project/
 ├── backmatter/               ← acknowledgements, appendices
 ├── bibliography/
 │   └── references.bib
-├── figures/
-├── images/
-├── assets/logos/
+├── figures/  images/  assets/logos/
 ├── styles/packages/          ← embedded styles, no external dependency
 ├── .vscode/                  ← pre-configured for live PDF preview
-├── AGENTS.md                 ← AI briefing for this document
+├── GETTING_STARTED.md        ← guide for you
+├── AGENTS.md                 ← briefing for AI assistants
 └── .gitignore
 ```
 
-The project is fully self-contained: styles and assets are copied in at creation time. It compiles, shares, and versions independently — no dependency on this repository.
+The project is fully self-contained: it compiles, shares, and versions independently — no dependency on this repository. Every project also ships `AGENTS.md`, a briefing that lets any AI assistant open the project cold and contribute correctly.
 
-## AI-friendly by design
+## Need help?
 
-Every generated project includes `AGENTS.md` — a self-contained briefing that tells any AI assistant exactly what the project contains, how to compile it, how to add content, and what not to touch. An AI can open a project cold and contribute correctly without any extra context.
+Start with the doctor — it checks everything and tells you what to fix:
+
+```bash
+latex-forge diagnose
+```
+
+| Problem | Fix |
+|---|---|
+| `latex-forge: command not found` | Open a new terminal, or run `pipx ensurepath` |
+| Nothing compiles / no PDF | `latex-forge setup --install-tex` installs LaTeX for your OS |
+| `Package X not found` | `tlmgr install X` (TeX Live) — MiKTeX installs it automatically |
+| Compilation stuck | `latex-forge build --clean`, then try again |
+| Something else | [Open an issue](https://github.com/thmsgo18/latex-forge/issues) with the output of `latex-forge diagnose` |
 
 ## Command reference
 
 | Command | Description |
 |---|---|
 | `latex-forge create` | Create a project (interactive) |
-| `latex-forge create --name NAME --template TEMPLATE` | Create with explicit arguments |
-| `latex-forge create --output DIR` | Set output directory |
-| `latex-forge rename OLD NEW` | Rename from parent directory |
-| `latex-forge rename NEW` | Rename from inside project |
+| `latex-forge create --name N --template T --output DIR` | Create with explicit arguments |
+| `latex-forge build [DIR] [--clean] [--verbose]` | Compile to PDF with latexmk |
+| `latex-forge watch [DIR]` | Recompile on every save |
+| `latex-forge rename [OLD] NEW` | Rename a project (folder + main file + artifacts) |
 | `latex-forge list-templates` | List available templates |
-| `latex-forge setup` | Check and set up the environment |
-| `latex-forge setup --check-only` | Check without installing |
-| `latex-forge setup --install-tex` | Install LaTeX |
-| `latex-forge template install URL` | Install a template |
-| `latex-forge template list` | List all templates |
+| `latex-forge template install SOURCE [--name N] [--force]` | Install a template (GitHub URL, ZIP, local path) |
+| `latex-forge template list [--json]` | List built-in and installed templates |
+| `latex-forge template update [NAME] [--json]` | Update installed gallery templates |
 | `latex-forge template remove NAME` | Remove an installed template |
-| `latex-forge completion` | Print shell completion code |
+| `latex-forge profile set / show / clear` | Manage your auto-fill profile |
+| `latex-forge setup [--check-only] [--install-tex]` | Check / set up the environment |
+| `latex-forge diagnose [--json]` | Environment health check |
+| `latex-forge completion [--shell SHELL]` | Print shell completion code |
 | `latex-forge --version` | Show version |
 
-## Versioning
+## Related projects
+
+| Project | What it adds |
+|---|---|
+| [**latex-forge-vscode**](https://github.com/thmsgo18/latex-forge-vscode) | Do everything from VS Code: create projects, browse the gallery with previews, one-click template install — no terminal needed |
+| [**latex-forge-gallery**](https://github.com/thmsgo18/latex-forge-gallery) | The curated template gallery (80+ templates) and its [browsable website](https://thmsgo18.github.io/latex-forge-gallery/) |
+
+## Versioning your documents
 
 Each project is self-contained — version it independently:
 
 ```bash
 cd my-project
-git init
-git add .
-git commit -m "Initial report"
+git init && git add . && git commit -m "Initial report"
 ```
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md). The demo GIFs are generated with [vhs](https://github.com/charmbracelet/vhs): `./docs/demo/record.sh`.
 
 ---
 

@@ -4,6 +4,7 @@ import json
 import os
 import re
 import shutil
+import subprocess
 from pathlib import Path
 
 
@@ -1334,10 +1335,29 @@ exit /b 1
     setup_sh_path.chmod(0o755)
 
 
+def init_git_repo(target_dir: Path) -> bool:
+    """Initialize a git repository with an initial commit. Returns True on success."""
+    if shutil.which("git") is None:
+        return False
+    try:
+        subprocess.run(["git", "init"], cwd=target_dir, capture_output=True, check=True)
+        subprocess.run(["git", "add", "-A"], cwd=target_dir, capture_output=True, check=True)
+        subprocess.run(
+            ["git", "commit", "-m", "Initial commit"],
+            cwd=target_dir,
+            capture_output=True,
+            check=True,
+        )
+    except subprocess.CalledProcessError:
+        return False
+    return True
+
+
 def create_project(
     name: str,
     template: str,
     output_dir: Path | None = None,
+    init_git: bool = False,
 ) -> tuple[Path, Path]:
     validate_name(name)
 
@@ -1388,6 +1408,9 @@ def create_project(
 
         from .profile import apply_profile_to_project, load_profile
         apply_profile_to_project(target_dir, template, load_profile())
+
+        if init_git:
+            init_git_repo(target_dir)
     except Exception:
         shutil.rmtree(target_dir, ignore_errors=True)
         raise

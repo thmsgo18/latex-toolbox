@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-06-10
+
+### Added
+- **`latex-forge create --git`**: initializes a git repository in the new project and creates an initial commit.
+- **`latex-forge export [project] [--output file.zip]`**: bundles the project's sources and compiled PDF into a clean ZIP for submission (arXiv, journal, teacher), excluding build artifacts and VCS metadata.
+- **`latex-forge build`/`watch`** now auto-install missing LaTeX packages: on a "File `X.sty' not found" error, the package providing it is looked up via `tlmgr search` and installed automatically before retrying the build.
+- **`latex-forge template install --engine {pdflatex,xelatex,lualatex}`**: declares the LaTeX engine for a template that doesn't already specify one, writing `latexforge.toml`. See [TEMPLATE_COMPATIBILITY.md](TEMPLATE_COMPATIBILITY.md) for making third-party templates fully compatible (engine + profile placeholders).
+- Gallery template installs (`template install <gallery-url>`) now download a small per-template archive instead of the entire gallery repository, making installs much faster.
+
 ## [0.4.0] - 2026-06-10
 
 ### Added

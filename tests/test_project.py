@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import subprocess
 from pathlib import Path
 from unittest.mock import patch
 
@@ -8,6 +9,7 @@ import pytest
 from latex_forge.project import (
     available_templates,
     create_project,
+    init_git_repo,
     patch_local_style,
     rename_current_project,
     rename_project,
@@ -144,6 +146,37 @@ def test_create_project_invalid_name(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     with pytest.raises(ValueError, match="Invalid project name"):
         create_project("my project", "project-report-en")
+
+
+def test_create_project_with_git(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("GIT_AUTHOR_NAME", "Test")
+    monkeypatch.setenv("GIT_AUTHOR_EMAIL", "test@example.com")
+    monkeypatch.setenv("GIT_COMMITTER_NAME", "Test")
+    monkeypatch.setenv("GIT_COMMITTER_EMAIL", "test@example.com")
+    target_dir, _ = create_project("my-project", "project-report-en", init_git=True)
+
+    assert (target_dir / ".git").is_dir()
+    log = subprocess.run(
+        ["git", "log", "--oneline"],
+        cwd=target_dir,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert "Initial commit" in log.stdout
+
+
+def test_create_project_without_git_by_default(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    target_dir, _ = create_project("my-project", "project-report-en")
+
+    assert not (target_dir / ".git").exists()
+
+
+def test_init_git_repo_missing_git(tmp_path, monkeypatch):
+    monkeypatch.setattr("latex_forge.project.shutil.which", lambda name: None)
+    assert init_git_repo(tmp_path) is False
 
 
 def test_create_project_atomic_cleanup(tmp_path, monkeypatch):

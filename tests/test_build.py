@@ -9,6 +9,9 @@ import pytest
 from latex_forge.build import (
     _detect_latexmk_flag,
     _find_main_tex,
+    _find_missing_files,
+    _install_missing_packages,
+    _tlmgr_package_for_file,
     build_command,
     run_build,
 )
@@ -172,3 +175,127 @@ def test_run_build_propagates_exit_code(project, monkeypatch):
 
     monkeypatch.setattr("latex_forge.build.subprocess.run", fake_run)
     assert run_build(project) == 12
+
+
+# ── Missing package detection & auto-install ──────────────────────────────
+
+
+def test_find_missing_files_parses_log(tmp_path):
+    log = tmp_path / "my-report.log"
+    log.write_text(
+        "! LaTeX Error: File `tikz.sty' not found.\n"
+        "Some other line\n"
+        "! LaTeX Error: File `tikz.sty' not found.\n",
+        encoding="utf-8",
+    )
+    assert _find_missing_files(log) == ["tikz.sty"]
+
+
+def test_find_missing_files_no_log(tmp_path):
+    assert _find_missing_files(tmp_path / "nope.log") == []
+
+
+def test_tlmgr_package_for_file(monkeypatch):
+    def fake_run(command, capture_output, text, check):
+        class R:
+            returncode = 0
+            stdout = "tikz.sty:\n\tpgf:\n\t\ttexmf-dist/tex/generic/pgf/frontendlayer/tikz/tikz.sty\n"
+
+        return R()
+
+    monkeypatch.setattr("latex_forge.build.subprocess.run", fake_run)
+    assert _tlmgr_package_for_file("tikz.sty") == "pgf"
+
+
+def test_tlmgr_package_for_file_not_found(monkeypatch):
+    def fake_run(command, capture_output, text, check):
+        class R:
+            returncode = 1
+            stdout = ""
+
+        return R()
+
+    monkeypatch.setattr("latex_forge.build.subprocess.run", fake_run)
+    assert _tlmgr_package_for_file("doesnotexist.sty") is None
+
+
+def test_install_missing_packages_no_tlmgr(monkeypatch):
+    monkeypatch.setattr("latex_forge.build.shutil.which", lambda _: None)
+    assert _install_missing_packages(["tikz.sty"]) == []
+
+
+def test_install_missing_packages_installs(monkeypatch):
+    monkeypatch.setattr("latex_forge.build.shutil.which", lambda _: "/usr/bin/tlmgr")
+
+    def fake_run(command, capture_output, text, check):
+        class R:
+            returncode = 0
+            stdout = ""
+
+        if command[1] == "search":
+            R.stdout = "tikz.sty:\n\tpgf:\n\t\tsome/path/tikz.sty\n"
+        return R()
+
+    monkeypatch.setattr("latex_forge.build.subprocess.run", fake_run)
+    assert _install_missing_packages(["tikz.sty"]) == ["pgf"]
+
+
+def test_run_build_retries_after_installing_missing_package(project, monkeypatch, capsys):
+    monkeypatch.setattr("latex_forge.build.shutil.which", lambda name: f"/usr/bin/{name}")
+
+    log_path = project / "build" / "my-report.log"
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    log_path.write_text("! LaTeX Error: File `tikz.sty' not found.\n", encoding="utf-8")
+
+    calls = {"latexmk": 0}
+
+    def fake_run(command, cwd=None, check=False, capture_output=False, text=False):
+        if command[0] == "latexmk":
+            calls["latexmk"] += 1
+
+            class R:
+                returncode = 1
+
+            return R()
+        if command[:2] == ["tlmgr", "search"]:
+            class R:
+                returncode = 0
+                stdout = "tikz.sty:\n\tpgf:\n\t\tsome/path/tikz.sty\n"
+
+            return R()
+        if command[:2] == ["tlmgr", "install"]:
+            class R:
+                returncode = 0
+                stdout = ""
+
+            return R()
+        raise AssertionError(f"Unexpected command: {command}")
+
+    monkeypatch.setattr("latex_forge.build.subprocess.run", fake_run)
+    result = run_build(project)
+
+    assert result == 1
+    assert calls["latexmk"] == 2
+    out = capsys.readouterr().out
+    assert "Missing package files: tikz.sty" in out
+    assert "Installed: pgf" in out
+
+
+def test_run_build_no_retry_without_missing_packages(project, monkeypatch, capsys):
+    monkeypatch.setattr("latex_forge.build.shutil.which", lambda name: f"/usr/bin/{name}")
+
+    calls = {"latexmk": 0}
+
+    def fake_run(command, cwd=None, check=False, capture_output=False, text=False):
+        calls["latexmk"] += 1
+
+        class R:
+            returncode = 1
+
+        return R()
+
+    monkeypatch.setattr("latex_forge.build.subprocess.run", fake_run)
+    result = run_build(project)
+
+    assert result == 1
+    assert calls["latexmk"] == 1

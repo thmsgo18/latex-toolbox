@@ -130,6 +130,11 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Directory where the project will be created (default: current directory).",
     )
+    create_parser.add_argument(
+        "--git",
+        action="store_true",
+        help="Initialize a git repository with an initial commit in the new project.",
+    )
 
     build_parser = subparsers.add_parser(
         "build",
@@ -166,6 +171,22 @@ def build_parser() -> argparse.ArgumentParser:
         "--verbose",
         action="store_true",
         help="Show the full latexmk output instead of errors only.",
+    )
+
+    export_parser = subparsers.add_parser(
+        "export",
+        help="Bundle the project sources and PDF into a clean ZIP for submission.",
+    )
+    export_parser.add_argument(
+        "project",
+        nargs="?",
+        default=None,
+        help="Project directory (default: current directory).",
+    )
+    export_parser.add_argument(
+        "--output",
+        default=None,
+        help="Path of the ZIP archive to create (default: <project>-export.zip next to it).",
     )
 
     rename_parser = subparsers.add_parser(
@@ -226,6 +247,16 @@ def build_parser() -> argparse.ArgumentParser:
         "--force",
         action="store_true",
         help="Overwrite an existing user-installed template with the same name.",
+    )
+    t_install.add_argument(
+        "--engine",
+        default=None,
+        choices=["lualatex", "xelatex", "pdflatex"],
+        help=(
+            "LaTeX engine for this template, written to its latexforge.toml "
+            "(use if the template doesn't already declare one). "
+            "See TEMPLATE_COMPATIBILITY.md."
+        ),
     )
 
     t_list = template_sub.add_parser(
@@ -392,7 +423,9 @@ def main(argv: list[str] | None = None) -> int:
 
         if args.template_command == "install":
             try:
-                name, path = install_template(args.source, args.name, force=args.force)
+                name, path = install_template(
+                    args.source, args.name, force=args.force, engine=args.engine
+                )
             except (ValueError, FileNotFoundError, FileExistsError, OSError) as exc:
                 print(str(exc), file=sys.stderr)
                 return 1
@@ -487,6 +520,23 @@ def main(argv: list[str] | None = None) -> int:
             print(str(exc), file=sys.stderr)
             return 1
 
+    if args.command == "export":
+        from .export import export_project
+
+        project_dir = Path(args.project).expanduser().resolve() if args.project else None
+        output = Path(args.output).expanduser().resolve() if args.output else None
+        try:
+            archive_path = export_project(project_dir=project_dir, output=output)
+        except (ValueError, FileNotFoundError) as exc:
+            print(str(exc), file=sys.stderr)
+            return 1
+
+        print(f"Exported: {archive_path}")
+        directory = (project_dir or Path.cwd()).resolve()
+        if not (directory / "build" / f"{directory.name}.pdf").exists():
+            print("Note: no compiled PDF found — run `latex-forge build` first to include it.")
+        return 0
+
     if args.command == "diagnose":
         from .diagnose import format_diagnose_text, run_diagnose
 
@@ -571,6 +621,7 @@ def main(argv: list[str] | None = None) -> int:
                 name=name,
                 template=template,
                 output_dir=output_dir,
+                init_git=args.git,
             )
         except (ValueError, FileExistsError) as exc:
             print(str(exc), file=sys.stderr)
@@ -583,6 +634,14 @@ def main(argv: list[str] | None = None) -> int:
             print(f"Next: fill in {first_file} then save to compile.")
         else:
             print("Next: fill in frontmatter/metadata.tex then save to compile.")
+        if args.git:
+            if (target_dir / ".git").is_dir():
+                print("Initialized a git repository with an initial commit.")
+            else:
+                print(
+                    "Warning: could not initialize git (is git installed?).",
+                    file=sys.stderr,
+                )
 
         if not first_run:
             warn_if_latex_missing()

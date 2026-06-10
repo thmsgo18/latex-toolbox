@@ -85,6 +85,21 @@ def test_install_local_dir_custom_name(sample_template):
     assert path.name == "custom-name"
 
 
+def test_install_with_engine_writes_latexforge_toml(sample_template):
+    name, path = install_template(str(sample_template), engine="xelatex")
+    assert (path / "latexforge.toml").read_text(encoding="utf-8") == 'engine = "xelatex"\n'
+
+
+def test_install_without_engine_does_not_write_latexforge_toml(sample_template):
+    name, path = install_template(str(sample_template))
+    assert not (path / "latexforge.toml").exists()
+
+
+def test_install_invalid_engine_raises(sample_template):
+    with pytest.raises(ValueError, match="Invalid engine"):
+        install_template(str(sample_template), engine="not-an-engine")
+
+
 def test_install_raises_when_already_installed(sample_template):
     install_template(str(sample_template))
     with pytest.raises(FileExistsError, match="already installed"):

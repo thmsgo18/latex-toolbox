@@ -71,9 +71,11 @@ Then open a new terminal and run step 1 again. Python 3.10+ is required.
 
 - **One-command projects** — complete folder structure, embedded styles, zero external dependencies
 - **Live PDF preview** — generated projects are pre-wired for [LaTeX Workshop](https://marketplace.visualstudio.com/items?itemName=James-Yu.latex-workshop): save in VS Code, see the PDF
-- **Terminal compilation** — `latex-forge build` and `latex-forge watch` work without any editor
-- **80+ templates** — CVs, theses, papers, posters, slides… installable from the [gallery](https://github.com/thmsgo18/latex-forge-gallery) in one command
+- **Terminal compilation** — `latex-forge build` and `latex-forge watch` work without any editor, and missing packages are installed automatically
+- **80+ templates** — CVs, theses, papers, posters, slides… installable from the [gallery](https://github.com/thmsgo18/latex-forge-gallery) in one command, plus your own with `--engine`
 - **Your profile, auto-filled** — set your name, email, and university once; every new project starts personalized
+- **Git-ready** — `latex-forge create --git` initializes a repository with the first commit
+- **Submission-ready exports** — `latex-forge export` bundles your sources and PDF into a clean ZIP
 - **Environment doctor** — `latex-forge setup` installs the toolchain per OS; `latex-forge diagnose` tells you what's wrong
 - **AI-friendly** — every project ships an `AGENTS.md` briefing so any AI assistant can contribute immediately
 - **Cross-platform** — macOS, Linux, Windows
@@ -134,7 +136,12 @@ You can also install **your own templates** — from any GitHub repo, ZIP file, 
 ```bash
 latex-forge template install https://github.com/someone/their-template
 latex-forge template install ~/my-templates/lab-notes --name lab-notes
+
+# declare the LaTeX engine if the template doesn't already (pdflatex/xelatex/lualatex)
+latex-forge template install https://github.com/someone/their-template --engine xelatex
 ```
+
+See [TEMPLATE_COMPATIBILITY.md](TEMPLATE_COMPATIBILITY.md) for how to get profile auto-fill (name, email, university…) working with your own templates too.
 
 > Prefer clicking to typing? The [VS Code extension](https://github.com/thmsgo18/latex-forge-vscode) has a built-in gallery browser with previews and one-click install.
 
@@ -281,12 +288,13 @@ latex-forge diagnose
 | Command | Description |
 |---|---|
 | `latex-forge create` | Create a project (interactive) |
-| `latex-forge create --name N --template T --output DIR` | Create with explicit arguments |
-| `latex-forge build [DIR] [--clean] [--verbose]` | Compile to PDF with latexmk |
+| `latex-forge create --name N --template T --output DIR [--git]` | Create with explicit arguments, optionally with `git init` |
+| `latex-forge build [DIR] [--clean] [--verbose]` | Compile to PDF with latexmk (auto-installs missing packages via tlmgr) |
 | `latex-forge watch [DIR]` | Recompile on every save |
+| `latex-forge export [DIR] [--output FILE]` | Bundle sources + PDF into a clean ZIP for submission |
 | `latex-forge rename [OLD] NEW` | Rename a project (folder + main file + artifacts) |
 | `latex-forge list-templates` | List available templates |
-| `latex-forge template install SOURCE [--name N] [--force]` | Install a template (GitHub URL, ZIP, local path) |
+| `latex-forge template install SOURCE [--name N] [--force] [--engine E]` | Install a template (GitHub URL, ZIP, local path) |
 | `latex-forge template list [--json]` | List built-in and installed templates |
 | `latex-forge template update [NAME] [--json]` | Update installed gallery templates |
 | `latex-forge template remove NAME` | Remove an installed template |

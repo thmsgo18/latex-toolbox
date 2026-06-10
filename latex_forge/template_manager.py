@@ -16,6 +16,14 @@ GALLERY_JSON_URL = (
 # URL pattern that identifies a gallery install URL
 _GALLERY_HOST = "thmsgo18/latex-forge-gallery"
 
+# Per-template archives published by .github/workflows/build-archives.yml to
+# the gallery's `dist` branch — a flat ZIP per template (main.tex at the
+# root), so installing one template doesn't require downloading the whole
+# gallery repository.
+_GALLERY_ARCHIVE_BASE = (
+    "https://raw.githubusercontent.com/thmsgo18/latex-forge-gallery/dist/"
+)
+
 
 def _validate_template_name(name: str) -> None:
     """Ensure *name* is a plain directory name inside the user library.
@@ -37,10 +45,14 @@ def _validate_template_name(name: str) -> None:
 # ── Public API ────────────────────────────────────────────────────────────
 
 
+_VALID_ENGINES = ("lualatex", "xelatex", "pdflatex")
+
+
 def install_template(
     source: str,
     name: str | None = None,
     force: bool = False,
+    engine: str | None = None,
 ) -> tuple[str, Path]:
     """Install a template from a GitHub URL, ZIP URL, or local path.
 
@@ -53,10 +65,20 @@ def install_template(
     - A local directory
     - A local ``.zip`` file
 
+    If *engine* is given (one of ``lualatex``, ``xelatex``, ``pdflatex``), it is
+    written to the template's ``latexforge.toml`` so that projects created from
+    it use the right compiler — useful for templates that don't already declare
+    one (see TEMPLATE_COMPATIBILITY.md).
+
     Raises ``FileExistsError`` if a user-installed template with the same name
     already exists and *force* is False.
-    Raises ``ValueError`` if the name matches a built-in template.
+    Raises ``ValueError`` if the name matches a built-in template, or if
+    *engine* is not a valid LaTeX engine.
     """
+    if engine is not None and engine not in _VALID_ENGINES:
+        raise ValueError(
+            f"Invalid engine: {engine!r}. Must be one of: {', '.join(_VALID_ENGINES)}"
+        )
     source = source.strip()
 
     if "github.com" in source:
@@ -88,6 +110,9 @@ def install_template(
                 "  - Local dir   : /path/to/template/\n"
                 "  - Local ZIP   : /path/to/template.zip"
             )
+
+    if engine is not None:
+        (path / "latexforge.toml").write_text(f'engine = "{engine}"\n', encoding="utf-8")
 
     # Persist metadata (version from gallery if available)
     _record_installation(template_name, source)
@@ -352,6 +377,23 @@ def _install_from_github(url: str, name: str | None, force: bool = False) -> tup
             subdir = "/".join(parts[tree_idx + 2:])
 
     template_name = name or (subdir.split("/")[-1] if subdir else repo)
+
+    archive_url = _gallery_archive_url(owner, repo, subdir)
+    if archive_url:
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                zip_path = Path(tmp) / "template.zip"
+                _download_url(archive_url, zip_path)
+                return _extract_and_install(
+                    zip_path,
+                    extract_to=Path(tmp) / "extracted",
+                    subdir=None,
+                    name=template_name,
+                    force=force,
+                )
+        except (ValueError, zipfile.BadZipFile):
+            pass  # archive not available — fall back to a full repo download
+
     zip_url = f"https://github.com/{owner}/{repo}/archive/HEAD.zip"
 
     with tempfile.TemporaryDirectory() as tmp:
@@ -364,6 +406,23 @@ def _install_from_github(url: str, name: str | None, force: bool = False) -> tup
             name=template_name,
             force=force,
         )
+
+
+def _gallery_archive_url(owner: str, repo: str, subdir: str | None) -> str | None:
+    """Return the fast per-template archive URL for a gallery template, or None.
+
+    Only matches URLs of the form
+    ``github.com/thmsgo18/latex-forge-gallery/tree/main/templates/<category>/<name>``
+    — the gallery's own templates, which have a corresponding flat ZIP on the
+    `dist` branch. Anything else (forks, other repos, the gallery root) falls
+    back to a full repository download.
+    """
+    if f"{owner}/{repo}" != _GALLERY_HOST or not subdir:
+        return None
+    parts = subdir.split("/")
+    if len(parts) != 3 or parts[0] != "templates":
+        return None
+    return _GALLERY_ARCHIVE_BASE + parts[2] + ".zip"
 
 
 def _install_from_zip_url(url: str, name: str | None, force: bool = False) -> tuple[str, Path]:

@@ -2,12 +2,14 @@
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import subprocess
 from pathlib import Path
 
 _ENGINE_FLAGS = ("-lualatex", "-xelatex", "-pdf")
 _DEFAULT_FLAG = "-lualatex"
+_MISSING_FILE_PATTERN = re.compile(r"File `([^']+)' not found")
 
 
 def _detect_latexmk_flag(project_dir: Path) -> str:
@@ -78,6 +80,64 @@ def build_command(
     return command
 
 
+def _find_missing_files(log_path: Path) -> list[str]:
+    """Return the .sty/.cls file names latexmk reported as missing, from its log."""
+    if not log_path.exists():
+        return []
+    text = log_path.read_text(encoding="utf-8", errors="replace")
+    return sorted(set(_MISSING_FILE_PATTERN.findall(text)))
+
+
+def _tlmgr_package_for_file(filename: str) -> str | None:
+    """Find which TeX Live package provides *filename* via `tlmgr search`."""
+    result = subprocess.run(
+        ["tlmgr", "search", "--global", "--file", f"/{filename}"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        return None
+    package = None
+    for line in result.stdout.splitlines():
+        if not line.strip():
+            continue
+        indent = len(line) - len(line.lstrip("\t "))
+        if indent == 0:
+            continue  # the searched-for file name itself
+        if indent == 1:
+            package = line.strip().rstrip(":")
+        elif package:
+            return package
+    return None
+
+
+def _install_missing_packages(missing_files: list[str]) -> list[str]:
+    """Try to install the TeX Live packages providing *missing_files*.
+
+    Returns the package names that were successfully installed. No-op (returns
+    an empty list) if `tlmgr` is not on PATH, e.g. on MiKTeX where missing
+    packages are installed automatically by the engine itself.
+    """
+    if shutil.which("tlmgr") is None:
+        return []
+
+    installed = []
+    for filename in missing_files:
+        package = _tlmgr_package_for_file(filename)
+        if package is None:
+            continue
+        result = subprocess.run(
+            ["tlmgr", "install", package],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if result.returncode == 0:
+            installed.append(package)
+    return installed
+
+
 def run_build(
     project_dir: Path | None = None,
     watch: bool = False,
@@ -114,6 +174,19 @@ def run_build(
     except KeyboardInterrupt:
         print("\nStopped.")
         return 0
+
+    if result.returncode != 0 and not watch:
+        log_path = directory / "build" / f"{Path(main_name).stem}.log"
+        missing_files = _find_missing_files(log_path)
+        if missing_files:
+            print(f"Missing package files: {', '.join(missing_files)}")
+            print("Trying to install them with tlmgr …", flush=True)
+            installed = _install_missing_packages(missing_files)
+            if installed:
+                print(f"Installed: {', '.join(installed)}. Recompiling …", flush=True)
+                result = subprocess.run(command, cwd=directory, check=False)
+            else:
+                print("Could not auto-install (tlmgr unavailable, offline, or no match).")
 
     if result.returncode == 0 and not watch:
         pdf = directory / "build" / (Path(main_name).stem + ".pdf")

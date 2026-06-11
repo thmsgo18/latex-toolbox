@@ -43,8 +43,9 @@ All tests must pass before submitting a pull request.
 
 Maintainers only:
 
-1. Update `version` in `pyproject.toml`
-2. Commit and tag: `git tag vX.Y.Z`
-3. Push: `git push && git push --tags`
+1. Tag the release commit: `git tag vX.Y.Z`
+2. Push: `git push && git push --tags`
 
-GitHub Actions will publish to PyPI automatically.
+The package version is derived from the git tag via `setuptools-scm` — no
+manual bump needed. GitHub Actions will publish to PyPI automatically, and the
+README version badge follows the latest tag.

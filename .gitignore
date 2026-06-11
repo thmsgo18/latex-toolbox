@@ -4,6 +4,12 @@ __pycache__/
 *.pyo
 dist/
 *.egg-info/
+.venv/
+.pytest_cache/
+
+# Secrets
+.env
+*.pem
 
 # macOS
 .DS_Store

@@ -1,4 +1,10 @@
-"""User profile — read, write and apply personal information to projects."""
+"""User profile — read, write and apply personal information to projects.
+
+The profile (name, email, university, etc.) is stored once in
+``~/.latex-forge/profile.toml`` and then substituted into the placeholders of
+every new project (CVs, reports, gallery templates), so the user doesn't have
+to retype the same information each time they run ``latex-forge new``.
+"""
 from __future__ import annotations
 
 import re
@@ -12,6 +18,8 @@ except ImportError:
 
 # ── Schema ────────────────────────────────────────────────────────────────
 
+# Defines every field the interactive `latex-forge profile set` prompt asks
+# for, its display label, and which section of the TOML file it belongs to.
 # (key, display_label, section)
 PROFILE_SCHEMA: list[tuple[str, str, str]] = [
     ("first_name",  "First name",            "identity"),
@@ -30,6 +38,8 @@ PROFILE_SCHEMA: list[tuple[str, str, str]] = [
     ("job_title",   "Job title",             "professional"),
 ]
 
+# Human-readable headers written as comments above each group of fields in
+# the generated profile.toml, in PROFILE_SCHEMA's grouping order.
 SECTION_HEADERS: dict[str, str] = {
     "identity":     "Identity",
     "online":       "Online profiles",
@@ -42,6 +52,7 @@ SECTION_HEADERS: dict[str, str] = {
 
 
 def profile_path() -> Path:
+    """Return the path to the user's stored profile file."""
     return Path.home() / ".latex-forge" / "profile.toml"
 
 
@@ -128,6 +139,14 @@ def apply_profile_to_project(
 def _apply_cv(
     target_dir: Path, template: str, profile: dict[str, str], full_name: str
 ) -> None:
+    """Fill in personal details for the built-in cv-en / cv-fr templates.
+
+    Handles both the built-in layout (placeholders directly in
+    sections/heading.tex or en-tete.tex) and the gallery-style layout
+    (frontmatter/metadata.tex with \\cvname / \\cvemail / ... commands),
+    since either file may be present depending on how the template was
+    generated.
+    """
     if template == "cv-en":
         heading_file  = target_dir / "sections" / "heading.tex"
         default_name  = "First LAST"
@@ -191,6 +210,13 @@ def _apply_cv(
 def _apply_metadata(
     target_dir: Path, template: str, profile: dict[str, str], full_name: str
 ) -> None:
+    """Fill in personal/institutional details for report-style templates.
+
+    Covers ``blank`` (plain \\author{...}) and the project-report-en/fr and
+    research templates, which use \\newcommand placeholders and an
+    \\addauthor{LASTNAME Firstname}{...} entry following each template's
+    national naming convention.
+    """
     metadata = target_dir / "frontmatter" / "metadata.tex"
     if not metadata.exists():
         return

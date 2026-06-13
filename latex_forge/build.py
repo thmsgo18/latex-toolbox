@@ -1,4 +1,10 @@
-"""Compile a generated project to PDF with latexmk (one-shot or watch mode)."""
+"""Compile a generated project to PDF with latexmk (one-shot or watch mode).
+
+Also handles a couple of quality-of-life features: locating the project's
+main .tex file by convention, picking the right engine flag from the
+project's VS Code settings, and (on TeX Live) auto-installing missing
+packages reported in the compilation log and retrying once.
+"""
 from __future__ import annotations
 
 import json

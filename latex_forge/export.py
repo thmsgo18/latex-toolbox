@@ -6,8 +6,15 @@ from pathlib import Path
 
 from .build import _find_main_tex
 
+# Directories that belong to latex-forge tooling or version control rather
+# than the document itself — never included in the export.
 EXCLUDED_DIRS = {"build", ".vscode", ".git", "scripts", "__pycache__"}
+# Individual files that are useful for editing the project but meaningless
+# (or confusing) to a reviewer receiving a standalone source archive.
 EXCLUDED_FILES = {".DS_Store", ".gitignore", "AGENTS.md", "GETTING_STARTED.md", "latexforge.toml"}
+# Auxiliary files produced by LaTeX engines, BibTeX/biber, and latexmk during
+# compilation. These are regenerated from the sources, so they're dropped —
+# except for the .bbl, which is re-added separately (see export_project).
 EXCLUDED_SUFFIXES = (
     ".aux", ".acn", ".acr", ".alg", ".bcf", ".blg", ".dvi",
     ".fdb_latexmk", ".fls", ".glg", ".glo", ".gls", ".idx", ".ilg",
@@ -17,6 +24,12 @@ EXCLUDED_SUFFIXES = (
 
 
 def _should_include(path: Path, project_dir: Path) -> bool:
+    """Decide whether a file belongs in the export archive.
+
+    Excludes anything under a tooling/VCS directory (``EXCLUDED_DIRS``),
+    known non-source files (``EXCLUDED_FILES``), and LaTeX build artifacts
+    (``EXCLUDED_SUFFIXES``).
+    """
     relative_parts = path.relative_to(project_dir).parts
     if any(part in EXCLUDED_DIRS for part in relative_parts):
         return False

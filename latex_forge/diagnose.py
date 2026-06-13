@@ -1,4 +1,10 @@
-"""Environment diagnostics for latex-forge."""
+"""Environment diagnostics for latex-forge.
+
+Checks that the local machine has everything ``latex-forge`` needs (TeX
+distribution, latexmk, etc.) and reports the user's configuration state,
+so problems can be spotted with a single ``latex-forge doctor`` command
+instead of trial-and-error compilation failures.
+"""
 from __future__ import annotations
 
 import shutil
@@ -8,9 +14,14 @@ from pathlib import Path
 
 
 # ── Individual checks ─────────────────────────────────────────────────────
+#
+# Each check below returns a small dict with at least an "ok" key. They never
+# raise: any unexpected error is swallowed and reported as a failed/unknown
+# check, so one broken probe can't crash the whole `doctor` command.
 
 
 def _check_latex_forge() -> dict:
+    """Report the installed latex-forge version (from package metadata)."""
     try:
         from importlib.metadata import version
         ver = version("latex-forge")
@@ -20,6 +31,7 @@ def _check_latex_forge() -> dict:
 
 
 def _check_pipx() -> dict:
+    """Check whether pipx is available (used to install latex-forge itself)."""
     if not shutil.which("pipx"):
         return {"ok": False, "version": None}
     try:
@@ -30,10 +42,12 @@ def _check_pipx() -> dict:
         ver = out.stdout.strip().splitlines()[0] if out.stdout.strip() else None
         return {"ok": True, "version": ver}
     except Exception:
+        # pipx is on PATH but --version failed; still treat as present.
         return {"ok": True, "version": None}
 
 
 def _check_texlive() -> dict:
+    """Check for a usable TeX engine and try to identify the TeX Live release year."""
     engines = ["pdflatex", "lualatex", "xelatex"]
     found = [e for e in engines if shutil.which(e)]
 
@@ -61,6 +75,7 @@ def _check_texlive() -> dict:
 
 
 def _check_latexmk() -> dict:
+    """Check for latexmk, the multi-pass build driver latex-forge relies on."""
     if not shutil.which("latexmk"):
         return {"ok": False, "fix": "sudo tlmgr install latexmk"}
     try:
@@ -71,10 +86,12 @@ def _check_latexmk() -> dict:
         ver = out.stdout.strip().splitlines()[0] if out.stdout.strip() else None
         return {"ok": True, "version": ver}
     except Exception:
+        # latexmk is on PATH but --version failed; still treat as present.
         return {"ok": True, "version": None}
 
 
 def _check_profile() -> dict:
+    """Check whether the user has saved a profile (name/affiliation, etc.)."""
     from .profile import profile_path
     p = profile_path()
     if p.exists():
@@ -83,6 +100,7 @@ def _check_profile() -> dict:
 
 
 def _check_default_template() -> dict:
+    """Check whether the user has configured a default project template."""
     try:
         from .config import get_default_template
         val = get_default_template()

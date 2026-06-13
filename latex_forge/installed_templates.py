@@ -15,6 +15,7 @@ from pathlib import Path
 
 
 def metadata_path() -> Path:
+    """Return the path to the JSON file tracking installed templates."""
     return Path.home() / ".latex-forge" / "installed_templates.json"
 
 
@@ -33,6 +34,7 @@ def load_all() -> dict[str, dict]:
 
 
 def _save_all(data: dict[str, dict]) -> None:
+    """Write the full metadata dict back to disk as pretty-printed JSON."""
     p = metadata_path()
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")

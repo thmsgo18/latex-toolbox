@@ -1,3 +1,9 @@
+"""First-run checks and `latex-forge setup`: verify and install the LaTeX toolchain.
+
+Detects the host OS and package manager, reports which required tools
+(latexmk, lualatex, bibtex/biber) and VS Code extensions are present, and can
+drive the platform-specific commands to install a full TeX distribution.
+"""
 from __future__ import annotations
 
 import json
@@ -16,18 +22,22 @@ TEMPLATE_SPECIFIC_TOOLS = ["bibtex", "biber"]
 
 
 def _marker_file() -> Path:
+    """Path to the sentinel file written after the first-run check has run once."""
     return Path.home() / ".latex_forge_initialized"
 
 
 def is_first_run() -> bool:
+    """Return True if `latex-forge` has never completed its first-run check before."""
     return not _marker_file().exists()
 
 
 def mark_initialized() -> None:
+    """Record that the first-run check has been performed, so it isn't repeated."""
     _marker_file().touch()
 
 
 def _prompt_yes_no(question: str) -> bool:
+    """Ask a yes/no question on stdin; defaults to No (including in non-interactive runs)."""
     if not sys.stdin.isatty():
         return False
     try:
@@ -39,6 +49,7 @@ def _prompt_yes_no(question: str) -> bool:
 
 
 def detect_os() -> str:
+    """Return a short OS identifier: "macos", "windows", "linux", or the raw platform name."""
     system = platform.system().lower()
     if system == "darwin":
         return "macos"
@@ -50,6 +61,7 @@ def detect_os() -> str:
 
 
 def vscode_extension_recommendations() -> list[str]:
+    """Return the extension IDs recommended by the bundled .vscode/extensions.json."""
     extensions_file = package_dir() / ".vscode" / "extensions.json"
     if not extensions_file.exists():
         return []
@@ -59,10 +71,16 @@ def vscode_extension_recommendations() -> list[str]:
 
 
 def command_exists(name: str) -> bool:
+    """Return True if *name* resolves to an executable on PATH."""
     return shutil.which(name) is not None
 
 
 def privilege_prefix() -> list[str]:
+    """Return the command prefix needed for privileged installs on Linux.
+
+    Empty if already running as root or if `sudo` is unavailable (in which
+    case the install command is attempted without elevation and may fail).
+    """
     geteuid = getattr(os, "geteuid", None)
     if geteuid is not None and geteuid() == 0:
         return []
@@ -72,6 +90,11 @@ def privilege_prefix() -> list[str]:
 
 
 def install_vscode_extensions() -> bool:
+    """Install every recommended extension via the `code` CLI.
+
+    Returns False if `code` is missing, or if any extension failed to
+    install (a warning is printed per failure but the rest still proceed).
+    """
     if not command_exists("code"):
         print("VS Code CLI not found: `code` is not in PATH.")
         print("On macOS, open VS Code then run:")
@@ -98,6 +121,13 @@ def install_vscode_extensions() -> bool:
 
 
 def install_tex_distribution() -> bool:
+    """Install a full TeX distribution using the host's native package manager.
+
+    Picks Homebrew (macOS), winget (Windows), or apt/dnf/pacman (Linux,
+    elevated via `privilege_prefix`), running each step's command in turn and
+    printing manual-install instructions if no supported manager is found or
+    a command fails.
+    """
     current_os = detect_os()
 
     commands: list[list[str]] = []
@@ -178,6 +208,11 @@ def install_tex_distribution() -> bool:
 
 
 def print_tool_status() -> tuple[bool, bool]:
+    """Print availability of required and template-specific LaTeX tools.
+
+    Returns (base_ready, extra_ready): whether all of BASE_TOOLS and all of
+    TEMPLATE_SPECIFIC_TOOLS, respectively, were found on PATH.
+    """
     base_ready = True
     extra_ready = True
 
@@ -199,6 +234,7 @@ def print_tool_status() -> tuple[bool, bool]:
 
 
 def print_os_specific_help() -> None:
+    """Print manual TeX-distribution installation instructions for the detected OS."""
     current_os = detect_os()
     print("")
     print("Recommended LaTeX distribution installation:")
@@ -231,6 +267,7 @@ def print_os_specific_help() -> None:
 
 
 def offer_open_vscode(target_dir: Path) -> None:
+    """Interactively offer to open *target_dir* in VS Code, if `code` is available."""
     if not command_exists("code"):
         return
     if not sys.stdin.isatty():
@@ -244,6 +281,7 @@ def offer_open_vscode(target_dir: Path) -> None:
 
 
 def warn_if_latex_missing() -> None:
+    """Print a warning (with a fix command) if lualatex is not on PATH."""
     if not command_exists("lualatex"):
         print("")
         print("[warn] LaTeX (lualatex) is not installed — you won't be able to compile yet.")
@@ -251,6 +289,11 @@ def warn_if_latex_missing() -> None:
 
 
 def run_first_launch_check() -> None:
+    """Run the lightweight check shown the first time `latex-forge` is used.
+
+    Only verifies the base LaTeX tools and, if missing, offers to install
+    them — unlike `run_setup`, it doesn't touch VS Code extensions.
+    """
     print("Welcome to LaTeX Forge!")
     print("Checking your environment before creating your first project...")
     print("")
@@ -275,6 +318,15 @@ def run_setup(
     skip_extensions: bool = False,
     install_tex: bool = False,
 ) -> int:
+    """Implement `latex-forge setup`: report or fix the local LaTeX environment.
+
+    With *check_only*, nothing is installed — only the current status is
+    printed. Otherwise, recommended VS Code extensions are installed (unless
+    *skip_extensions*), and a missing TeX distribution is installed either
+    because *install_tex* was requested or the user agrees to a prompt.
+    Returns 0 if the environment ends up ready for compilation, 1 otherwise,
+    or 2 for an invalid combination of flags.
+    """
     if check_only and install_tex:
         print("`--check-only` and `--install-tex` cannot be used together.")
         return 2

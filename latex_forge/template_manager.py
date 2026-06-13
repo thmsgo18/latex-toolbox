@@ -1,4 +1,12 @@
-"""Install, remove, list and update user-installed templates."""
+"""Install, remove, list and update user-installed templates.
+
+User-installed templates live alongside the built-in ones (see
+``latex_forge/project.py``) but are stored under
+``~/.latex-forge/templates/`` and tracked in
+``~/.latex-forge/installed_templates.json`` (see ``installed_templates.py``)
+so that ``latex-forge template update`` can later detect newer versions
+published to the gallery.
+"""
 from __future__ import annotations
 
 import json
@@ -313,10 +321,12 @@ def update_templates(
 
 
 def _user_templates_dir() -> Path:
+    """Return the directory holding all user-installed templates."""
     return Path.home() / ".latex-forge" / "templates"
 
 
 def _user_template_path(name: str) -> Path:
+    """Return the install directory for the user-installed template *name*."""
     return _user_templates_dir() / name
 
 
@@ -347,6 +357,7 @@ def _record_installation(name: str, source: str) -> None:
 
 
 def _download_url(url: str, dest: Path) -> None:
+    """Download *url* to *dest*, raising ``ValueError`` with a clear message on failure."""
     print(f"  Downloading {url} …")
     try:
         urllib.request.urlretrieve(url, dest)
@@ -426,6 +437,7 @@ def _gallery_archive_url(owner: str, repo: str, subdir: str | None) -> str | Non
 
 
 def _install_from_zip_url(url: str, name: str | None, force: bool = False) -> tuple[str, Path]:
+    """Download a ZIP from *url* and install it as a template."""
     template_name = name or Path(url.rstrip("/")).stem
     with tempfile.TemporaryDirectory() as tmp:
         zip_path = Path(tmp) / "template.zip"
@@ -440,6 +452,7 @@ def _install_from_zip_url(url: str, name: str | None, force: bool = False) -> tu
 
 
 def _install_from_zip_file(zip_path: Path, name: str | None, force: bool = False) -> tuple[str, Path]:
+    """Install a template from a local ZIP file."""
     template_name = name or zip_path.stem
     with tempfile.TemporaryDirectory() as tmp:
         return _extract_and_install(
@@ -452,6 +465,7 @@ def _install_from_zip_file(zip_path: Path, name: str | None, force: bool = False
 
 
 def _install_from_dir(source: Path, name: str | None, force: bool = False) -> tuple[str, Path]:
+    """Install a template by copying it from a local directory."""
     template_name = name or source.name
     return _copy_to_user_library(source, template_name, force=force)
 
@@ -466,6 +480,13 @@ def _extract_and_install(
     name: str,
     force: bool = False,
 ) -> tuple[str, Path]:
+    """Extract *zip_path* and locate the template root inside it, then install it.
+
+    Handles three archive layouts: a flat ZIP with ``main.tex`` at the root
+    (the gallery's per-template archives), a GitHub-style ZIP with everything
+    under one top-level directory (optionally narrowed to *subdir*), and the
+    case where that directory itself wraps a single further subdirectory.
+    """
     extract_to.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(zip_path) as zf:
         zf.extractall(extract_to)

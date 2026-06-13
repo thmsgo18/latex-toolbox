@@ -1,3 +1,10 @@
+"""Command-line interface for latex-forge.
+
+Defines the ``latex-forge`` argument parser (``build_parser``) and dispatches
+each subcommand to the relevant module (project creation, build, template
+management, profile, diagnostics, ...) from ``main``, which is the entry
+point registered as the ``latex-forge`` console script.
+"""
 from __future__ import annotations
 
 import argparse
@@ -29,6 +36,7 @@ from .setup import (
 
 
 def _get_version() -> str:
+    """Return the installed latex-forge version, or "unknown" if not packaged."""
     try:
         return version("latex-forge")
     except PackageNotFoundError:
@@ -36,6 +44,7 @@ def _get_version() -> str:
 
 
 def _is_interactive() -> bool:
+    """Return True if stdin is a TTY, i.e. the user can be prompted."""
     try:
         return sys.stdin.isatty()
     except Exception:
@@ -43,6 +52,7 @@ def _is_interactive() -> bool:
 
 
 def _ask_project_name() -> str:
+    """Prompt for a project name until a valid one is entered (or exit on EOF/Ctrl-C)."""
     while True:
         try:
             name = input("Project name: ").strip()
@@ -57,6 +67,7 @@ def _ask_project_name() -> str:
 
 
 def _select_template_interactively() -> str:
+    """Print a numbered list of available templates and prompt for a choice."""
     templates = available_templates()
     width = max(len(t) for t in templates)
     print("Available templates:")
@@ -79,6 +90,10 @@ def _select_template_interactively() -> str:
 
 
 def _ask_output_dir() -> Path:
+    """Prompt for the output directory, defaulting to the configured or current directory.
+
+    Creates the chosen directory if it doesn't exist yet.
+    """
     config_dir = get_default_output_dir()
     default = config_dir if config_dir is not None else Path.cwd()
     try:
@@ -99,6 +114,7 @@ def _ask_output_dir() -> Path:
 
 
 def build_parser() -> argparse.ArgumentParser:
+    """Build the top-level argparse parser with all latex-forge subcommands."""
     parser = argparse.ArgumentParser(
         prog="latex-forge",
         description="Utilities for generating standalone LaTeX projects from the toolbox.",
@@ -338,10 +354,18 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Parse arguments and dispatch to the handler for ``args.command``.
+
+    Each branch below corresponds to one top-level subcommand (and, for
+    ``profile``/``template``, a nested sub-subcommand). Imports of the
+    relevant modules are deferred to each branch to keep CLI startup fast.
+    Returns the process exit code.
+    """
     parser = build_parser()
     argcomplete.autocomplete(parser)
     args = parser.parse_args(argv)
 
+    # ── latex-forge profile (set / show / clear) ─────────────────────────
     if args.command == "profile":
         from .profile import (
             PROFILE_SCHEMA,
@@ -412,6 +436,7 @@ def main(argv: list[str] | None = None) -> int:
             print("Profile cleared.")
             return 0
 
+    # ── latex-forge template (install / list / update / remove) ─────────
     if args.command == "template":
         from .template_manager import (
             install_template,
@@ -505,6 +530,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"Template removed: {args.name}")
             return 0
 
+    # ── latex-forge build / watch ─────────────────────────────────────────
     if args.command in ("build", "watch"):
         from .build import run_build
 
@@ -520,6 +546,7 @@ def main(argv: list[str] | None = None) -> int:
             print(str(exc), file=sys.stderr)
             return 1
 
+    # ── latex-forge export ────────────────────────────────────────────────
     if args.command == "export":
         from .export import export_project
 
@@ -537,6 +564,7 @@ def main(argv: list[str] | None = None) -> int:
             print("Note: no compiled PDF found — run `latex-forge build` first to include it.")
         return 0
 
+    # ── latex-forge diagnose ─────────────────────────────────────────────
     if args.command == "diagnose":
         from .diagnose import format_diagnose_text, run_diagnose
 
@@ -552,6 +580,7 @@ def main(argv: list[str] | None = None) -> int:
             return 1
         return 0
 
+    # ── latex-forge list-templates ───────────────────────────────────────
     if args.command == "list-templates":
         templates = available_templates()
         width = max(len(t) for t in templates)
@@ -563,6 +592,7 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"  {t}")
         return 0
 
+    # ── latex-forge completion ───────────────────────────────────────────
     if args.command == "completion":
         shell = args.shell
         if shell is None:
@@ -573,6 +603,7 @@ def main(argv: list[str] | None = None) -> int:
         print(argcomplete.shellcode(["latex-forge"], shell=shell))
         return 0
 
+    # ── latex-forge create ────────────────────────────────────────────────
     if args.command == "create":
         name = args.name
         template = args.template
@@ -650,6 +681,7 @@ def main(argv: list[str] | None = None) -> int:
 
         return 0
 
+    # ── latex-forge rename ────────────────────────────────────────────────
     if args.command == "rename":
         try:
             if len(args.names) == 1:
@@ -676,6 +708,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Main file: {main_tex_file.name}")
         return 0
 
+    # ── latex-forge setup ────────────────────────────────────────────────
     if args.command == "setup":
         return run_setup(
             check_only=args.check_only,

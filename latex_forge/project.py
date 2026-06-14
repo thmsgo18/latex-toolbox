@@ -1243,6 +1243,49 @@ def install_vscode_extensions() -> bool:
     return all_ok
 
 
+def _miktex_bin_dir() -> Path | None:
+    candidates = []
+    for env_var in ("LOCALAPPDATA", "PROGRAMFILES", "PROGRAMFILES(X86)"):
+        base = os.environ.get(env_var)
+        if not base:
+            continue
+        candidates.append(Path(base) / "Programs" / "MiKTeX" / "miktex" / "bin" / "x64")
+        candidates.append(Path(base) / "MiKTeX" / "miktex" / "bin" / "x64")
+
+    for candidate in candidates:
+        if (candidate / "mpm.exe").exists():
+            return candidate
+    return None
+
+
+def _ensure_miktex_latexmk() -> None:
+    bin_dir = _miktex_bin_dir()
+
+    def tool(name: str) -> str:
+        return str(bin_dir / f"{name}.exe") if bin_dir else name
+
+    print("")
+    print("Configuring MiKTeX (auto-install missing packages, latexmk, biber)...")
+    steps = [
+        [tool("initexmf"), "--set-config-value=[MPM]AutoInstall=1"],
+        [tool("mpm"), "--update-db"],
+        [tool("mpm"), "--install=latexmk"],
+        [tool("mpm"), "--install=biber"],
+    ]
+    for step in steps:
+        try:
+            result = subprocess.run(step, check=False, capture_output=True, text=True)
+        except (FileNotFoundError, OSError):
+            print(f"[warn] Could not run: {' '.join(step)}")
+            print("       Open 'MiKTeX Console' -> Packages and install 'latexmk' and 'biber' manually.")
+            return
+        if result.returncode != 0:
+            stderr = result.stderr.strip() or result.stdout.strip()
+            print(f"[warn] Command failed: {' '.join(step)}")
+            if stderr:
+                print(stderr)
+
+
 def install_tex_distribution() -> bool:
     current_os = detect_os()
 
@@ -1309,6 +1352,9 @@ def install_tex_distribution() -> bool:
             print("")
             print("[warn] Automatic installation failed.")
             return False
+
+    if current_os == "windows":
+        _ensure_miktex_latexmk()
 
     print("")
     print("[ok] Installation commands completed.")
